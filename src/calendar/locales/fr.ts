@@ -1,0 +1,41 @@
+import type { CalendarLocale } from "../types/types";
+
+export const frenchLocale: CalendarLocale = {
+  weekdays: {
+    shorthand: ["dim", "lun", "mar", "mer", "jeu", "ven", "sam"],
+    longhand: ["dimanche", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi"],
+  },
+  months: {
+    shorthand: [
+      "janv.",
+      "févr.",
+      "mars",
+      "avr.",
+      "mai",
+      "juin",
+      "juil.",
+      "août",
+      "sept.",
+      "oct.",
+      "nov.",
+      "déc.",
+    ],
+    longhand: [
+      "janvier",
+      "février",
+      "mars",
+      "avril",
+      "mai",
+      "juin",
+      "juillet",
+      "août",
+      "septembre",
+      "octobre",
+      "novembre",
+      "décembre",
+    ],
+  },
+  firstDayOfWeek: 1,
+  rangeDurationOne: "1 jour",
+  rangeDurationOther: "{n} jours",
+};

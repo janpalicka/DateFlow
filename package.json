@@ -1,0 +1,24 @@
+{
+  "name": "@local/calendar-picker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "scripts": {
+    "dev": "vp dev",
+    "build": "vp build",
+    "preview": "vp preview",
+    "check": "vp check",
+    "fix": "vp check --fix",
+    "fmt": "vp fmt",
+    "lint": "vp lint"
+  },
+  "dependencies": {
+    "date-fns": "^4.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "typescript": "~5.7.3",
+    "vite-plus": "^0.1.14"
+  }
+}
