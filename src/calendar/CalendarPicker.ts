@@ -26,7 +26,6 @@ import {
   shouldShowTimeOn,
   yearRange,
 } from "@/calendar/utils";
-
 import "./calendar.css";
 
 const fillHourMinute = (selectH: HTMLSelectElement, selectM: HTMLSelectElement): void => {

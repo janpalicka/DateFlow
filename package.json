@@ -3,7 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@10.28.0",
   "scripts": {
     "dev": "vp dev",
     "build": "vp build",
@@ -14,11 +13,13 @@
     "lint": "vp lint"
   },
   "dependencies": {
+    "@floating-ui/dom": "^1.7.6",
     "date-fns": "^4.1.0"
   },
   "devDependencies": {
     "@types/node": "^22.13.0",
     "typescript": "~5.7.3",
     "vite-plus": "^0.1.14"
-  }
+  },
+  "packageManager": "pnpm@10.28.0"
 }

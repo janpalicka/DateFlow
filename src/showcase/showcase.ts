@@ -1,3 +1,4 @@
+import { autoUpdate, computePosition, flip, offset, shift } from "@floating-ui/dom";
 import { format } from "date-fns";
 import {
   createCalendarPicker,
@@ -44,6 +45,111 @@ function makeLog(initial: string): HTMLElement {
   return pre;
 }
 
+function mountFloatingCalendarDemo(
+  opts: Parameters<typeof createCalendarPicker>[1],
+  onValueChange: (value: string) => void,
+  onRangeChange?: (value: string) => void,
+  onReady?: (api: ReturnType<typeof createCalendarPicker>) => void,
+  setupFloating?: (floating: HTMLDivElement) => void,
+  formatSingle?: (date: Date | null) => string,
+): HTMLElement {
+  const options = opts ?? {};
+  const wrap = document.createElement("div");
+  wrap.className = "showcase-card__floating-trigger-wrap";
+
+  const trigger = document.createElement("pre");
+  trigger.className = "showcase-card__log showcase-card__log--trigger";
+  trigger.tabIndex = 0;
+  trigger.setAttribute("role", "button");
+  trigger.setAttribute("aria-label", "Open calendar");
+  trigger.textContent = "Click to open calendar";
+  wrap.append(trigger);
+
+  const floating = document.createElement("div");
+  floating.className = "showcase-floating";
+  floating.hidden = true;
+  setupFloating?.(floating);
+  document.body.append(floating);
+
+  const api = createCalendarPicker(floating, {
+    ...options,
+    onChange: (d) => {
+      options.onChange?.(d);
+      onValueChange((formatSingle ?? ((date) => (date ? formatSelection(date) : "No date selected")))(d));
+    },
+  });
+  onReady?.(api);
+
+  const syncFromInitial = (): void => {
+    if ((options.mode ?? "single") === "range") {
+      const fmt = options.outputFormat ?? (options.showTime ? "yyyy-MM-dd HH:mm" : "yyyy-MM-dd");
+      const sep = options.rangeOutputSeparator ?? " → ";
+      const initial = api.getRange();
+      onRangeChange?.(formatRangeLine(initial, fmt, sep));
+      return;
+    }
+    const initial = api.getValue();
+    onValueChange(
+      (formatSingle ?? ((date) => (date ? formatSelection(date) : "No date selected")))(initial),
+    );
+  };
+  syncFromInitial();
+
+  let cleanupAutoUpdate: (() => void) | null = null;
+  const updatePosition = (): void => {
+    void computePosition(trigger, floating, {
+      strategy: "fixed",
+      placement: "bottom-start",
+      middleware: [offset(8), flip(), shift({ padding: 8 })],
+    }).then(({ x, y }) => {
+      Object.assign(floating.style, {
+        left: `${String(Math.round(x))}px`,
+        top: `${String(Math.round(y))}px`,
+      });
+    });
+  };
+
+  const close = (): void => {
+    floating.hidden = true;
+    cleanupAutoUpdate?.();
+    cleanupAutoUpdate = null;
+    trigger.setAttribute("aria-expanded", "false");
+  };
+
+  const open = (): void => {
+    floating.hidden = false;
+    trigger.setAttribute("aria-expanded", "true");
+    cleanupAutoUpdate = autoUpdate(trigger, floating, updatePosition);
+    updatePosition();
+  };
+
+  const toggle = (): void => {
+    if (floating.hidden) open();
+    else close();
+  };
+
+  trigger.addEventListener("click", toggle);
+  trigger.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      toggle();
+    }
+    if (e.key === "Escape") {
+      close();
+    }
+  });
+
+  document.addEventListener("pointerdown", (e) => {
+    if (floating.hidden) return;
+    const target = e.target as Node | null;
+    if (!target) return;
+    if (floating.contains(target) || trigger.contains(target)) return;
+    close();
+  });
+
+  return wrap;
+}
+
 export function mountShowcase(root: HTMLElement): void {
   root.classList.add("showcase");
   const hero = document.createElement("header");
@@ -68,21 +174,23 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 1 — Default */
   {
-    const m = document.createElement("div");
     const pre = makeLog("—");
-    const api = createCalendarPicker(m, {
-      value: new Date(2026, 2, 15, 12, 30),
-      showTime: true,
-      onChange: (d) => {
-        pre.textContent = d ? formatSelection(d) : "No date selected";
+    const m = mountFloatingCalendarDemo(
+      {
+        value: new Date(2026, 2, 15, 12, 30),
+        showTime: true,
+        onChange: () => {
+          // handled by mountFloatingCalendarDemo
+        },
       },
-    });
-    const initial = api.getValue();
-    pre.textContent = initial ? formatSelection(initial) : "No date selected";
+      (value) => {
+        pre.textContent = value;
+      },
+    );
     grid.append(
       card(
-        "1. Default (English, Sunday week start)",
-        "Default locale: US-style week (Sunday first). `showTime: true` so the preset time (12:30) is visible and editable.",
+        "1. Floating calendar (click the log line)",
+        "Calendar opens as a floating panel anchored to the log `pre` element. Click outside or press Escape to close it.",
         m,
         [pre],
       ),
@@ -91,14 +199,18 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 2 — German */
   {
-    const m = document.createElement("div");
     const pre = makeLog("No date selected");
-    createCalendarPicker(m, {
+    const m = mountFloatingCalendarDemo(
+      {
       locale: germanLocale,
       onChange: (d) => {
         pre.textContent = d ? formatSelection(d) : "No date selected";
       },
-    });
+      },
+      (value) => {
+        pre.textContent = value;
+      },
+    );
     grid.append(
       card(
         "2. German locale",
@@ -111,14 +223,18 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 3 — French */
   {
-    const m = document.createElement("div");
     const pre = makeLog("No date selected");
-    createCalendarPicker(m, {
+    const m = mountFloatingCalendarDemo(
+      {
       locale: frenchLocale,
       onChange: (d) => {
         pre.textContent = d ? formatSelection(d) : "No date selected";
       },
-    });
+      },
+      (value) => {
+        pre.textContent = value;
+      },
+    );
     grid.append(
       card("3. French locale", "Another full locale with Monday as the first weekday.", m, [pre]),
     );
@@ -126,9 +242,9 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 4 — Partial locale override */
   {
-    const m = document.createElement("div");
     const pre = makeLog("No date selected");
-    createCalendarPicker(m, {
+    const m = mountFloatingCalendarDemo(
+      {
       locale: {
         ...czechLocale,
         weekNumberHeader: "Tý",
@@ -136,7 +252,11 @@ export function mountShowcase(root: HTMLElement): void {
       onChange: (d) => {
         pre.textContent = d ? formatSelection(d) : "No date selected";
       },
-    });
+      },
+      (value) => {
+        pre.textContent = value;
+      },
+    );
     grid.append(
       card(
         "4. Partial locale (Czech labels, Monday week start)",
@@ -149,15 +269,19 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 5 — min / max */
   {
-    const m = document.createElement("div");
     const pre = makeLog("No date selected");
-    createCalendarPicker(m, {
+    const m = mountFloatingCalendarDemo(
+      {
       minDate: new Date(2026, 2, 10),
       maxDate: new Date(2026, 2, 25),
       onChange: (d) => {
         pre.textContent = d ? formatSelection(d) : "No date selected";
       },
-    });
+      },
+      (value) => {
+        pre.textContent = value;
+      },
+    );
     grid.append(
       card(
         "5. Allowed date range (min / max)",
@@ -170,14 +294,18 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 6 — disabled array */
   {
-    const m = document.createElement("div");
     const pre = makeLog("No date selected");
-    createCalendarPicker(m, {
+    const m = mountFloatingCalendarDemo(
+      {
       disabledDates: [new Date(2026, 2, 17), new Date(2026, 2, 18), new Date(2026, 2, 19)],
       onChange: (d) => {
         pre.textContent = d ? formatSelection(d) : "No date selected";
       },
-    });
+      },
+      (value) => {
+        pre.textContent = value;
+      },
+    );
     grid.append(
       card(
         "6. Disallowed specific dates (array)",
@@ -190,14 +318,18 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 7 — disabled predicate */
   {
-    const m = document.createElement("div");
     const pre = makeLog("No date selected");
-    createCalendarPicker(m, {
+    const m = mountFloatingCalendarDemo(
+      {
       disabledDates: (d) => d.getDay() === 0 || d.getDay() === 6,
       onChange: (d) => {
         pre.textContent = d ? formatSelection(d) : "No date selected";
       },
-    });
+      },
+      (value) => {
+        pre.textContent = value;
+      },
+    );
     grid.append(
       card("7. Disallowed pattern (predicate)", "Weekends disabled via (date) => boolean.", m, [
         pre,
@@ -207,15 +339,19 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 8 — whitelist array */
   {
-    const m = document.createElement("div");
     const pre = makeLog("No date selected");
     const allowed = [5, 12, 19, 26].map((day) => new Date(2026, 2, day));
-    createCalendarPicker(m, {
+    const m = mountFloatingCalendarDemo(
+      {
       enabledDatesOnly: allowed,
       onChange: (d) => {
         pre.textContent = d ? formatSelection(d) : "No date selected";
       },
-    });
+      },
+      (value) => {
+        pre.textContent = value;
+      },
+    );
     grid.append(
       card(
         "8. Allowed dates only — whitelist array",
@@ -228,14 +364,18 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 9 — whitelist predicate */
   {
-    const m = document.createElement("div");
     const pre = makeLog("No date selected");
-    createCalendarPicker(m, {
+    const m = mountFloatingCalendarDemo(
+      {
       enabledDatesOnly: (d) => d.getDate() % 2 === 1,
       onChange: (d) => {
         pre.textContent = d ? formatSelection(d) : "No date selected";
       },
-    });
+      },
+      (value) => {
+        pre.textContent = value;
+      },
+    );
     grid.append(
       card(
         "9. Allowed dates only — predicate",
@@ -248,17 +388,19 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 10 — time 24h */
   {
-    const m = document.createElement("div");
     const pre = makeLog("—");
-    const api = createCalendarPicker(m, {
+    const m = mountFloatingCalendarDemo(
+      {
       showTime: true,
       value: new Date(2026, 2, 20, 14, 45),
       onChange: (d) => {
         pre.textContent = d ? formatSelection(d) : "No date selected";
       },
-    });
-    const t0 = api.getValue();
-    pre.textContent = t0 ? formatSelection(t0) : "No date selected";
+      },
+      (value) => {
+        pre.textContent = value;
+      },
+    );
     grid.append(
       card(
         "10. Time selection (24-hour)",
@@ -271,15 +413,19 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 11 — dark theme */
   {
-    const m = document.createElement("div");
     const pre = makeLog("No date selected");
-    createCalendarPicker(m, {
+    const m = mountFloatingCalendarDemo(
+      {
       theme: "dark",
       showTime: true,
       onChange: (d) => {
         pre.textContent = d ? formatSelection(d) : "No date selected";
       },
-    });
+      },
+      (value) => {
+        pre.textContent = value;
+      },
+    );
     grid.append(
       card("11. Theme: dark preset", 'Uses data-cal-theme="dark" and bundled CSS variables.', m, [
         pre,
@@ -289,9 +435,21 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 12 — custom CSS variables */
   {
-    const m = document.createElement("div");
-    m.classList.add("showcase-card__mount--inline-theme");
-    m.style.cssText = `
+    const pre = makeLog("No date selected");
+    const m = mountFloatingCalendarDemo(
+      {
+        className: "showcase-card__mount--inline-theme",
+        onChange: (d) => {
+          pre.textContent = d ? formatSelection(d) : "No date selected";
+        },
+      },
+      (value) => {
+        pre.textContent = value;
+      },
+      undefined,
+      undefined,
+      (floating) => {
+        floating.style.cssText = `
       --cal-bg: #fff7ed;
       --cal-surface: #ffedd5;
       --cal-text: #431407;
@@ -300,12 +458,8 @@ export function mountShowcase(root: HTMLElement): void {
       --cal-accent: #c2410c;
       --cal-accent-contrast: #fff7ed;
     `;
-    const pre = makeLog("No date selected");
-    createCalendarPicker(m, {
-      onChange: (d) => {
-        pre.textContent = d ? formatSelection(d) : "No date selected";
       },
-    });
+    );
     grid.append(
       card(
         "12. Custom theme (CSS variables)",
@@ -318,17 +472,19 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 13 — narrow year dropdown */
   {
-    const m = document.createElement("div");
     const pre = makeLog("—");
-    const api = createCalendarPicker(m, {
+    const m = mountFloatingCalendarDemo(
+      {
       yearDropdownRadius: 3,
       value: new Date(2026, 5, 1),
       onChange: (d) => {
         pre.textContent = d ? formatSelection(d) : "No date selected";
       },
-    });
-    const y0 = api.getValue();
-    pre.textContent = y0 ? formatSelection(y0) : "No date selected";
+      },
+      (value) => {
+        pre.textContent = value;
+      },
+    );
     grid.append(
       card(
         "13. Year dropdown span",
@@ -341,35 +497,46 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 14 — setOptions */
   {
-    const m = document.createElement("div");
     const pre = makeLog("No date selected");
     let rangeMode = false;
     const rangeFmt = "yyyy-MM-dd";
-    const api = createCalendarPicker(m, {
-      onChange: (d) => {
-        if (!rangeMode) {
-          pre.textContent = d ? formatSelection(d) : "No date selected";
-        }
+    let api: ReturnType<typeof createCalendarPicker> | null = null;
+    const m = mountFloatingCalendarDemo(
+      {
+        onChange: (d) => {
+          if (!rangeMode) {
+            pre.textContent = d ? formatSelection(d) : "No date selected";
+          }
+        },
+        onRangeChange: (r) => {
+          if (rangeMode) {
+            pre.textContent = formatRangeLine(r, rangeFmt, " → ");
+          }
+        },
       },
-      onRangeChange: (r) => {
-        if (rangeMode) {
-          pre.textContent = formatRangeLine(r, rangeFmt, " → ");
-        }
+      (value) => {
+        if (!rangeMode) pre.textContent = value;
       },
-    });
+      (value) => {
+        if (rangeMode) pre.textContent = value;
+      },
+      (calendarApi) => {
+        api = calendarApi;
+      },
+    );
     const actions = document.createElement("div");
     actions.className = "showcase-card__actions";
     const bDe = document.createElement("button");
     bDe.type = "button";
     bDe.textContent = "Locale → German";
     bDe.addEventListener("click", () => {
-      api.setOptions({ locale: germanLocale });
+      api?.setOptions({ locale: germanLocale });
     });
     const bFr = document.createElement("button");
     bFr.type = "button";
     bFr.textContent = "Locale → French";
     bFr.addEventListener("click", () => {
-      api.setOptions({ locale: frenchLocale });
+      api?.setOptions({ locale: frenchLocale });
     });
     const bTime = document.createElement("button");
     bTime.type = "button";
@@ -377,12 +544,13 @@ export function mountShowcase(root: HTMLElement): void {
     let timeOn = false;
     bTime.addEventListener("click", () => {
       timeOn = !timeOn;
-      api.setOptions({ showTime: timeOn });
+      api?.setOptions({ showTime: timeOn });
     });
     const bMode = document.createElement("button");
     bMode.type = "button";
     bMode.textContent = "Toggle range mode";
     bMode.addEventListener("click", () => {
+      if (!api) return;
       if (!rangeMode) {
         const v = api.getValue();
         rangeMode = true;
@@ -412,9 +580,9 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 15 — Combined */
   {
-    const m = document.createElement("div");
     const pre = makeLog("No date selected");
-    createCalendarPicker(m, {
+    const m = mountFloatingCalendarDemo(
+      {
       theme: "forest",
       locale: germanLocale,
       minDate: new Date(2026, 2, 1),
@@ -424,7 +592,11 @@ export function mountShowcase(root: HTMLElement): void {
       onChange: (d) => {
         pre.textContent = d ? formatSelection(d) : "No date selected";
       },
-    });
+      },
+      (value) => {
+        pre.textContent = value;
+      },
+    );
     grid.append(
       card(
         "15. Combined demo",
@@ -437,14 +609,18 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 16 — ariaLabel */
   {
-    const m = document.createElement("div");
     const pre = makeLog("No date selected");
-    createCalendarPicker(m, {
+    const m = mountFloatingCalendarDemo(
+      {
       ariaLabel: "Delivery date",
       onChange: (d) => {
         pre.textContent = d ? formatSelection(d) : "No date selected";
       },
-    });
+      },
+      (value) => {
+        pre.textContent = value;
+      },
+    );
     grid.append(
       card("16. Accessibility: aria-label", "Root has a custom aria-label for screen readers.", m, [
         pre,
@@ -454,14 +630,18 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 17 — high-contrast preset */
   {
-    const m = document.createElement("div");
     const pre = makeLog("No date selected");
-    createCalendarPicker(m, {
+    const m = mountFloatingCalendarDemo(
+      {
       theme: "contrast",
       onChange: (d) => {
         pre.textContent = d ? formatSelection(d) : "No date selected";
       },
-    });
+      },
+      (value) => {
+        pre.textContent = value;
+      },
+    );
     grid.append(
       card(
         "17. Theme: high contrast",
@@ -474,16 +654,22 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 18 — Time picker off (default) */
   {
-    const m = document.createElement("div");
     const pre = makeLog("—");
-    const api = createCalendarPicker(m, {
+    const m = mountFloatingCalendarDemo(
+      {
       value: new Date(2026, 5, 8),
       onChange: (d) => {
         pre.textContent = d ? format(d, "yyyy-MM-dd") : "No date selected";
       },
-    });
-    const v0 = api.getValue();
-    pre.textContent = v0 ? format(v0, "yyyy-MM-dd") : "No date selected";
+      },
+      (value) => {
+        pre.textContent = value;
+      },
+      undefined,
+      undefined,
+      undefined,
+      (d) => (d ? format(d, "yyyy-MM-dd") : "No date selected"),
+    );
     grid.append(
       card(
         "18. Time picker disabled (default)",
@@ -496,18 +682,24 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 19 — Custom output format (single) */
   {
-    const m = document.createElement("div");
     const pre = makeLog("—");
-    const api = createCalendarPicker(m, {
+    const m = mountFloatingCalendarDemo(
+      {
       value: new Date(2026, 7, 19, 15, 0),
       showTime: true,
       outputFormat: "EEEE, d MMMM yyyy 'at' HH:mm",
       onChange: (d) => {
         pre.textContent = d ? format(d, "EEEE, d MMMM yyyy 'at' HH:mm") : "No date selected";
       },
-    });
-    const v = api.getValue();
-    pre.textContent = v ? format(v, "EEEE, d MMMM yyyy 'at' HH:mm") : "No date selected";
+      },
+      (value) => {
+        pre.textContent = value;
+      },
+      undefined,
+      undefined,
+      undefined,
+      (d) => (d ? format(d, "EEEE, d MMMM yyyy 'at' HH:mm") : "No date selected"),
+    );
     grid.append(
       card(
         "19. Custom output format",
@@ -520,15 +712,23 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 20 — Week numbers (ISO) */
   {
-    const m = document.createElement("div");
     const pre = makeLog("No date selected");
-    createCalendarPicker(m, {
+    const m = mountFloatingCalendarDemo(
+      {
       showWeekNumbers: true,
       locale: germanLocale,
       onChange: (d) => {
         pre.textContent = d ? format(d, "yyyy-MM-dd") : "No date selected";
       },
-    });
+      },
+      (value) => {
+        pre.textContent = value;
+      },
+      undefined,
+      undefined,
+      undefined,
+      (d) => (d ? format(d, "yyyy-MM-dd") : "No date selected"),
+    );
     grid.append(
       card(
         "20. Week numbers",
@@ -541,10 +741,10 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 21 — Date range (no time) */
   {
-    const m = document.createElement("div");
     const pre = makeLog("—");
     const fmt = "yyyy-MM-dd";
-    const api = createCalendarPicker(m, {
+    const m = mountFloatingCalendarDemo(
+      {
       mode: "range",
       range: {
         start: new Date(2026, 2, 5),
@@ -554,8 +754,12 @@ export function mountShowcase(root: HTMLElement): void {
       onRangeChange: (r) => {
         pre.textContent = formatRangeLine(r, fmt, " → ");
       },
-    });
-    pre.textContent = formatRangeLine(api.getRange(), fmt, " → ");
+      },
+      () => {},
+      (value) => {
+        pre.textContent = value;
+      },
+    );
     grid.append(
       card(
         "21. Date range",
@@ -568,10 +772,10 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 22 — Range + dual times + defaults */
   {
-    const m = document.createElement("div");
     const pre = makeLog("—");
     const fmt = "yyyy-MM-dd HH:mm";
-    const api = createCalendarPicker(m, {
+    const m = mountFloatingCalendarDemo(
+      {
       mode: "range",
       showTime: true,
       range: {
@@ -582,8 +786,12 @@ export function mountShowcase(root: HTMLElement): void {
       onRangeChange: (r) => {
         pre.textContent = formatRangeLine(r, fmt, " → ");
       },
-    });
-    pre.textContent = formatRangeLine(api.getRange(), fmt, " → ");
+      },
+      () => {},
+      (value) => {
+        pre.textContent = value;
+      },
+    );
     grid.append(
       card(
         "22. Range with start & end time",
@@ -596,11 +804,11 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 23 — Range output separator + format */
   {
-    const m = document.createElement("div");
     const pre = makeLog("—");
     const fmt = "dd.MM.yyyy HH:mm";
     const sep = " — ";
-    const api = createCalendarPicker(m, {
+    const m = mountFloatingCalendarDemo(
+      {
       mode: "range",
       showTime: true,
       outputFormat: fmt,
@@ -612,8 +820,12 @@ export function mountShowcase(root: HTMLElement): void {
       onRangeChange: (r) => {
         pre.textContent = formatRangeLine(r, fmt, sep);
       },
-    });
-    pre.textContent = formatRangeLine(api.getRange(), fmt, sep);
+      },
+      () => {},
+      (value) => {
+        pre.textContent = value;
+      },
+    );
     grid.append(
       card(
         "23. Range separator & format",
@@ -626,10 +838,10 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 24 — Range + weeks + custom week header */
   {
-    const m = document.createElement("div");
     const pre = makeLog("—");
     const fmt = "yyyy-MM-dd";
-    const api = createCalendarPicker(m, {
+    const m = mountFloatingCalendarDemo(
+      {
       mode: "range",
       showWeekNumbers: true,
       locale: { weekNumberHeader: "KW" },
@@ -638,8 +850,12 @@ export function mountShowcase(root: HTMLElement): void {
       onRangeChange: (r) => {
         pre.textContent = formatRangeLine(r, fmt, " → ");
       },
-    });
-    pre.textContent = formatRangeLine(api.getRange(), fmt, " → ");
+      },
+      () => {},
+      (value) => {
+        pre.textContent = value;
+      },
+    );
     grid.append(
       card(
         "24. Range + week numbers",
@@ -652,10 +868,10 @@ export function mountShowcase(root: HTMLElement): void {
 
   /* 25 — Date range + dark theme */
   {
-    const m = document.createElement("div");
     const pre = makeLog("—");
     const fmt = "yyyy-MM-dd";
-    const api = createCalendarPicker(m, {
+    const m = mountFloatingCalendarDemo(
+      {
       mode: "range",
       theme: "dark",
       outputFormat: fmt,
@@ -666,8 +882,12 @@ export function mountShowcase(root: HTMLElement): void {
       onRangeChange: (r) => {
         pre.textContent = formatRangeLine(r, fmt, " → ");
       },
-    });
-    pre.textContent = formatRangeLine(api.getRange(), fmt, " → ");
+      },
+      () => {},
+      (value) => {
+        pre.textContent = value;
+      },
+    );
     grid.append(
       card(
         "25. Date range + dark theme",
