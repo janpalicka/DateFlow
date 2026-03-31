@@ -57,7 +57,14 @@ function mountFloatingCalendarDemo(
   const wrap = document.createElement("div");
   wrap.className = "showcase-card__floating-trigger-wrap";
   const singleFormatter =
-    formatSingle ?? ((date: Date | null): string => (date ? formatSelection(date) : "No date selected"));
+    formatSingle ??
+    ((date: Date | null): string => {
+      if (!date) return "No date selected";
+      if (!options.showTime) return format(date, "yyyy-MM-dd");
+      return options.use12HourTime
+        ? format(date, "yyyy-MM-dd hh:mm a")
+        : format(date, "yyyy-MM-dd HH:mm");
+    });
 
   const trigger = document.createElement("pre");
   trigger.className = "showcase-card__log showcase-card__log--trigger";
@@ -86,7 +93,13 @@ function mountFloatingCalendarDemo(
     },
     onRangeChange: (r) => {
       options.onRangeChange?.(r);
-      const fmt = options.outputFormat ?? (options.showTime ? "yyyy-MM-dd HH:mm" : "yyyy-MM-dd");
+      const fmt = options.outputFormat
+        ? options.outputFormat
+        : options.showTime
+          ? options.use12HourTime
+            ? "yyyy-MM-dd hh:mm a"
+            : "yyyy-MM-dd HH:mm"
+          : "yyyy-MM-dd";
       const sep = options.rangeOutputSeparator ?? " → ";
       const value = formatRangeLine(r, fmt, sep);
       setTriggerValue(value);
@@ -97,7 +110,13 @@ function mountFloatingCalendarDemo(
 
   const syncFromInitial = (): void => {
     if ((options.mode ?? "single") === "range") {
-      const fmt = options.outputFormat ?? (options.showTime ? "yyyy-MM-dd HH:mm" : "yyyy-MM-dd");
+      const fmt = options.outputFormat
+        ? options.outputFormat
+        : options.showTime
+          ? options.use12HourTime
+            ? "yyyy-MM-dd hh:mm a"
+            : "yyyy-MM-dd HH:mm"
+          : "yyyy-MM-dd";
       const sep = options.rangeOutputSeparator ?? " → ";
       const initial = api.getRange();
       const value = formatRangeLine(initial, fmt, sep);
@@ -903,6 +922,32 @@ export function mountShowcase(root: HTMLElement): void {
       card(
         "25. Date range + dark theme",
         '`mode: "range"` with `theme: "dark"` (`data-cal-theme="dark"` and bundled CSS variables).',
+        m,
+        [],
+      ),
+    );
+  }
+
+  /* 26 — Time selection (12-hour + AM/PM) */
+  {
+    const pre = makeLog("—");
+    const m = mountFloatingCalendarDemo(
+      {
+        showTime: true,
+        use12HourTime: true,
+        value: new Date(2026, 6, 9, 15, 30),
+        onChange: (d) => {
+          pre.textContent = d ? format(d, "yyyy-MM-dd hh:mm a") : "No date selected";
+        },
+      },
+      (value) => {
+        pre.textContent = value;
+      },
+    );
+    grid.append(
+      card(
+        "26. Time selection (12-hour)",
+        "Hour 1-12 with AM/PM selector.",
         m,
         [],
       ),

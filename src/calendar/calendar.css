@@ -352,6 +352,10 @@
   text-align: center;
 }
 
+.cal__time .cal__select--meridiem {
+  flex-basis: 4.25rem;
+}
+
 .cal__time-sep {
   font-weight: 600;
   color: var(--cal-muted);

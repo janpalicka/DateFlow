@@ -54,8 +54,14 @@ export interface CalendarOptions {
    */
   showTime?: boolean;
   /**
+   * When `showTime` is enabled, render hour selector in 12-hour format with AM/PM selector.
+   * Default: `false` (24-hour time).
+   */
+  use12HourTime?: boolean;
+  /**
    * [date-fns `format`](https://date-fns.org/docs/format) for the visible &lt;output&gt; text.
-   * Default: `"yyyy-MM-dd"` without time, `"yyyy-MM-dd HH:mm"` with `showTime`.
+   * Default: `"yyyy-MM-dd"` without time, `"yyyy-MM-dd HH:mm"` with 24h time,
+   * `"yyyy-MM-dd hh:mm a"` with 12h time.
    */
   outputFormat?: string;
   /** Between start and end when `mode === "range"` and both ends exist. Default: `" → "`. */

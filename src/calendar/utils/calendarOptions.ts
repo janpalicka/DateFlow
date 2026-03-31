@@ -3,7 +3,8 @@ import type { CalendarOptions } from "../types/types";
 
 const effectiveOutputFormat = (options: CalendarOptions): string => {
   if (options.outputFormat) return options.outputFormat;
-  return options.showTime ? "yyyy-MM-dd HH:mm" : "yyyy-MM-dd";
+  if (!options.showTime) return "yyyy-MM-dd";
+  return options.use12HourTime ? "yyyy-MM-dd hh:mm a" : "yyyy-MM-dd HH:mm";
 };
 
 const shouldShowTimeOn = (options: CalendarOptions): boolean => {

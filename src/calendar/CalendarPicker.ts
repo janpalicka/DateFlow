@@ -27,10 +27,18 @@ import {
 } from "@/calendar/utils";
 import "./calendar.css";
 
-const fillHourMinute = (selectH: HTMLSelectElement, selectM: HTMLSelectElement): void => {
+const fillHourMinute = (
+  selectH: HTMLSelectElement,
+  selectM: HTMLSelectElement,
+  selectMeridiem: HTMLSelectElement,
+  use12HourTime: boolean,
+): void => {
   selectH.replaceChildren();
   selectM.replaceChildren();
-  for (let h = 0; h < 24; h += 1) {
+  selectMeridiem.replaceChildren();
+  const hourFrom = use12HourTime ? 1 : 0;
+  const hourTo = use12HourTime ? 12 : 23;
+  for (let h = hourFrom; h <= hourTo; h += 1) {
     const o = document.createElement("option");
     o.value = String(h);
     o.textContent = h < 10 ? `0${String(h)}` : String(h);
@@ -42,16 +50,46 @@ const fillHourMinute = (selectH: HTMLSelectElement, selectM: HTMLSelectElement):
     o.textContent = m < 10 ? `0${String(m)}` : String(m);
     selectM.append(o);
   }
+  for (const value of ["AM", "PM"]) {
+    const o = document.createElement("option");
+    o.value = value;
+    o.textContent = value;
+    selectMeridiem.append(o);
+  }
 };
 
-const setHM = (selectH: HTMLSelectElement, selectM: HTMLSelectElement, d: Date): void => {
-  selectH.value = String(d.getHours());
+const setHM = (
+  selectH: HTMLSelectElement,
+  selectM: HTMLSelectElement,
+  selectMeridiem: HTMLSelectElement,
+  d: Date,
+  use12HourTime: boolean,
+): void => {
+  const h = d.getHours();
+  if (use12HourTime) {
+    const isPm = h >= 12;
+    const h12 = h % 12 === 0 ? 12 : h % 12;
+    selectH.value = String(h12);
+    selectMeridiem.value = isPm ? "PM" : "AM";
+  } else {
+    selectH.value = String(h);
+    selectMeridiem.value = h >= 12 ? "PM" : "AM";
+  }
   selectM.value = String(d.getMinutes());
 };
 
-const applyHM = (base: Date, selectH: HTMLSelectElement, selectM: HTMLSelectElement): Date => {
-  const h = Number.parseInt(selectH.value, 10);
+const applyHM = (
+  base: Date,
+  selectH: HTMLSelectElement,
+  selectM: HTMLSelectElement,
+  selectMeridiem: HTMLSelectElement,
+  use12HourTime: boolean,
+): Date => {
+  const rawHour = Number.parseInt(selectH.value, 10);
   const min = Number.parseInt(selectM.value, 10);
+  const h = use12HourTime
+    ? rawHour % 12 + (selectMeridiem.value === "PM" ? 12 : 0)
+    : rawHour;
   return new Date(base.getFullYear(), base.getMonth(), base.getDate(), h, min, 0, 0);
 };
 
@@ -184,13 +222,16 @@ export const createCalendarPicker = (
   const minuteSingle = document.createElement("select");
   minuteSingle.className = "cal__select cal__select--minute";
   minuteSingle.setAttribute("aria-label", "Minute");
+  const meridiemSingle = document.createElement("select");
+  meridiemSingle.className = "cal__select cal__select--meridiem";
+  meridiemSingle.setAttribute("aria-label", "AM/PM");
   const timeSepSingle = document.createElement("span");
   timeSepSingle.className = "cal__time-sep";
   timeSepSingle.textContent = ":";
   const timeLabelSingle = document.createElement("span");
   timeLabelSingle.className = "cal__time-label";
   timeLabelSingle.textContent = "Time (24h)";
-  timeRowSingle.append(timeLabelSingle, hourSingle, timeSepSingle, minuteSingle);
+  timeRowSingle.append(timeLabelSingle, hourSingle, timeSepSingle, minuteSingle, meridiemSingle);
 
   const timeRowRangeStart = document.createElement("div");
   timeRowRangeStart.className = "cal__time cal__time--range-start";
@@ -200,13 +241,16 @@ export const createCalendarPicker = (
   const minuteStart = document.createElement("select");
   minuteStart.className = "cal__select cal__select--minute";
   minuteStart.setAttribute("aria-label", "Start minute");
+  const meridiemStart = document.createElement("select");
+  meridiemStart.className = "cal__select cal__select--meridiem";
+  meridiemStart.setAttribute("aria-label", "Start AM/PM");
   const sepStart = document.createElement("span");
   sepStart.className = "cal__time-sep";
   sepStart.textContent = ":";
   const labelStart = document.createElement("span");
   labelStart.className = "cal__time-label";
   labelStart.textContent = "Start time (24h)";
-  timeRowRangeStart.append(labelStart, hourStart, sepStart, minuteStart);
+  timeRowRangeStart.append(labelStart, hourStart, sepStart, minuteStart, meridiemStart);
 
   const timeRowRangeEnd = document.createElement("div");
   timeRowRangeEnd.className = "cal__time cal__time--range-end";
@@ -216,22 +260,25 @@ export const createCalendarPicker = (
   const minuteEnd = document.createElement("select");
   minuteEnd.className = "cal__select cal__select--minute";
   minuteEnd.setAttribute("aria-label", "End minute");
+  const meridiemEnd = document.createElement("select");
+  meridiemEnd.className = "cal__select cal__select--meridiem";
+  meridiemEnd.setAttribute("aria-label", "End AM/PM");
   const sepEnd = document.createElement("span");
   sepEnd.className = "cal__time-sep";
   sepEnd.textContent = ":";
   const labelEnd = document.createElement("span");
   labelEnd.className = "cal__time-label";
   labelEnd.textContent = "End time (24h)";
-  timeRowRangeEnd.append(labelEnd, hourEnd, sepEnd, minuteEnd);
+  timeRowRangeEnd.append(labelEnd, hourEnd, sepEnd, minuteEnd, meridiemEnd);
 
   timeWrap.append(timeRowSingle, timeRowRangeStart, timeRowRangeEnd);
 
   root.append(header, weekdaysRow, grid, timeWrap);
   container.append(root);
 
-  fillHourMinute(hourSingle, minuteSingle);
-  fillHourMinute(hourStart, minuteStart);
-  fillHourMinute(hourEnd, minuteEnd);
+  fillHourMinute(hourSingle, minuteSingle, meridiemSingle, options.use12HourTime ?? false);
+  fillHourMinute(hourStart, minuteStart, meridiemStart, options.use12HourTime ?? false);
+  fillHourMinute(hourEnd, minuteEnd, meridiemEnd, options.use12HourTime ?? false);
 
   const emitSingle = (): void => {
     if (!selected) {
@@ -490,18 +537,30 @@ export const createCalendarPicker = (
         if (mode() === "single") {
           const dayOnly = new Date(cellYear, cellMonth, dayNum, 0, 0, 0, 0);
           selected = shouldShowTimeOn(options)
-            ? applyHM(dayOnly, hourSingle, minuteSingle)
+            ? applyHM(
+                dayOnly,
+                hourSingle,
+                minuteSingle,
+                meridiemSingle,
+                options.use12HourTime ?? false,
+              )
             : dayOnly;
           emitSingle();
         } else {
           const clicked = new Date(cellYear, cellMonth, dayNum, 0, 0, 0, 0);
           if (!rangeStart || (rangeStart && rangeEnd)) {
             rangeStart = shouldShowTimeOn(options)
-              ? applyHM(clicked, hourStart, minuteStart)
+              ? applyHM(
+                  clicked,
+                  hourStart,
+                  minuteStart,
+                  meridiemStart,
+                  options.use12HourTime ?? false,
+                )
               : clicked;
             rangeEnd = null;
             rangeHoverEnd = startOfDay(rangeStart);
-            setHM(hourEnd, minuteEnd, rangeStart);
+            setHM(hourEnd, minuteEnd, meridiemEnd, rangeStart, options.use12HourTime ?? false);
           } else {
             clearRangeHover();
             const d0 = startOfDay(rangeStart);
@@ -513,8 +572,12 @@ export const createCalendarPicker = (
               lo = hi;
               hi = t;
             }
-            rangeStart = shouldShowTimeOn(options) ? applyHM(lo, hourStart, minuteStart) : lo;
-            rangeEnd = shouldShowTimeOn(options) ? applyHM(hi, hourEnd, minuteEnd) : hi;
+            rangeStart = shouldShowTimeOn(options)
+              ? applyHM(lo, hourStart, minuteStart, meridiemStart, options.use12HourTime ?? false)
+              : lo;
+            rangeEnd = shouldShowTimeOn(options)
+              ? applyHM(hi, hourEnd, minuteEnd, meridiemEnd, options.use12HourTime ?? false)
+              : hi;
           }
           emitRange();
         }
@@ -526,15 +589,19 @@ export const createCalendarPicker = (
   };
 
   function syncTimeSelectsFromValue(): void {
+    const use12 = options.use12HourTime ?? false;
+    fillHourMinute(hourSingle, minuteSingle, meridiemSingle, use12);
+    fillHourMinute(hourStart, minuteStart, meridiemStart, use12);
+    fillHourMinute(hourEnd, minuteEnd, meridiemEnd, use12);
     if (mode() === "single") {
       const base = selected ?? now;
-      setHM(hourSingle, minuteSingle, base);
+      setHM(hourSingle, minuteSingle, meridiemSingle, base, use12);
       return;
     }
     const s = rangeStart ?? now;
     const e = rangeEnd ?? rangeStart ?? now;
-    setHM(hourStart, minuteStart, s);
-    setHM(hourEnd, minuteEnd, e);
+    setHM(hourStart, minuteStart, meridiemStart, s, use12);
+    setHM(hourEnd, minuteEnd, meridiemEnd, e, use12);
   }
 
   function canGoPrevMonth(): boolean {
@@ -553,11 +620,18 @@ export const createCalendarPicker = (
 
   function updateTimeVisibility(): void {
     const st = options.showTime ?? false;
+    const use12 = options.use12HourTime ?? false;
     const rng = mode() === "range";
     timeWrap.hidden = !st;
     timeRowSingle.hidden = !st || rng;
     timeRowRangeStart.hidden = !st || !rng;
     timeRowRangeEnd.hidden = !st || !rng;
+    meridiemSingle.hidden = !st || !use12 || rng;
+    meridiemStart.hidden = !st || !use12 || !rng;
+    meridiemEnd.hidden = !st || !use12 || !rng;
+    timeLabelSingle.textContent = use12 ? "Time (12h)" : "Time (24h)";
+    labelStart.textContent = use12 ? "Start time (12h)" : "Start time (24h)";
+    labelEnd.textContent = use12 ? "End time (12h)" : "End time (24h)";
   }
 
   function render(): void {
@@ -608,36 +682,57 @@ export const createCalendarPicker = (
 
   const onTimeSingleChange = (): void => {
     if (!selected) return;
-    selected = applyHM(selected, hourSingle, minuteSingle);
+    selected = applyHM(
+      selected,
+      hourSingle,
+      minuteSingle,
+      meridiemSingle,
+      options.use12HourTime ?? false,
+    );
     emitSingle();
   };
 
   const onTimeRangeStartChange = (): void => {
     if (!rangeStart) return;
-    rangeStart = applyHM(rangeStart, hourStart, minuteStart);
+    rangeStart = applyHM(
+      rangeStart,
+      hourStart,
+      minuteStart,
+      meridiemStart,
+      options.use12HourTime ?? false,
+    );
     if (rangeEnd && compareCalendarDay(rangeEnd, rangeStart) < 0) {
       rangeEnd = new Date(rangeStart);
-      setHM(hourEnd, minuteEnd, rangeEnd);
+      setHM(hourEnd, minuteEnd, meridiemEnd, rangeEnd, options.use12HourTime ?? false);
     }
     emitRange();
   };
 
   const onTimeRangeEndChange = (): void => {
     if (!rangeEnd) return;
-    rangeEnd = applyHM(rangeEnd, hourEnd, minuteEnd);
+    rangeEnd = applyHM(
+      rangeEnd,
+      hourEnd,
+      minuteEnd,
+      meridiemEnd,
+      options.use12HourTime ?? false,
+    );
     if (rangeStart && compareCalendarDay(rangeEnd, rangeStart) < 0) {
       rangeStart = new Date(rangeEnd);
-      setHM(hourStart, minuteStart, rangeStart);
+      setHM(hourStart, minuteStart, meridiemStart, rangeStart, options.use12HourTime ?? false);
     }
     emitRange();
   };
 
   hourSingle.addEventListener("change", onTimeSingleChange);
   minuteSingle.addEventListener("change", onTimeSingleChange);
+  meridiemSingle.addEventListener("change", onTimeSingleChange);
   hourStart.addEventListener("change", onTimeRangeStartChange);
   minuteStart.addEventListener("change", onTimeRangeStartChange);
+  meridiemStart.addEventListener("change", onTimeRangeStartChange);
   hourEnd.addEventListener("change", onTimeRangeEndChange);
   minuteEnd.addEventListener("change", onTimeRangeEndChange);
+  meridiemEnd.addEventListener("change", onTimeRangeEndChange);
 
   render();
 
