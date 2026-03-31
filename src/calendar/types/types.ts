@@ -68,6 +68,11 @@ export interface CalendarOptions {
   rangeOutputSeparator?: string;
   /** Show ISO week numbers in the first column. Default: `false`. */
   showWeekNumbers?: boolean;
+  /**
+   * In single mode, hide the picker container right after a day is selected.
+   * Default: `true`.
+   */
+  hideOnSingleSelect?: boolean;
   className?: string;
   /** Sets `data-cal-theme` on the root for styling. */
   theme?: string;

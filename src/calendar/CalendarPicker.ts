@@ -552,6 +552,9 @@ export const createCalendarPicker = (
               )
             : dayOnly;
           emitSingle();
+          if (options.hideOnSingleSelect ?? true) {
+            container.hidden = true;
+          }
         } else {
           const clicked = new Date(cellYear, cellMonth, dayNum, 0, 0, 0, 0);
           if (!rangeStart || (rangeStart && rangeEnd)) {
