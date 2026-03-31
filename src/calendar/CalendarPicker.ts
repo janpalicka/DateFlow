@@ -1,4 +1,5 @@
 import {
+  addMonths,
   compareAsc,
   differenceInCalendarDays,
   format,
@@ -171,12 +172,30 @@ export const createCalendarPicker = (
   selectsWrap.append(monthSelect, yearSelect);
   header.append(btnPrev, selectsWrap, btnNext, btnReset);
 
+  const headerRight = document.createElement("div");
+  headerRight.className = "cal__header cal__header--sub";
+  const selectsWrapRight = document.createElement("div");
+  selectsWrapRight.className = "cal__selects";
+  const monthSelectRight = document.createElement("select");
+  monthSelectRight.className = "cal__select cal__select--month";
+  monthSelectRight.setAttribute("aria-label", "Month");
+  const yearSelectRight = document.createElement("select");
+  yearSelectRight.className = "cal__select cal__select--year";
+  yearSelectRight.setAttribute("aria-label", "Year");
+  selectsWrapRight.append(monthSelectRight, yearSelectRight);
+  headerRight.append(selectsWrapRight);
+
   const weekdaysRow = document.createElement("div");
   weekdaysRow.className = "cal__weekdays";
+  const weekdaysRowRight = document.createElement("div");
+  weekdaysRowRight.className = "cal__weekdays";
 
   const grid = document.createElement("div");
   grid.className = "cal__grid";
   grid.setAttribute("role", "grid");
+  const gridRight = document.createElement("div");
+  gridRight.className = "cal__grid";
+  gridRight.setAttribute("role", "grid");
 
   function clearRangeHover(): void {
     rangeHoverEnd = null;
@@ -209,16 +228,23 @@ export const createCalendarPicker = (
     render();
   }
 
-  grid.addEventListener("mousemove", updateRangeHoverFromPointer);
-  grid.addEventListener("mouseleave", () => {
+  const onGridMouseLeave = (): void => {
     if (mode() === "range" && rangeStart && !rangeEnd && rangeHoverEnd !== null) {
       clearRangeHover();
       render();
     }
-  });
+  };
+  grid.addEventListener("mousemove", updateRangeHoverFromPointer);
+  grid.addEventListener("mouseleave", onGridMouseLeave);
+  gridRight.addEventListener("mousemove", updateRangeHoverFromPointer);
+  gridRight.addEventListener("mouseleave", onGridMouseLeave);
 
   const timeWrap = document.createElement("div");
   timeWrap.className = "cal__time-wrap";
+  const timeWrapRangeStart = document.createElement("div");
+  timeWrapRangeStart.className = "cal__time-wrap cal__time-wrap--pane";
+  const timeWrapRangeEnd = document.createElement("div");
+  timeWrapRangeEnd.className = "cal__time-wrap cal__time-wrap--pane";
 
   const timeRowSingle = document.createElement("div");
   timeRowSingle.className = "cal__time cal__time--single";
@@ -236,7 +262,6 @@ export const createCalendarPicker = (
   timeSepSingle.textContent = ":";
   const timeLabelSingle = document.createElement("span");
   timeLabelSingle.className = "cal__time-label";
-  timeLabelSingle.textContent = "Time (24h)";
   timeRowSingle.append(timeLabelSingle, hourSingle, timeSepSingle, minuteSingle, meridiemSingle);
 
   const timeRowRangeStart = document.createElement("div");
@@ -255,7 +280,6 @@ export const createCalendarPicker = (
   sepStart.textContent = ":";
   const labelStart = document.createElement("span");
   labelStart.className = "cal__time-label";
-  labelStart.textContent = "Start time (24h)";
   timeRowRangeStart.append(labelStart, hourStart, sepStart, minuteStart, meridiemStart);
 
   const timeRowRangeEnd = document.createElement("div");
@@ -274,12 +298,24 @@ export const createCalendarPicker = (
   sepEnd.textContent = ":";
   const labelEnd = document.createElement("span");
   labelEnd.className = "cal__time-label";
-  labelEnd.textContent = "End time (24h)";
+  labelEnd.textContent = "";
   timeRowRangeEnd.append(labelEnd, hourEnd, sepEnd, minuteEnd, meridiemEnd);
 
-  timeWrap.append(timeRowSingle, timeRowRangeStart, timeRowRangeEnd);
+  timeWrap.append(timeRowSingle);
+  timeWrapRangeStart.append(timeRowRangeStart);
+  timeWrapRangeEnd.append(timeRowRangeEnd);
 
-  root.append(header, weekdaysRow, grid, timeWrap);
+  const paneLeft = document.createElement("div");
+  paneLeft.className = "cal__pane";
+  paneLeft.append(header, weekdaysRow, grid, timeWrapRangeStart);
+  const paneRight = document.createElement("div");
+  paneRight.className = "cal__pane";
+  paneRight.append(headerRight, weekdaysRowRight, gridRight, timeWrapRangeEnd);
+  const panes = document.createElement("div");
+  panes.className = "cal__panes";
+  panes.append(paneLeft, paneRight);
+
+  root.append(panes, timeWrap);
   container.append(root);
 
   fillHourMinute(hourSingle, minuteSingle, meridiemSingle, options.use12HourTime ?? false);
@@ -314,15 +350,23 @@ export const createCalendarPicker = (
   const fillMonthYearSelects = (): void => {
     const locale = mergeLocale(options.locale);
     monthSelect.replaceChildren();
+    monthSelectRight.replaceChildren();
     for (let m = 0; m < 12; m += 1) {
       const o = document.createElement("option");
       o.value = String(m);
       o.textContent = locale.months.longhand[m] ?? String(m);
       monthSelect.append(o);
+      const r = document.createElement("option");
+      r.value = String(m);
+      r.textContent = locale.months.longhand[m] ?? String(m);
+      monthSelectRight.append(r);
     }
     monthSelect.value = String(viewMonth);
+    const rightView = addMonths(new Date(viewYear, viewMonth, 1), 1);
+    monthSelectRight.value = String(rightView.getMonth());
 
     yearSelect.replaceChildren();
+    yearSelectRight.replaceChildren();
     const radius = options.yearDropdownRadius ?? 50;
     const { from, to } = yearRange(viewYear, options.minDate, options.maxDate, radius);
     for (let y = from; y <= to; y += 1) {
@@ -332,18 +376,31 @@ export const createCalendarPicker = (
       yearSelect.append(o);
     }
     yearSelect.value = String(viewYear);
+    const { from: rightFrom, to: rightTo } = yearRange(
+      rightView.getFullYear(),
+      options.minDate,
+      options.maxDate,
+      radius,
+    );
+    for (let y = rightFrom; y <= rightTo; y += 1) {
+      const o = document.createElement("option");
+      o.value = String(y);
+      o.textContent = String(y);
+      yearSelectRight.append(o);
+    }
+    yearSelectRight.value = String(rightView.getFullYear());
   };
 
-  const renderWeekdays = (): void => {
+  const renderWeekdaysRow = (target: HTMLDivElement): void => {
     const locale = mergeLocale(options.locale);
     const showWk = options.showWeekNumbers ?? false;
-    weekdaysRow.replaceChildren();
-    weekdaysRow.classList.toggle("cal__weekdays--with-weeks", showWk);
+    target.replaceChildren();
+    target.classList.toggle("cal__weekdays--with-weeks", showWk);
     if (showWk) {
       const wk = document.createElement("div");
       wk.className = "cal__weekday cal__weekday--weeknum";
       wk.textContent = locale.weekNumberHeader ?? "Wk";
-      weekdaysRow.append(wk);
+      target.append(wk);
     }
     const start = locale.firstDayOfWeek % 7;
     for (let i = 0; i < 7; i += 1) {
@@ -351,20 +408,29 @@ export const createCalendarPicker = (
       const cell = document.createElement("div");
       cell.className = "cal__weekday";
       cell.textContent = locale.weekdays.shorthand[idx] ?? "";
-      weekdaysRow.append(cell);
+      target.append(cell);
     }
   };
 
-  const renderGrid = (): void => {
+  const renderWeekdays = (): void => {
+    renderWeekdaysRow(weekdaysRow);
+    renderWeekdaysRow(weekdaysRowRight);
+  };
+
+  const renderGridForMonth = (
+    target: HTMLDivElement,
+    panelYear: number,
+    panelMonth: number,
+  ): void => {
     const locale = mergeLocale(options.locale);
     const showWk = options.showWeekNumbers ?? false;
-    grid.replaceChildren();
-    grid.classList.toggle("cal__grid--with-weeks", showWk);
+    target.replaceChildren();
+    target.classList.toggle("cal__grid--with-weeks", showWk);
 
-    const first = new Date(viewYear, viewMonth, 1);
+    const first = new Date(panelYear, panelMonth, 1);
     const startWeekday = (first.getDay() - (locale.firstDayOfWeek % 7) + 7) % 7;
-    const dim = getDaysInMonth(new Date(viewYear, viewMonth, 1));
-    const prevDim = getDaysInMonth(new Date(viewYear, viewMonth - 1, 1));
+    const dim = getDaysInMonth(new Date(panelYear, panelMonth, 1));
+    const prevDim = getDaysInMonth(new Date(panelYear, panelMonth - 1, 1));
 
     const totalCells = 42;
 
@@ -375,20 +441,20 @@ export const createCalendarPicker = (
         let cellMonth0: number;
         let cellYear0: number;
         if (rowFirstIdx < startWeekday) {
-          cellMonth0 = viewMonth - 1;
-          cellYear0 = viewYear;
+          cellMonth0 = panelMonth - 1;
+          cellYear0 = panelYear;
           if (cellMonth0 < 0) {
             cellMonth0 = 11;
             cellYear0 -= 1;
           }
           dayNum0 = prevDim - (startWeekday - rowFirstIdx - 1);
         } else if (rowFirstIdx < startWeekday + dim) {
-          cellMonth0 = viewMonth;
-          cellYear0 = viewYear;
+          cellMonth0 = panelMonth;
+          cellYear0 = panelYear;
           dayNum0 = rowFirstIdx - startWeekday + 1;
         } else {
-          cellMonth0 = viewMonth + 1;
-          cellYear0 = viewYear;
+          cellMonth0 = panelMonth + 1;
+          cellYear0 = panelYear;
           if (cellMonth0 > 11) {
             cellMonth0 = 0;
             cellYear0 += 1;
@@ -399,7 +465,7 @@ export const createCalendarPicker = (
         const wkCell = document.createElement("div");
         wkCell.className = "cal__weeknum";
         wkCell.textContent = String(getISOWeek(weekRef));
-        grid.append(wkCell);
+        target.append(wkCell);
       }
 
       let dayNum: number;
@@ -409,21 +475,21 @@ export const createCalendarPicker = (
 
       if (i < startWeekday) {
         muted = true;
-        cellMonth = viewMonth - 1;
-        cellYear = viewYear;
+        cellMonth = panelMonth - 1;
+        cellYear = panelYear;
         if (cellMonth < 0) {
           cellMonth = 11;
           cellYear -= 1;
         }
         dayNum = prevDim - (startWeekday - i - 1);
       } else if (i < startWeekday + dim) {
-        cellMonth = viewMonth;
-        cellYear = viewYear;
+        cellMonth = panelMonth;
+        cellYear = panelYear;
         dayNum = i - startWeekday + 1;
       } else {
         muted = true;
-        cellMonth = viewMonth + 1;
-        cellYear = viewYear;
+        cellMonth = panelMonth + 1;
+        cellYear = panelYear;
         if (cellMonth > 11) {
           cellMonth = 0;
           cellYear += 1;
@@ -593,8 +659,14 @@ export const createCalendarPicker = (
         render();
       });
 
-      grid.append(btn);
+      target.append(btn);
     }
+  };
+
+  const renderGrid = (): void => {
+    renderGridForMonth(grid, viewYear, viewMonth);
+    const rightView = addMonths(new Date(viewYear, viewMonth, 1), 1);
+    renderGridForMonth(gridRight, rightView.getFullYear(), rightView.getMonth());
   };
 
   function syncTimeSelectsFromValue(): void {
@@ -622,7 +694,8 @@ export const createCalendarPicker = (
 
   function canGoNextMonth(): boolean {
     if (!options.maxDate) return true;
-    const next = new Date(viewYear, viewMonth + 1, 1);
+    const nextShift = mode() === "range" ? 2 : 1;
+    const next = new Date(viewYear, viewMonth + nextShift, 1);
     const maxM = startOfDay(options.maxDate);
     return compareCalendarDay(next, new Date(maxM.getFullYear(), maxM.getMonth(), 1)) <= 0;
   }
@@ -631,16 +704,15 @@ export const createCalendarPicker = (
     const st = options.showTime ?? false;
     const use12 = options.use12HourTime ?? false;
     const rng = mode() === "range";
-    timeWrap.hidden = !st;
+    timeWrap.hidden = !st || rng;
+    timeWrapRangeStart.hidden = !st || !rng;
+    timeWrapRangeEnd.hidden = !st || !rng;
     timeRowSingle.hidden = !st || rng;
     timeRowRangeStart.hidden = !st || !rng;
     timeRowRangeEnd.hidden = !st || !rng;
     meridiemSingle.hidden = !st || !use12 || rng;
     meridiemStart.hidden = !st || !use12 || !rng;
     meridiemEnd.hidden = !st || !use12 || !rng;
-    timeLabelSingle.textContent = use12 ? "Time (12h)" : "Time (24h)";
-    labelStart.textContent = use12 ? "Start time (12h)" : "Start time (24h)";
-    labelEnd.textContent = use12 ? "End time (12h)" : "End time (24h)";
   }
 
   function updateResetVisibility(): void {
@@ -654,6 +726,9 @@ export const createCalendarPicker = (
   }
 
   function render(): void {
+    const isRange = mode() === "range";
+    root.classList.toggle("cal--range", isRange);
+    paneRight.hidden = !isRange;
     fillMonthYearSelects();
     renderWeekdays();
     renderGrid();
@@ -710,6 +785,26 @@ export const createCalendarPicker = (
   yearSelect.addEventListener("change", (): void => {
     clearRangeHover();
     viewYear = Number.parseInt(yearSelect.value, 10);
+    render();
+  });
+
+  monthSelectRight.addEventListener("change", (): void => {
+    clearRangeHover();
+    const nextMonth = Number.parseInt(monthSelectRight.value, 10);
+    const nextYear = Number.parseInt(yearSelectRight.value, 10);
+    const left = addMonths(new Date(nextYear, nextMonth, 1), -1);
+    viewYear = left.getFullYear();
+    viewMonth = left.getMonth();
+    render();
+  });
+
+  yearSelectRight.addEventListener("change", (): void => {
+    clearRangeHover();
+    const nextMonth = Number.parseInt(monthSelectRight.value, 10);
+    const nextYear = Number.parseInt(yearSelectRight.value, 10);
+    const left = addMonths(new Date(nextYear, nextMonth, 1), -1);
+    viewYear = left.getFullYear();
+    viewMonth = left.getMonth();
     render();
   });
 

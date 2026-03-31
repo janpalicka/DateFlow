@@ -43,6 +43,19 @@
   margin-bottom: 0.5rem;
 }
 
+.cal__header--sub {
+  grid-template-columns: 1fr;
+}
+
+.cal__panes {
+  display: grid;
+  gap: 1rem;
+}
+
+.cal__pane[hidden] {
+  display: none !important;
+}
+
 .cal__selects {
   display: flex;
   flex-wrap: nowrap;
@@ -82,6 +95,22 @@
   background-repeat: no-repeat;
   background-position: right 0.5rem center;
   background-size: 0.6rem;
+}
+
+.cal__time .cal__select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+  min-height: 2.35rem;
+  font-size: 0.8125rem;
+  border: 1px solid var(--cal-header-select-border);
+  background-color: var(--cal-bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 0.6rem;
+  padding: 0.35rem 1.85rem 0.35rem 0.55rem;
 }
 
 .cal__select--month {
@@ -358,6 +387,12 @@
   gap: 0.5rem;
 }
 
+.cal__time-wrap--pane {
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--cal-border);
+}
+
 /* `hidden` must beat `.cal__time { display: flex }` or all time rows stay visible. */
 .cal__time-wrap[hidden],
 .cal__time[hidden] {
@@ -368,7 +403,13 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
   gap: 0.35rem;
+}
+
+.cal__time-wrap--pane .cal__time {
+  flex-wrap: nowrap;
+  justify-content: center;
 }
 
 .cal__time-label {
@@ -378,6 +419,10 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--cal-muted);
+}
+
+.cal__time-wrap--pane .cal__time-label {
+  flex: 0 0 auto;
 }
 
 .cal__time .cal__select {
@@ -419,6 +464,10 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
 }
 
+.cal[data-cal-theme="dark"] .cal__time .cal__select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+}
+
 .cal[data-cal-theme="forest"] {
   --cal-accent: #15803d;
   --cal-accent-contrast: #ecfdf5;
@@ -444,5 +493,16 @@
 
   .cal__day {
     font-size: 1rem;
+  }
+}
+
+@media (min-width: 900px) {
+  .cal.cal--range {
+    width: min(100%, 48rem);
+  }
+
+  .cal.cal--range .cal__panes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
   }
 }
