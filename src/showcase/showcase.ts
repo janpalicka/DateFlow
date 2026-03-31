@@ -56,13 +56,18 @@ function mountFloatingCalendarDemo(
   const options = opts ?? {};
   const wrap = document.createElement("div");
   wrap.className = "showcase-card__floating-trigger-wrap";
+  const singleFormatter =
+    formatSingle ?? ((date: Date | null): string => (date ? formatSelection(date) : "No date selected"));
 
   const trigger = document.createElement("pre");
   trigger.className = "showcase-card__log showcase-card__log--trigger";
   trigger.tabIndex = 0;
   trigger.setAttribute("role", "button");
   trigger.setAttribute("aria-label", "Open calendar");
-  trigger.textContent = "Click to open calendar";
+  const setTriggerValue = (value: string): void => {
+    trigger.textContent = value;
+  };
+  setTriggerValue("No date selected");
   wrap.append(trigger);
 
   const floating = document.createElement("div");
@@ -75,7 +80,17 @@ function mountFloatingCalendarDemo(
     ...options,
     onChange: (d) => {
       options.onChange?.(d);
-      onValueChange((formatSingle ?? ((date) => (date ? formatSelection(date) : "No date selected")))(d));
+      const value = singleFormatter(d);
+      setTriggerValue(value);
+      onValueChange(value);
+    },
+    onRangeChange: (r) => {
+      options.onRangeChange?.(r);
+      const fmt = options.outputFormat ?? (options.showTime ? "yyyy-MM-dd HH:mm" : "yyyy-MM-dd");
+      const sep = options.rangeOutputSeparator ?? " → ";
+      const value = formatRangeLine(r, fmt, sep);
+      setTriggerValue(value);
+      onRangeChange?.(value);
     },
   });
   onReady?.(api);
@@ -85,13 +100,15 @@ function mountFloatingCalendarDemo(
       const fmt = options.outputFormat ?? (options.showTime ? "yyyy-MM-dd HH:mm" : "yyyy-MM-dd");
       const sep = options.rangeOutputSeparator ?? " → ";
       const initial = api.getRange();
-      onRangeChange?.(formatRangeLine(initial, fmt, sep));
+      const value = formatRangeLine(initial, fmt, sep);
+      setTriggerValue(value);
+      onRangeChange?.(value);
       return;
     }
     const initial = api.getValue();
-    onValueChange(
-      (formatSingle ?? ((date) => (date ? formatSelection(date) : "No date selected")))(initial),
-    );
+    const value = singleFormatter(initial);
+    setTriggerValue(value);
+    onValueChange(value);
   };
   syncFromInitial();
 
@@ -192,7 +209,7 @@ export function mountShowcase(root: HTMLElement): void {
         "1. Floating calendar (click the log line)",
         "Calendar opens as a floating panel anchored to the log `pre` element. Click outside or press Escape to close it.",
         m,
-        [pre],
+        [],
       ),
     );
   }
@@ -216,7 +233,7 @@ export function mountShowcase(root: HTMLElement): void {
         "2. German locale",
         "Full locale object: German month names and Monday as the first day of the week.",
         m,
-        [pre],
+        [],
       ),
     );
   }
@@ -236,7 +253,7 @@ export function mountShowcase(root: HTMLElement): void {
       },
     );
     grid.append(
-      card("3. French locale", "Another full locale with Monday as the first weekday.", m, [pre]),
+      card("3. French locale", "Another full locale with Monday as the first weekday.", m, []),
     );
   }
 
@@ -262,7 +279,7 @@ export function mountShowcase(root: HTMLElement): void {
         "4. Partial locale (Czech labels, Monday week start)",
         "Uses Czech locale defaults (Monday first day) while overriding only the week number header.",
         m,
-        [pre],
+        [],
       ),
     );
   }
@@ -287,7 +304,7 @@ export function mountShowcase(root: HTMLElement): void {
         "5. Allowed date range (min / max)",
         "Only days between 10 Mar 2026 and 25 Mar 2026 (inclusive) are selectable.",
         m,
-        [pre],
+        [],
       ),
     );
   }
@@ -311,7 +328,7 @@ export function mountShowcase(root: HTMLElement): void {
         "6. Disallowed specific dates (array)",
         "17–19 March 2026 blocked; useful for holidays or one-off closures.",
         m,
-        [pre],
+        [],
       ),
     );
   }
@@ -331,9 +348,7 @@ export function mountShowcase(root: HTMLElement): void {
       },
     );
     grid.append(
-      card("7. Disallowed pattern (predicate)", "Weekends disabled via (date) => boolean.", m, [
-        pre,
-      ]),
+      card("7. Disallowed pattern (predicate)", "Weekends disabled via (date) => boolean.", m, []),
     );
   }
 
@@ -357,7 +372,7 @@ export function mountShowcase(root: HTMLElement): void {
         "8. Allowed dates only — whitelist array",
         "Only four Thursdays in March 2026 can be picked.",
         m,
-        [pre],
+        [],
       ),
     );
   }
@@ -381,7 +396,7 @@ export function mountShowcase(root: HTMLElement): void {
         "9. Allowed dates only — predicate",
         "Only odd-numbered calendar days are selectable.",
         m,
-        [pre],
+        [],
       ),
     );
   }
@@ -406,7 +421,7 @@ export function mountShowcase(root: HTMLElement): void {
         "10. Time selection (24-hour)",
         "Hour 0–23 and minute 0–59; combined with the selected day.",
         m,
-        [pre],
+        [],
       ),
     );
   }
@@ -427,9 +442,7 @@ export function mountShowcase(root: HTMLElement): void {
       },
     );
     grid.append(
-      card("11. Theme: dark preset", 'Uses data-cal-theme="dark" and bundled CSS variables.', m, [
-        pre,
-      ]),
+      card("11. Theme: dark preset", 'Uses data-cal-theme="dark" and bundled CSS variables.', m, []),
     );
   }
 
@@ -465,7 +478,7 @@ export function mountShowcase(root: HTMLElement): void {
         "12. Custom theme (CSS variables)",
         "Parent sets --cal-* variables; no new theme name required.",
         m,
-        [pre],
+        [],
       ),
     );
   }
@@ -490,7 +503,7 @@ export function mountShowcase(root: HTMLElement): void {
         "13. Year dropdown span",
         "yearDropdownRadius: 3 → years from 2023 to 2029 in the select (plus min/max clamping when set).",
         m,
-        [pre],
+        [],
       ),
     );
   }
@@ -573,7 +586,7 @@ export function mountShowcase(root: HTMLElement): void {
         "14. Runtime setOptions",
         "Switch locale, `showTime`, or `mode` / `range` without remounting.",
         m,
-        [actions, pre],
+        [actions],
       ),
     );
   }
@@ -602,7 +615,7 @@ export function mountShowcase(root: HTMLElement): void {
         "15. Combined demo",
         "German locale, forest theme, min/max range, Wednesdays blocked, with time.",
         m,
-        [pre],
+        [],
       ),
     );
   }
@@ -622,9 +635,7 @@ export function mountShowcase(root: HTMLElement): void {
       },
     );
     grid.append(
-      card("16. Accessibility: aria-label", "Root has a custom aria-label for screen readers.", m, [
-        pre,
-      ]),
+      card("16. Accessibility: aria-label", "Root has a custom aria-label for screen readers.", m, []),
     );
   }
 
@@ -647,7 +658,7 @@ export function mountShowcase(root: HTMLElement): void {
         "17. Theme: high contrast",
         'data-cal-theme="contrast" — strong borders and yellow accent on black.',
         m,
-        [pre],
+        [],
       ),
     );
   }
@@ -675,7 +686,7 @@ export function mountShowcase(root: HTMLElement): void {
         "18. Time picker disabled (default)",
         "`showTime` defaults to `false`. Output uses date-only tokens unless you set `outputFormat` or enable time.",
         m,
-        [pre],
+        [],
       ),
     );
   }
@@ -705,7 +716,7 @@ export function mountShowcase(root: HTMLElement): void {
         "19. Custom output format",
         "`outputFormat` is a date-fns pattern for the built-in &lt;output&gt; (and you can match it in your own UI).",
         m,
-        [pre],
+        [],
       ),
     );
   }
@@ -734,7 +745,7 @@ export function mountShowcase(root: HTMLElement): void {
         "20. Week numbers",
         "`showWeekNumbers: true` adds an ISO week column (`getISOWeek`). Optional `locale.weekNumberHeader` (here German locale + default “Wk” from English merge).",
         m,
-        [pre],
+        [],
       ),
     );
   }
@@ -765,7 +776,7 @@ export function mountShowcase(root: HTMLElement): void {
         "21. Date range",
         '`mode: "range"`: first click starts a range, second completes it (third starts over). Default `range` sets initial start/end.',
         m,
-        [pre],
+        [],
       ),
     );
   }
@@ -797,7 +808,7 @@ export function mountShowcase(root: HTMLElement): void {
         "22. Range with start & end time",
         "With `showTime` in range mode you get separate start and end time controls; times apply to the earlier/later calendar day after both days are chosen.",
         m,
-        [pre],
+        [],
       ),
     );
   }
@@ -831,7 +842,7 @@ export function mountShowcase(root: HTMLElement): void {
         "23. Range separator & format",
         "`rangeOutputSeparator` and `outputFormat` control the printed range string.",
         m,
-        [pre],
+        [],
       ),
     );
   }
@@ -861,7 +872,7 @@ export function mountShowcase(root: HTMLElement): void {
         "24. Range + week numbers",
         'Combine `mode: "range"`, `showWeekNumbers`, and a localized week column title via `locale.weekNumberHeader` (here “KW”).',
         m,
-        [pre],
+        [],
       ),
     );
   }
@@ -893,7 +904,7 @@ export function mountShowcase(root: HTMLElement): void {
         "25. Date range + dark theme",
         '`mode: "range"` with `theme: "dark"` (`data-cal-theme="dark"` and bundled CSS variables).',
         m,
-        [pre],
+        [],
       ),
     );
   }

@@ -18,7 +18,6 @@ import {
   compareCalendarDay,
   dateOnlyIfNeeded,
   dayInInclusiveRange,
-  effectiveOutputFormat,
   formatRangeDurationLabel,
   isSelectable,
   mergeLocale,
@@ -227,11 +226,7 @@ export const createCalendarPicker = (
 
   timeWrap.append(timeRowSingle, timeRowRangeStart, timeRowRangeEnd);
 
-  const output = document.createElement("output");
-  output.className = "cal__output";
-  output.setAttribute("aria-live", "polite");
-
-  root.append(header, weekdaysRow, grid, timeWrap, output);
+  root.append(header, weekdaysRow, grid, timeWrap);
   container.append(root);
 
   fillHourMinute(hourSingle, minuteSingle);
@@ -530,31 +525,6 @@ export const createCalendarPicker = (
     }
   };
 
-  function updateOutput(): void {
-    const fmt = effectiveOutputFormat(options);
-    const sep = options.rangeOutputSeparator ?? " → ";
-    if (mode() === "single") {
-      if (!selected) {
-        output.textContent = "No date selected";
-        return;
-      }
-      output.textContent = format(dateOnlyIfNeeded(options, selected), fmt);
-      return;
-    }
-    if (!rangeStart) {
-      output.textContent = "No range selected";
-      return;
-    }
-    if (!rangeEnd) {
-      output.textContent = `${format(dateOnlyIfNeeded(options, rangeStart), fmt)} …`;
-      return;
-    }
-    output.textContent = `${format(dateOnlyIfNeeded(options, rangeStart), fmt)}${sep}${format(
-      dateOnlyIfNeeded(options, rangeEnd),
-      fmt,
-    )}`;
-  }
-
   function syncTimeSelectsFromValue(): void {
     if (mode() === "single") {
       const base = selected ?? now;
@@ -595,7 +565,6 @@ export const createCalendarPicker = (
     renderWeekdays();
     renderGrid();
     syncTimeSelectsFromValue();
-    updateOutput();
     updateTimeVisibility();
     btnPrev.disabled = !canGoPrevMonth();
     btnNext.disabled = !canGoNextMonth();
@@ -641,7 +610,6 @@ export const createCalendarPicker = (
     if (!selected) return;
     selected = applyHM(selected, hourSingle, minuteSingle);
     emitSingle();
-    updateOutput();
   };
 
   const onTimeRangeStartChange = (): void => {
@@ -652,7 +620,6 @@ export const createCalendarPicker = (
       setHM(hourEnd, minuteEnd, rangeEnd);
     }
     emitRange();
-    updateOutput();
   };
 
   const onTimeRangeEndChange = (): void => {
@@ -663,7 +630,6 @@ export const createCalendarPicker = (
       setHM(hourStart, minuteStart, rangeStart);
     }
     emitRange();
-    updateOutput();
   };
 
   hourSingle.addEventListener("change", onTimeSingleChange);
