@@ -37,7 +37,7 @@
 
 .cal__header {
   display: grid;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr auto auto;
   gap: 0.5rem;
   align-items: center;
   margin-bottom: 0.5rem;
@@ -132,6 +132,39 @@
 .cal__nav:focus-visible {
   outline: 2px solid var(--cal-accent);
   outline-offset: 2px;
+}
+
+.cal__reset {
+  min-width: 2.25rem;
+  min-height: 2.25rem;
+  padding: 0;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--cal-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.85;
+  cursor: pointer;
+}
+
+.cal__reset:hover {
+  background: var(--cal-surface);
+  opacity: 1;
+}
+
+.cal__reset:focus-visible {
+  outline: 2px solid var(--cal-accent);
+  outline-offset: 2px;
+}
+
+.cal__reset-icon {
+  display: block;
+}
+
+.cal__reset[hidden] {
+  display: none !important;
 }
 
 .cal__weekdays {

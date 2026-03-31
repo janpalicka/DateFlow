@@ -151,6 +151,12 @@ export const createCalendarPicker = (
   btnNext.innerHTML =
     '<svg class="cal__nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>';
 
+  const btnReset = document.createElement("button");
+  btnReset.type = "button";
+  btnReset.className = "cal__reset";
+  btnReset.innerHTML =
+    '<svg class="cal__reset-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 2v5h5"/><path d="M3.05 13a9 9 0 1 0 3.36-7.03L3 7"/><path d="M12 7v5l3 2"/></svg>';
+
   const selectsWrap = document.createElement("div");
   selectsWrap.className = "cal__selects";
 
@@ -163,7 +169,7 @@ export const createCalendarPicker = (
   yearSelect.setAttribute("aria-label", "Year");
 
   selectsWrap.append(monthSelect, yearSelect);
-  header.append(btnPrev, selectsWrap, btnNext);
+  header.append(btnPrev, selectsWrap, btnNext, btnReset);
 
   const weekdaysRow = document.createElement("div");
   weekdaysRow.className = "cal__weekdays";
@@ -634,12 +640,23 @@ export const createCalendarPicker = (
     labelEnd.textContent = use12 ? "End time (12h)" : "End time (24h)";
   }
 
+  function updateResetVisibility(): void {
+    const visible = options.showResetButton ?? false;
+    btnReset.hidden = !visible;
+    if (visible) {
+      const label = options.resetInputLabel ?? "Reset";
+      btnReset.setAttribute("aria-label", label);
+      btnReset.title = label;
+    }
+  }
+
   function render(): void {
     fillMonthYearSelects();
     renderWeekdays();
     renderGrid();
     syncTimeSelectsFromValue();
     updateTimeVisibility();
+    updateResetVisibility();
     btnPrev.disabled = !canGoPrevMonth();
     btnNext.disabled = !canGoNextMonth();
   }
@@ -664,6 +681,19 @@ export const createCalendarPicker = (
       viewYear += 1;
     } else {
       viewMonth += 1;
+    }
+    render();
+  });
+
+  btnReset.addEventListener("click", (): void => {
+    clearRangeHover();
+    if (mode() === "single") {
+      selected = null;
+      emitSingle();
+    } else {
+      rangeStart = null;
+      rangeEnd = null;
+      emitRange();
     }
     render();
   });

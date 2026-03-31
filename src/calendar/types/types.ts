@@ -76,6 +76,13 @@ export interface CalendarOptions {
    * do not constrain it. Default `50` → roughly ±50 years.
    */
   yearDropdownRadius?: number;
+  /** Show reset icon button in header. Default: `false`. */
+  showResetButton?: boolean;
+  /**
+   * Accessible label/title for reset icon button.
+   * Used only when `showResetButton` is true. Default: `"Reset"`.
+   */
+  resetInputLabel?: string;
   /** Accessible label for the calendar region */
   ariaLabel?: string;
 }

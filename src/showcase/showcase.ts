@@ -954,5 +954,32 @@ export function mountShowcase(root: HTMLElement): void {
     );
   }
 
+  /* 27 — Reset button */
+  {
+    const pre = makeLog("—");
+    const m = mountFloatingCalendarDemo(
+      {
+        value: new Date(2026, 2, 13, 14, 15),
+        showTime: true,
+        showResetButton: true,
+        resetInputLabel: "Reset",
+        onChange: (d) => {
+          pre.textContent = d ? formatSelection(d) : "No date selected";
+        },
+      },
+      (value) => {
+        pre.textContent = value;
+      },
+    );
+    grid.append(
+      card(
+        "27. Reset button",
+        "Set `showResetButton: true` to show a header reset icon next to the next arrow (`resetInputLabel` controls its aria-label/title).",
+        m,
+        [],
+      ),
+    );
+  }
+
   root.append(hero, grid);
 }
