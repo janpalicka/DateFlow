@@ -747,50 +747,9 @@ export const createCalendarPicker = (
   function render(): void {
     const isRange = mode() === "range";
     const hasRangeSelection = Boolean(rangeStart || rangeEnd);
-    // #region agent log
-    fetch("http://127.0.0.1:7608/ingest/4e070bc7-e576-4360-bee6-1fc059d18598", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "e61a4a" },
-      body: JSON.stringify({
-        sessionId: "e61a4a",
-        runId: "non-range-actions-debug",
-        hypothesisId: "H1-H2-H3",
-        location: "CalendarPicker.ts:render",
-        message: "render visibility state",
-        data: {
-          mode: mode(),
-          isRange,
-          hasRangeSelection,
-          rangeStart: Boolean(rangeStart),
-          rangeEnd: Boolean(rangeEnd),
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-    // #endregion
     root.classList.toggle("cal--range", isRange);
     paneRight.hidden = !isRange;
     rangeActions.hidden = !isRange || !hasRangeSelection;
-    // #region agent log
-    fetch("http://127.0.0.1:7608/ingest/4e070bc7-e576-4360-bee6-1fc059d18598", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "e61a4a" },
-      body: JSON.stringify({
-        sessionId: "e61a4a",
-        runId: "non-range-actions-debug",
-        hypothesisId: "H5",
-        location: "CalendarPicker.ts:render:afterVisibilitySet",
-        message: "post-visibility DOM state",
-        data: {
-          mode: mode(),
-          rangeActionsHiddenProp: rangeActions.hidden,
-          rangeActionsDisplay: getComputedStyle(rangeActions).display,
-          paneRightHiddenProp: paneRight.hidden,
-        },
-        timestamp: Date.now(),
-      }),
-    }).catch(() => {});
-    // #endregion
     fillMonthYearSelects();
     renderWeekdays();
     renderGrid();
@@ -1022,25 +981,6 @@ export const createCalendarPicker = (
       render();
     },
     setOptions(partial: Partial<CalendarOptions>): void {
-      // #region agent log
-      fetch("http://127.0.0.1:7608/ingest/4e070bc7-e576-4360-bee6-1fc059d18598", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "e61a4a" },
-        body: JSON.stringify({
-          sessionId: "e61a4a",
-          runId: "non-range-actions-debug",
-          hypothesisId: "H4",
-          location: "CalendarPicker.ts:setOptions:entry",
-          message: "setOptions called",
-          data: {
-            partialMode: partial.mode ?? null,
-            currentMode: mode(),
-            hasPartialRange: partial.range !== undefined,
-          },
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {});
-      // #endregion
       options = { ...options, ...partial };
       if (partial.mode !== undefined || partial.range !== undefined) {
         clearRangeHover();
@@ -1102,25 +1042,6 @@ export const createCalendarPicker = (
       if (mode() === "range") {
         syncCommittedRange();
       }
-      // #region agent log
-      fetch("http://127.0.0.1:7608/ingest/4e070bc7-e576-4360-bee6-1fc059d18598", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "e61a4a" },
-        body: JSON.stringify({
-          sessionId: "e61a4a",
-          runId: "non-range-actions-debug",
-          hypothesisId: "H4",
-          location: "CalendarPicker.ts:setOptions:exit",
-          message: "setOptions applied",
-          data: {
-            modeAfter: mode(),
-            rangeStart: Boolean(rangeStart),
-            rangeEnd: Boolean(rangeEnd),
-          },
-          timestamp: Date.now(),
-        }),
-      }).catch(() => {});
-      // #endregion
       render();
     },
     destroy(): void {
