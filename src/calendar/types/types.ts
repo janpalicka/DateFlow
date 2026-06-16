@@ -87,6 +87,11 @@ export interface CalendarOptions {
    * Default: `false` (input is read-only; pick dates from the calendar only).
    */
   allowInput?: boolean;
+  /**
+   * When `allowInput` is enabled, keep the calendar open after Enter commits typed input.
+   * Default: `false` (calendar closes on successful Enter, like a day click).
+   */
+  keepOpenOnAllowInputEnter?: boolean;
   className?: string;
   /** Sets `data-cal-theme` on the root for styling. */
   theme?: string;

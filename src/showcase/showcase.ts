@@ -1036,5 +1036,67 @@ export function mountShowcase(root: HTMLElement): void {
     );
   }
 
+  /* 31 — allowInput + time (24-hour) */
+  {
+    const m = mountFloatingCalendarDemo(
+      {
+        value: new Date(2026, 2, 15, 14, 30),
+        showTime: true,
+        allowInput: true,
+      },
+      () => {},
+    );
+    grid.append(
+      card(
+        "31. Direct date input with time (24-hour)",
+        "`allowInput: true` with `showTime: true` — type date and time as `yyyy-MM-dd HH:mm` (default `outputFormat`).",
+        m,
+        [],
+      ),
+    );
+  }
+
+  /* 32 — allowInput + time (12-hour) */
+  {
+    const m = mountFloatingCalendarDemo(
+      {
+        value: new Date(2026, 2, 15, 15, 30),
+        showTime: true,
+        use12HourTime: true,
+        allowInput: true,
+      },
+      () => {},
+    );
+    grid.append(
+      card(
+        "32. Direct date input with time (12-hour)",
+        "`allowInput: true` with `showTime: true` and `use12HourTime: true` — type date and time as `yyyy-MM-dd hh:mm a`.",
+        m,
+        [],
+      ),
+    );
+  }
+
+  /* 33 — allowInput + keep open on Enter */
+  {
+    const m = mountFloatingCalendarDemo(
+      {
+        value: new Date(2026, 2, 15, 14, 30),
+        showTime: true,
+        allowInput: true,
+        keepOpenOnAllowInputEnter: true,
+      },
+      () => {},
+    );
+    grid.append(
+      card(
+        "33. Direct input — keep calendar open on Enter",
+        "`keepOpenOnAllowInputEnter: true` with `allowInput: true` — Enter commits typed input but leaves the calendar open (default `false` closes it).",
+        m,
+        [],
+      ),
+    );
+  }
+
   root.append(hero, grid);
 }

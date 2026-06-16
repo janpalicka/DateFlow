@@ -495,8 +495,8 @@ export const createCalendarPicker = (
     return true;
   };
 
-  const commitTypedInput = (): void => {
-    if (syncingInput || !allowInputOn()) return;
+  const commitTypedInput = (): boolean => {
+    if (syncingInput || !allowInputOn()) return false;
     const text = valueInput.value;
     const ref = selected ?? rangeStart ?? new Date();
 
@@ -510,13 +510,13 @@ export const createCalendarPicker = (
         syncCommittedRange();
         emitRange();
         render();
-        return;
+        return true;
       }
       const parts = trimmed.split(sep);
       const start = tryParseDate(parts[0] ?? "", ref);
       if (!start) {
         syncInputFromState();
-        return;
+        return false;
       }
       let end: Date | null = null;
       const endPart = (parts[1] ?? "").trim();
@@ -524,7 +524,7 @@ export const createCalendarPicker = (
         end = tryParseDate(endPart, ref);
         if (!end) {
           syncInputFromState();
-          return;
+          return false;
         }
       }
       const startNorm = dateOnlyIfNeeded(options, start);
@@ -539,7 +539,7 @@ export const createCalendarPicker = (
         )
       ) {
         syncInputFromState();
-        return;
+        return false;
       }
       if (
         endNorm &&
@@ -552,7 +552,7 @@ export const createCalendarPicker = (
         )
       ) {
         syncInputFromState();
-        return;
+        return false;
       }
       clearRangeHover();
       rangeStart = shouldShowTimeOn(options) ? start : startOfDay(start);
@@ -564,7 +564,7 @@ export const createCalendarPicker = (
       syncCommittedRange();
       emitRange();
       render();
-      return;
+      return true;
     }
 
     const trimmed = text.trim();
@@ -572,15 +572,16 @@ export const createCalendarPicker = (
       selected = null;
       emitSingle();
       render();
-      return;
+      return true;
     }
     const parsed = tryParseDate(trimmed, ref);
     if (!parsed || !applyParsedSingle(parsed)) {
       syncInputFromState();
-      return;
+      return false;
     }
     emitSingle();
     render();
+    return true;
   };
 
   const onInputBlur = (): void => {
@@ -590,8 +591,11 @@ export const createCalendarPicker = (
   const onInputKeydown = (e: KeyboardEvent): void => {
     if (e.key !== "Enter") return;
     e.preventDefault();
-    commitTypedInput();
+    const committed = commitTypedInput();
     valueInput.blur();
+    if (committed && !(options.keepOpenOnAllowInputEnter ?? false)) {
+      container.hidden = true;
+    }
   };
 
   valueInput.addEventListener("blur", onInputBlur);
