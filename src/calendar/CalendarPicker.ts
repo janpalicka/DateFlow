@@ -28,6 +28,16 @@ import {
 } from "@/calendar/utils";
 import "./calendar.css";
 
+const fillSecond = (selectS: HTMLSelectElement): void => {
+  selectS.replaceChildren();
+  for (let s = 0; s < 60; s += 1) {
+    const o = document.createElement("option");
+    o.value = String(s);
+    o.textContent = s < 10 ? `0${String(s)}` : String(s);
+    selectS.append(o);
+  }
+};
+
 const fillHourMinute = (
   selectH: HTMLSelectElement,
   selectM: HTMLSelectElement,
@@ -63,6 +73,7 @@ const setHM = (
   selectH: HTMLSelectElement,
   selectM: HTMLSelectElement,
   selectMeridiem: HTMLSelectElement,
+  selectS: HTMLSelectElement | null,
   d: Date,
   use12HourTime: boolean,
 ): void => {
@@ -77,6 +88,7 @@ const setHM = (
     selectMeridiem.value = h >= 12 ? "PM" : "AM";
   }
   selectM.value = String(d.getMinutes());
+  if (selectS) selectS.value = String(d.getSeconds());
 };
 
 const applyHM = (
@@ -84,14 +96,14 @@ const applyHM = (
   selectH: HTMLSelectElement,
   selectM: HTMLSelectElement,
   selectMeridiem: HTMLSelectElement,
+  selectS: HTMLSelectElement | null,
   use12HourTime: boolean,
 ): Date => {
   const rawHour = Number.parseInt(selectH.value, 10);
   const min = Number.parseInt(selectM.value, 10);
-  const h = use12HourTime
-    ? rawHour % 12 + (selectMeridiem.value === "PM" ? 12 : 0)
-    : rawHour;
-  return new Date(base.getFullYear(), base.getMonth(), base.getDate(), h, min, 0, 0);
+  const sec = selectS ? Number.parseInt(selectS.value, 10) : 0;
+  const h = use12HourTime ? (rawHour % 12) + (selectMeridiem.value === "PM" ? 12 : 0) : rawHour;
+  return new Date(base.getFullYear(), base.getMonth(), base.getDate(), h, min, sec, 0);
 };
 
 export const createCalendarPicker = (
@@ -269,6 +281,12 @@ export const createCalendarPicker = (
   const minuteSingle = document.createElement("select");
   minuteSingle.className = "cal__select cal__select--minute";
   minuteSingle.setAttribute("aria-label", "Minute");
+  const timeSepSecondSingle = document.createElement("span");
+  timeSepSecondSingle.className = "cal__time-sep cal__time-sep--second";
+  timeSepSecondSingle.textContent = ":";
+  const secondSingle = document.createElement("select");
+  secondSingle.className = "cal__select cal__select--second";
+  secondSingle.setAttribute("aria-label", "Second");
   const meridiemSingle = document.createElement("select");
   meridiemSingle.className = "cal__select cal__select--meridiem";
   meridiemSingle.setAttribute("aria-label", "AM/PM");
@@ -277,7 +295,15 @@ export const createCalendarPicker = (
   timeSepSingle.textContent = ":";
   const timeLabelSingle = document.createElement("span");
   timeLabelSingle.className = "cal__time-label";
-  timeRowSingle.append(timeLabelSingle, hourSingle, timeSepSingle, minuteSingle, meridiemSingle);
+  timeRowSingle.append(
+    timeLabelSingle,
+    hourSingle,
+    timeSepSingle,
+    minuteSingle,
+    timeSepSecondSingle,
+    secondSingle,
+    meridiemSingle,
+  );
 
   const timeRowRangeStart = document.createElement("div");
   timeRowRangeStart.className = "cal__time cal__time--range-start";
@@ -287,6 +313,12 @@ export const createCalendarPicker = (
   const minuteStart = document.createElement("select");
   minuteStart.className = "cal__select cal__select--minute";
   minuteStart.setAttribute("aria-label", "Start minute");
+  const sepSecondStart = document.createElement("span");
+  sepSecondStart.className = "cal__time-sep cal__time-sep--second";
+  sepSecondStart.textContent = ":";
+  const secondStart = document.createElement("select");
+  secondStart.className = "cal__select cal__select--second";
+  secondStart.setAttribute("aria-label", "Start second");
   const meridiemStart = document.createElement("select");
   meridiemStart.className = "cal__select cal__select--meridiem";
   meridiemStart.setAttribute("aria-label", "Start AM/PM");
@@ -295,7 +327,15 @@ export const createCalendarPicker = (
   sepStart.textContent = ":";
   const labelStart = document.createElement("span");
   labelStart.className = "cal__time-label";
-  timeRowRangeStart.append(labelStart, hourStart, sepStart, minuteStart, meridiemStart);
+  timeRowRangeStart.append(
+    labelStart,
+    hourStart,
+    sepStart,
+    minuteStart,
+    sepSecondStart,
+    secondStart,
+    meridiemStart,
+  );
 
   const timeRowRangeEnd = document.createElement("div");
   timeRowRangeEnd.className = "cal__time cal__time--range-end";
@@ -305,6 +345,12 @@ export const createCalendarPicker = (
   const minuteEnd = document.createElement("select");
   minuteEnd.className = "cal__select cal__select--minute";
   minuteEnd.setAttribute("aria-label", "End minute");
+  const sepSecondEnd = document.createElement("span");
+  sepSecondEnd.className = "cal__time-sep cal__time-sep--second";
+  sepSecondEnd.textContent = ":";
+  const secondEnd = document.createElement("select");
+  secondEnd.className = "cal__select cal__select--second";
+  secondEnd.setAttribute("aria-label", "End second");
   const meridiemEnd = document.createElement("select");
   meridiemEnd.className = "cal__select cal__select--meridiem";
   meridiemEnd.setAttribute("aria-label", "End AM/PM");
@@ -314,7 +360,15 @@ export const createCalendarPicker = (
   const labelEnd = document.createElement("span");
   labelEnd.className = "cal__time-label";
   labelEnd.textContent = "";
-  timeRowRangeEnd.append(labelEnd, hourEnd, sepEnd, minuteEnd, meridiemEnd);
+  timeRowRangeEnd.append(
+    labelEnd,
+    hourEnd,
+    sepEnd,
+    minuteEnd,
+    sepSecondEnd,
+    secondEnd,
+    meridiemEnd,
+  );
 
   timeWrap.append(timeRowSingle);
   timeWrapRangeStart.append(timeRowRangeStart);
@@ -336,6 +390,12 @@ export const createCalendarPicker = (
   fillHourMinute(hourSingle, minuteSingle, meridiemSingle, options.use12HourTime ?? false);
   fillHourMinute(hourStart, minuteStart, meridiemStart, options.use12HourTime ?? false);
   fillHourMinute(hourEnd, minuteEnd, meridiemEnd, options.use12HourTime ?? false);
+
+  const showSecondsOn = (): boolean => options.showSeconds ?? false;
+  const use12Hour = (): boolean => options.use12HourTime ?? false;
+  const secondForSingle = (): HTMLSelectElement | null => (showSecondsOn() ? secondSingle : null);
+  const secondForStart = (): HTMLSelectElement | null => (showSecondsOn() ? secondStart : null);
+  const secondForEnd = (): HTMLSelectElement | null => (showSecondsOn() ? secondEnd : null);
 
   const emitSingle = (): void => {
     if (!selected) {
@@ -634,7 +694,8 @@ export const createCalendarPicker = (
                 hourSingle,
                 minuteSingle,
                 meridiemSingle,
-                options.use12HourTime ?? false,
+                secondForSingle(),
+                use12Hour(),
               )
             : dayOnly;
           emitSingle();
@@ -650,12 +711,13 @@ export const createCalendarPicker = (
                   hourStart,
                   minuteStart,
                   meridiemStart,
-                  options.use12HourTime ?? false,
+                  secondForStart(),
+                  use12Hour(),
                 )
               : clicked;
             rangeEnd = null;
             rangeHoverEnd = startOfDay(rangeStart);
-            setHM(hourEnd, minuteEnd, meridiemEnd, rangeStart, options.use12HourTime ?? false);
+            setHM(hourEnd, minuteEnd, meridiemEnd, secondForEnd(), rangeStart, use12Hour());
           } else {
             clearRangeHover();
             const d0 = startOfDay(rangeStart);
@@ -668,10 +730,10 @@ export const createCalendarPicker = (
               hi = t;
             }
             rangeStart = shouldShowTimeOn(options)
-              ? applyHM(lo, hourStart, minuteStart, meridiemStart, options.use12HourTime ?? false)
+              ? applyHM(lo, hourStart, minuteStart, meridiemStart, secondForStart(), use12Hour())
               : lo;
             rangeEnd = shouldShowTimeOn(options)
-              ? applyHM(hi, hourEnd, minuteEnd, meridiemEnd, options.use12HourTime ?? false)
+              ? applyHM(hi, hourEnd, minuteEnd, meridiemEnd, secondForEnd(), use12Hour())
               : hi;
           }
         }
@@ -689,19 +751,24 @@ export const createCalendarPicker = (
   };
 
   function syncTimeSelectsFromValue(): void {
-    const use12 = options.use12HourTime ?? false;
+    const use12 = use12Hour();
     fillHourMinute(hourSingle, minuteSingle, meridiemSingle, use12);
     fillHourMinute(hourStart, minuteStart, meridiemStart, use12);
     fillHourMinute(hourEnd, minuteEnd, meridiemEnd, use12);
+    if (showSecondsOn()) {
+      fillSecond(secondSingle);
+      fillSecond(secondStart);
+      fillSecond(secondEnd);
+    }
     if (mode() === "single") {
       const base = selected ?? now;
-      setHM(hourSingle, minuteSingle, meridiemSingle, base, use12);
+      setHM(hourSingle, minuteSingle, meridiemSingle, secondForSingle(), base, use12);
       return;
     }
     const s = rangeStart ?? now;
     const e = rangeEnd ?? rangeStart ?? now;
-    setHM(hourStart, minuteStart, meridiemStart, s, use12);
-    setHM(hourEnd, minuteEnd, meridiemEnd, e, use12);
+    setHM(hourStart, minuteStart, meridiemStart, secondForStart(), s, use12);
+    setHM(hourEnd, minuteEnd, meridiemEnd, secondForEnd(), e, use12);
   }
 
   function canGoPrevMonth(): boolean {
@@ -721,7 +788,8 @@ export const createCalendarPicker = (
 
   function updateTimeVisibility(): void {
     const st = options.showTime ?? false;
-    const use12 = options.use12HourTime ?? false;
+    const use12 = use12Hour();
+    const secs = showSecondsOn();
     const rng = mode() === "range";
     timeWrap.hidden = !st || rng;
     timeWrapRangeStart.hidden = !st || !rng;
@@ -732,6 +800,12 @@ export const createCalendarPicker = (
     meridiemSingle.hidden = !st || !use12 || rng;
     meridiemStart.hidden = !st || !use12 || !rng;
     meridiemEnd.hidden = !st || !use12 || !rng;
+    secondSingle.hidden = !st || !secs || rng;
+    timeSepSecondSingle.hidden = !st || !secs || rng;
+    secondStart.hidden = !st || !secs || !rng;
+    sepSecondStart.hidden = !st || !secs || !rng;
+    secondEnd.hidden = !st || !secs || !rng;
+    sepSecondEnd.hidden = !st || !secs || !rng;
   }
 
   function updateResetVisibility(): void {
@@ -810,10 +884,10 @@ export const createCalendarPicker = (
         hi = t;
       }
       rangeStart = shouldShowTimeOn(options)
-        ? applyHM(lo, hourStart, minuteStart, meridiemStart, options.use12HourTime ?? false)
+        ? applyHM(lo, hourStart, minuteStart, meridiemStart, secondForStart(), use12Hour())
         : lo;
       rangeEnd = shouldShowTimeOn(options)
-        ? applyHM(hi, hourEnd, minuteEnd, meridiemEnd, options.use12HourTime ?? false)
+        ? applyHM(hi, hourEnd, minuteEnd, meridiemEnd, secondForEnd(), use12Hour())
         : hi;
     }
     clearRangeHover();
@@ -873,7 +947,8 @@ export const createCalendarPicker = (
       hourSingle,
       minuteSingle,
       meridiemSingle,
-      options.use12HourTime ?? false,
+      secondForSingle(),
+      use12Hour(),
     );
     emitSingle();
   };
@@ -885,39 +960,37 @@ export const createCalendarPicker = (
       hourStart,
       minuteStart,
       meridiemStart,
-      options.use12HourTime ?? false,
+      secondForStart(),
+      use12Hour(),
     );
     if (rangeEnd && compareCalendarDay(rangeEnd, rangeStart) < 0) {
       rangeEnd = new Date(rangeStart);
-      setHM(hourEnd, minuteEnd, meridiemEnd, rangeEnd, options.use12HourTime ?? false);
+      setHM(hourEnd, minuteEnd, meridiemEnd, secondForEnd(), rangeEnd, use12Hour());
     }
     render();
   };
 
   const onTimeRangeEndChange = (): void => {
     if (!rangeEnd) return;
-    rangeEnd = applyHM(
-      rangeEnd,
-      hourEnd,
-      minuteEnd,
-      meridiemEnd,
-      options.use12HourTime ?? false,
-    );
+    rangeEnd = applyHM(rangeEnd, hourEnd, minuteEnd, meridiemEnd, secondForEnd(), use12Hour());
     if (rangeStart && compareCalendarDay(rangeEnd, rangeStart) < 0) {
       rangeStart = new Date(rangeEnd);
-      setHM(hourStart, minuteStart, meridiemStart, rangeStart, options.use12HourTime ?? false);
+      setHM(hourStart, minuteStart, meridiemStart, secondForStart(), rangeStart, use12Hour());
     }
     render();
   };
 
   hourSingle.addEventListener("change", onTimeSingleChange);
   minuteSingle.addEventListener("change", onTimeSingleChange);
+  secondSingle.addEventListener("change", onTimeSingleChange);
   meridiemSingle.addEventListener("change", onTimeSingleChange);
   hourStart.addEventListener("change", onTimeRangeStartChange);
   minuteStart.addEventListener("change", onTimeRangeStartChange);
+  secondStart.addEventListener("change", onTimeRangeStartChange);
   meridiemStart.addEventListener("change", onTimeRangeStartChange);
   hourEnd.addEventListener("change", onTimeRangeEndChange);
   minuteEnd.addEventListener("change", onTimeRangeEndChange);
+  secondEnd.addEventListener("change", onTimeRangeEndChange);
   meridiemEnd.addEventListener("change", onTimeRangeEndChange);
 
   render();

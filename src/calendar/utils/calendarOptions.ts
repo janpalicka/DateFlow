@@ -4,6 +4,9 @@ import type { CalendarOptions } from "../types/types";
 const effectiveOutputFormat = (options: CalendarOptions): string => {
   if (options.outputFormat) return options.outputFormat;
   if (!options.showTime) return "yyyy-MM-dd";
+  if (options.showSeconds) {
+    return options.use12HourTime ? "yyyy-MM-dd hh:mm:ss a" : "yyyy-MM-dd HH:mm:ss";
+  }
   return options.use12HourTime ? "yyyy-MM-dd hh:mm a" : "yyyy-MM-dd HH:mm";
 };
 

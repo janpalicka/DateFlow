@@ -56,14 +56,18 @@ function mountFloatingCalendarDemo(
   const options = opts ?? {};
   const wrap = document.createElement("div");
   wrap.className = "showcase-card__floating-trigger-wrap";
+  const defaultTimeFormat = (): string => {
+    if (options.showSeconds) {
+      return options.use12HourTime ? "yyyy-MM-dd hh:mm:ss a" : "yyyy-MM-dd HH:mm:ss";
+    }
+    return options.use12HourTime ? "yyyy-MM-dd hh:mm a" : "yyyy-MM-dd HH:mm";
+  };
   const singleFormatter =
     formatSingle ??
     ((date: Date | null): string => {
       if (!date) return "No date selected";
       if (!options.showTime) return format(date, "yyyy-MM-dd");
-      return options.use12HourTime
-        ? format(date, "yyyy-MM-dd hh:mm a")
-        : format(date, "yyyy-MM-dd HH:mm");
+      return format(date, defaultTimeFormat());
     });
 
   const trigger = document.createElement("pre");
@@ -96,9 +100,7 @@ function mountFloatingCalendarDemo(
       const fmt = options.outputFormat
         ? options.outputFormat
         : options.showTime
-          ? options.use12HourTime
-            ? "yyyy-MM-dd hh:mm a"
-            : "yyyy-MM-dd HH:mm"
+          ? defaultTimeFormat()
           : "yyyy-MM-dd";
       const sep = options.rangeOutputSeparator ?? " → ";
       const value = formatRangeLine(r, fmt, sep);
@@ -113,9 +115,7 @@ function mountFloatingCalendarDemo(
       const fmt = options.outputFormat
         ? options.outputFormat
         : options.showTime
-          ? options.use12HourTime
-            ? "yyyy-MM-dd hh:mm a"
-            : "yyyy-MM-dd HH:mm"
+          ? defaultTimeFormat()
           : "yyyy-MM-dd";
       const sep = options.rangeOutputSeparator ?? " → ";
       const initial = api.getRange();
@@ -238,10 +238,10 @@ export function mountShowcase(root: HTMLElement): void {
     const pre = makeLog("No date selected");
     const m = mountFloatingCalendarDemo(
       {
-      locale: germanLocale,
-      onChange: (d) => {
-        pre.textContent = d ? formatSelection(d) : "No date selected";
-      },
+        locale: germanLocale,
+        onChange: (d) => {
+          pre.textContent = d ? formatSelection(d) : "No date selected";
+        },
       },
       (value) => {
         pre.textContent = value;
@@ -262,10 +262,10 @@ export function mountShowcase(root: HTMLElement): void {
     const pre = makeLog("No date selected");
     const m = mountFloatingCalendarDemo(
       {
-      locale: frenchLocale,
-      onChange: (d) => {
-        pre.textContent = d ? formatSelection(d) : "No date selected";
-      },
+        locale: frenchLocale,
+        onChange: (d) => {
+          pre.textContent = d ? formatSelection(d) : "No date selected";
+        },
       },
       (value) => {
         pre.textContent = value;
@@ -281,13 +281,13 @@ export function mountShowcase(root: HTMLElement): void {
     const pre = makeLog("No date selected");
     const m = mountFloatingCalendarDemo(
       {
-      locale: {
-        ...czechLocale,
-        weekNumberHeader: "Tý",
-      },
-      onChange: (d) => {
-        pre.textContent = d ? formatSelection(d) : "No date selected";
-      },
+        locale: {
+          ...czechLocale,
+          weekNumberHeader: "Tý",
+        },
+        onChange: (d) => {
+          pre.textContent = d ? formatSelection(d) : "No date selected";
+        },
       },
       (value) => {
         pre.textContent = value;
@@ -308,11 +308,11 @@ export function mountShowcase(root: HTMLElement): void {
     const pre = makeLog("No date selected");
     const m = mountFloatingCalendarDemo(
       {
-      minDate: new Date(2026, 2, 10),
-      maxDate: new Date(2026, 2, 25),
-      onChange: (d) => {
-        pre.textContent = d ? formatSelection(d) : "No date selected";
-      },
+        minDate: new Date(2026, 2, 10),
+        maxDate: new Date(2026, 2, 25),
+        onChange: (d) => {
+          pre.textContent = d ? formatSelection(d) : "No date selected";
+        },
       },
       (value) => {
         pre.textContent = value;
@@ -333,10 +333,10 @@ export function mountShowcase(root: HTMLElement): void {
     const pre = makeLog("No date selected");
     const m = mountFloatingCalendarDemo(
       {
-      disabledDates: [new Date(2026, 2, 17), new Date(2026, 2, 18), new Date(2026, 2, 19)],
-      onChange: (d) => {
-        pre.textContent = d ? formatSelection(d) : "No date selected";
-      },
+        disabledDates: [new Date(2026, 2, 17), new Date(2026, 2, 18), new Date(2026, 2, 19)],
+        onChange: (d) => {
+          pre.textContent = d ? formatSelection(d) : "No date selected";
+        },
       },
       (value) => {
         pre.textContent = value;
@@ -357,10 +357,10 @@ export function mountShowcase(root: HTMLElement): void {
     const pre = makeLog("No date selected");
     const m = mountFloatingCalendarDemo(
       {
-      disabledDates: (d) => d.getDay() === 0 || d.getDay() === 6,
-      onChange: (d) => {
-        pre.textContent = d ? formatSelection(d) : "No date selected";
-      },
+        disabledDates: (d) => d.getDay() === 0 || d.getDay() === 6,
+        onChange: (d) => {
+          pre.textContent = d ? formatSelection(d) : "No date selected";
+        },
       },
       (value) => {
         pre.textContent = value;
@@ -377,10 +377,10 @@ export function mountShowcase(root: HTMLElement): void {
     const allowed = [5, 12, 19, 26].map((day) => new Date(2026, 2, day));
     const m = mountFloatingCalendarDemo(
       {
-      enabledDatesOnly: allowed,
-      onChange: (d) => {
-        pre.textContent = d ? formatSelection(d) : "No date selected";
-      },
+        enabledDatesOnly: allowed,
+        onChange: (d) => {
+          pre.textContent = d ? formatSelection(d) : "No date selected";
+        },
       },
       (value) => {
         pre.textContent = value;
@@ -401,10 +401,10 @@ export function mountShowcase(root: HTMLElement): void {
     const pre = makeLog("No date selected");
     const m = mountFloatingCalendarDemo(
       {
-      enabledDatesOnly: (d) => d.getDate() % 2 === 1,
-      onChange: (d) => {
-        pre.textContent = d ? formatSelection(d) : "No date selected";
-      },
+        enabledDatesOnly: (d) => d.getDate() % 2 === 1,
+        onChange: (d) => {
+          pre.textContent = d ? formatSelection(d) : "No date selected";
+        },
       },
       (value) => {
         pre.textContent = value;
@@ -425,11 +425,11 @@ export function mountShowcase(root: HTMLElement): void {
     const pre = makeLog("—");
     const m = mountFloatingCalendarDemo(
       {
-      showTime: true,
-      value: new Date(2026, 2, 20, 14, 45),
-      onChange: (d) => {
-        pre.textContent = d ? formatSelection(d) : "No date selected";
-      },
+        showTime: true,
+        value: new Date(2026, 2, 20, 14, 45),
+        onChange: (d) => {
+          pre.textContent = d ? formatSelection(d) : "No date selected";
+        },
       },
       (value) => {
         pre.textContent = value;
@@ -450,18 +450,23 @@ export function mountShowcase(root: HTMLElement): void {
     const pre = makeLog("No date selected");
     const m = mountFloatingCalendarDemo(
       {
-      theme: "dark",
-      showTime: true,
-      onChange: (d) => {
-        pre.textContent = d ? formatSelection(d) : "No date selected";
-      },
+        theme: "dark",
+        showTime: true,
+        onChange: (d) => {
+          pre.textContent = d ? formatSelection(d) : "No date selected";
+        },
       },
       (value) => {
         pre.textContent = value;
       },
     );
     grid.append(
-      card("11. Theme: dark preset", 'Uses data-cal-theme="dark" and bundled CSS variables.', m, []),
+      card(
+        "11. Theme: dark preset",
+        'Uses data-cal-theme="dark" and bundled CSS variables.',
+        m,
+        [],
+      ),
     );
   }
 
@@ -507,11 +512,11 @@ export function mountShowcase(root: HTMLElement): void {
     const pre = makeLog("—");
     const m = mountFloatingCalendarDemo(
       {
-      yearDropdownRadius: 3,
-      value: new Date(2026, 5, 1),
-      onChange: (d) => {
-        pre.textContent = d ? formatSelection(d) : "No date selected";
-      },
+        yearDropdownRadius: 3,
+        value: new Date(2026, 5, 1),
+        onChange: (d) => {
+          pre.textContent = d ? formatSelection(d) : "No date selected";
+        },
       },
       (value) => {
         pre.textContent = value;
@@ -615,15 +620,15 @@ export function mountShowcase(root: HTMLElement): void {
     const pre = makeLog("No date selected");
     const m = mountFloatingCalendarDemo(
       {
-      theme: "forest",
-      locale: germanLocale,
-      minDate: new Date(2026, 2, 1),
-      maxDate: new Date(2026, 3, 30),
-      disabledDates: (d) => d.getDay() === 3,
-      showTime: true,
-      onChange: (d) => {
-        pre.textContent = d ? formatSelection(d) : "No date selected";
-      },
+        theme: "forest",
+        locale: germanLocale,
+        minDate: new Date(2026, 2, 1),
+        maxDate: new Date(2026, 3, 30),
+        disabledDates: (d) => d.getDay() === 3,
+        showTime: true,
+        onChange: (d) => {
+          pre.textContent = d ? formatSelection(d) : "No date selected";
+        },
       },
       (value) => {
         pre.textContent = value;
@@ -644,17 +649,22 @@ export function mountShowcase(root: HTMLElement): void {
     const pre = makeLog("No date selected");
     const m = mountFloatingCalendarDemo(
       {
-      ariaLabel: "Delivery date",
-      onChange: (d) => {
-        pre.textContent = d ? formatSelection(d) : "No date selected";
-      },
+        ariaLabel: "Delivery date",
+        onChange: (d) => {
+          pre.textContent = d ? formatSelection(d) : "No date selected";
+        },
       },
       (value) => {
         pre.textContent = value;
       },
     );
     grid.append(
-      card("16. Accessibility: aria-label", "Root has a custom aria-label for screen readers.", m, []),
+      card(
+        "16. Accessibility: aria-label",
+        "Root has a custom aria-label for screen readers.",
+        m,
+        [],
+      ),
     );
   }
 
@@ -663,10 +673,10 @@ export function mountShowcase(root: HTMLElement): void {
     const pre = makeLog("No date selected");
     const m = mountFloatingCalendarDemo(
       {
-      theme: "contrast",
-      onChange: (d) => {
-        pre.textContent = d ? formatSelection(d) : "No date selected";
-      },
+        theme: "contrast",
+        onChange: (d) => {
+          pre.textContent = d ? formatSelection(d) : "No date selected";
+        },
       },
       (value) => {
         pre.textContent = value;
@@ -687,10 +697,10 @@ export function mountShowcase(root: HTMLElement): void {
     const pre = makeLog("—");
     const m = mountFloatingCalendarDemo(
       {
-      value: new Date(2026, 5, 8),
-      onChange: (d) => {
-        pre.textContent = d ? format(d, "yyyy-MM-dd") : "No date selected";
-      },
+        value: new Date(2026, 5, 8),
+        onChange: (d) => {
+          pre.textContent = d ? format(d, "yyyy-MM-dd") : "No date selected";
+        },
       },
       (value) => {
         pre.textContent = value;
@@ -715,12 +725,12 @@ export function mountShowcase(root: HTMLElement): void {
     const pre = makeLog("—");
     const m = mountFloatingCalendarDemo(
       {
-      value: new Date(2026, 7, 19, 15, 0),
-      showTime: true,
-      outputFormat: "EEEE, d MMMM yyyy 'at' HH:mm",
-      onChange: (d) => {
-        pre.textContent = d ? format(d, "EEEE, d MMMM yyyy 'at' HH:mm") : "No date selected";
-      },
+        value: new Date(2026, 7, 19, 15, 0),
+        showTime: true,
+        outputFormat: "EEEE, d MMMM yyyy 'at' HH:mm",
+        onChange: (d) => {
+          pre.textContent = d ? format(d, "EEEE, d MMMM yyyy 'at' HH:mm") : "No date selected";
+        },
       },
       (value) => {
         pre.textContent = value;
@@ -745,11 +755,11 @@ export function mountShowcase(root: HTMLElement): void {
     const pre = makeLog("No date selected");
     const m = mountFloatingCalendarDemo(
       {
-      showWeekNumbers: true,
-      locale: germanLocale,
-      onChange: (d) => {
-        pre.textContent = d ? format(d, "yyyy-MM-dd") : "No date selected";
-      },
+        showWeekNumbers: true,
+        locale: germanLocale,
+        onChange: (d) => {
+          pre.textContent = d ? format(d, "yyyy-MM-dd") : "No date selected";
+        },
       },
       (value) => {
         pre.textContent = value;
@@ -775,15 +785,15 @@ export function mountShowcase(root: HTMLElement): void {
     const fmt = "yyyy-MM-dd";
     const m = mountFloatingCalendarDemo(
       {
-      mode: "range",
-      range: {
-        start: new Date(2026, 2, 5),
-        end: new Date(2026, 2, 18),
-      },
-      outputFormat: fmt,
-      onRangeChange: (r) => {
-        pre.textContent = formatRangeLine(r, fmt, " → ");
-      },
+        mode: "range",
+        range: {
+          start: new Date(2026, 2, 5),
+          end: new Date(2026, 2, 18),
+        },
+        outputFormat: fmt,
+        onRangeChange: (r) => {
+          pre.textContent = formatRangeLine(r, fmt, " → ");
+        },
       },
       () => {},
       (value) => {
@@ -806,16 +816,16 @@ export function mountShowcase(root: HTMLElement): void {
     const fmt = "yyyy-MM-dd HH:mm";
     const m = mountFloatingCalendarDemo(
       {
-      mode: "range",
-      showTime: true,
-      range: {
-        start: new Date(2026, 3, 10, 9, 30),
-        end: new Date(2026, 3, 14, 17, 45),
-      },
-      outputFormat: fmt,
-      onRangeChange: (r) => {
-        pre.textContent = formatRangeLine(r, fmt, " → ");
-      },
+        mode: "range",
+        showTime: true,
+        range: {
+          start: new Date(2026, 3, 10, 9, 30),
+          end: new Date(2026, 3, 14, 17, 45),
+        },
+        outputFormat: fmt,
+        onRangeChange: (r) => {
+          pre.textContent = formatRangeLine(r, fmt, " → ");
+        },
       },
       () => {},
       (value) => {
@@ -839,17 +849,17 @@ export function mountShowcase(root: HTMLElement): void {
     const sep = " — ";
     const m = mountFloatingCalendarDemo(
       {
-      mode: "range",
-      showTime: true,
-      outputFormat: fmt,
-      rangeOutputSeparator: sep,
-      range: {
-        start: new Date(2026, 8, 1, 8, 0),
-        end: new Date(2026, 8, 7, 20, 0),
-      },
-      onRangeChange: (r) => {
-        pre.textContent = formatRangeLine(r, fmt, sep);
-      },
+        mode: "range",
+        showTime: true,
+        outputFormat: fmt,
+        rangeOutputSeparator: sep,
+        range: {
+          start: new Date(2026, 8, 1, 8, 0),
+          end: new Date(2026, 8, 7, 20, 0),
+        },
+        onRangeChange: (r) => {
+          pre.textContent = formatRangeLine(r, fmt, sep);
+        },
       },
       () => {},
       (value) => {
@@ -872,14 +882,14 @@ export function mountShowcase(root: HTMLElement): void {
     const fmt = "yyyy-MM-dd";
     const m = mountFloatingCalendarDemo(
       {
-      mode: "range",
-      showWeekNumbers: true,
-      locale: { weekNumberHeader: "KW" },
-      outputFormat: fmt,
-      range: { start: new Date(2026, 0, 6), end: new Date(2026, 0, 20) },
-      onRangeChange: (r) => {
-        pre.textContent = formatRangeLine(r, fmt, " → ");
-      },
+        mode: "range",
+        showWeekNumbers: true,
+        locale: { weekNumberHeader: "KW" },
+        outputFormat: fmt,
+        range: { start: new Date(2026, 0, 6), end: new Date(2026, 0, 20) },
+        onRangeChange: (r) => {
+          pre.textContent = formatRangeLine(r, fmt, " → ");
+        },
       },
       () => {},
       (value) => {
@@ -902,16 +912,16 @@ export function mountShowcase(root: HTMLElement): void {
     const fmt = "yyyy-MM-dd";
     const m = mountFloatingCalendarDemo(
       {
-      mode: "range",
-      theme: "dark",
-      outputFormat: fmt,
-      range: {
-        start: new Date(2026, 4, 12),
-        end: new Date(2026, 4, 26),
-      },
-      onRangeChange: (r) => {
-        pre.textContent = formatRangeLine(r, fmt, " → ");
-      },
+        mode: "range",
+        theme: "dark",
+        outputFormat: fmt,
+        range: {
+          start: new Date(2026, 4, 12),
+          end: new Date(2026, 4, 26),
+        },
+        onRangeChange: (r) => {
+          pre.textContent = formatRangeLine(r, fmt, " → ");
+        },
       },
       () => {},
       (value) => {
@@ -944,14 +954,7 @@ export function mountShowcase(root: HTMLElement): void {
         pre.textContent = value;
       },
     );
-    grid.append(
-      card(
-        "26. Time selection (12-hour)",
-        "Hour 1-12 with AM/PM selector.",
-        m,
-        [],
-      ),
-    );
+    grid.append(card("26. Time selection (12-hour)", "Hour 1-12 with AM/PM selector.", m, []));
   }
 
   /* 27 — Reset button */
@@ -975,6 +978,59 @@ export function mountShowcase(root: HTMLElement): void {
       card(
         "27. Reset button",
         "Set `showResetButton: true` to show a header reset icon next to the next arrow (`resetInputLabel` controls its aria-label/title).",
+        m,
+        [],
+      ),
+    );
+  }
+
+  /* 28 — Time with seconds */
+  {
+    const pre = makeLog("—");
+    const m = mountFloatingCalendarDemo(
+      {
+        value: new Date(2026, 2, 15, 14, 30, 45),
+        showTime: true,
+        showSeconds: true,
+        onChange: (d) => {
+          pre.textContent = d ? format(d, "yyyy-MM-dd HH:mm:ss") : "No date selected";
+        },
+      },
+      (value) => {
+        pre.textContent = value;
+      },
+    );
+    grid.append(
+      card(
+        "28. Time selection with seconds",
+        "`showSeconds: true` adds a seconds selector when `showTime` is enabled (default `false`).",
+        m,
+        [],
+      ),
+    );
+  }
+
+  /* 29 — Time with seconds (12-hour) */
+  {
+    const pre = makeLog("—");
+    const m = mountFloatingCalendarDemo(
+      {
+        value: new Date(2026, 2, 15, 15, 30, 45),
+        showTime: true,
+        showSeconds: true,
+        use12HourTime: true,
+        onChange: (d) => {
+          pre.textContent = d ? format(d, "yyyy-MM-dd hh:mm:ss a") : "No date selected";
+        },
+      },
+      (value) => {
+        pre.textContent = value;
+      },
+    );
+    grid.append(
+      card(
+        "29. Time selection with seconds (12-hour)",
+        "`showSeconds: true` with `use12HourTime: true` — hour, minute, second, and AM/PM selectors.",
         m,
         [],
       ),

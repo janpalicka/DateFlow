@@ -412,19 +412,14 @@
 
 .cal__time {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: center;
-  gap: 0.35rem;
-}
-
-.cal__time-wrap--pane .cal__time {
-  flex-wrap: nowrap;
-  justify-content: center;
+  gap: 0.25rem;
 }
 
 .cal__time-label {
-  flex: 1 1 100%;
+  flex: 0 0 auto;
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -432,20 +427,23 @@
   color: var(--cal-muted);
 }
 
-.cal__time-wrap--pane .cal__time-label {
-  flex: 0 0 auto;
+.cal__time-label:empty {
+  display: none;
 }
 
 .cal__time .cal__select {
-  flex: 0 1 4.5rem;
+  flex: 0 0 auto;
+  min-width: 3.4rem;
   text-align: center;
+  padding: 0.35rem 1.65rem 0.35rem 0.4rem;
 }
 
 .cal__time .cal__select--meridiem {
-  flex-basis: 4.25rem;
+  min-width: 3.6rem;
 }
 
 .cal__time-sep {
+  flex: 0 0 auto;
   font-weight: 600;
   color: var(--cal-muted);
 }

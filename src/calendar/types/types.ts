@@ -59,9 +59,14 @@ export interface CalendarOptions {
    */
   use12HourTime?: boolean;
   /**
+   * When `showTime` is enabled, show a seconds selector after minutes.
+   * Default: `false`.
+   */
+  showSeconds?: boolean;
+  /**
    * [date-fns `format`](https://date-fns.org/docs/format) for the visible &lt;output&gt; text.
    * Default: `"yyyy-MM-dd"` without time, `"yyyy-MM-dd HH:mm"` with 24h time,
-   * `"yyyy-MM-dd hh:mm a"` with 12h time.
+   * `"yyyy-MM-dd hh:mm a"` with 12h time, with `:ss` when `showSeconds` is enabled.
    */
   outputFormat?: string;
   /** Between start and end when `mode === "range"` and both ends exist. Default: `" → "`. */
