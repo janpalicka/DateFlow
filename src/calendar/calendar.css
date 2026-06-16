@@ -48,6 +48,14 @@
   grid-template-columns: 1fr;
 }
 
+.cal__header--range-start {
+  grid-template-columns: auto 1fr auto;
+}
+
+.cal__header--range-end {
+  grid-template-columns: 1fr auto;
+}
+
 .cal__panes {
   display: grid;
   gap: 1rem;

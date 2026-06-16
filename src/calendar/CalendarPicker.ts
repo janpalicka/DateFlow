@@ -1031,12 +1031,30 @@ export const createCalendarPicker = (
     }
   }
 
+  function layoutRangeHeaders(): void {
+    const isRange = mode() === "range";
+    if (isRange) {
+      if (btnNext.parentElement !== headerRight) {
+        headerRight.append(btnNext);
+      }
+      header.classList.add("cal__header--range-start");
+      headerRight.classList.add("cal__header--range-end");
+      return;
+    }
+    if (btnNext.parentElement !== header) {
+      header.insertBefore(btnNext, btnReset);
+    }
+    header.classList.remove("cal__header--range-start");
+    headerRight.classList.remove("cal__header--range-end");
+  }
+
   function render(): void {
     const isRange = mode() === "range";
     const hasRangeSelection = Boolean(rangeStart || rangeEnd);
     root.classList.toggle("cal--range", isRange);
     paneRight.hidden = !isRange;
     rangeActions.hidden = !isRange || !hasRangeSelection;
+    layoutRangeHeaders();
     fillMonthYearSelects();
     renderWeekdays();
     renderGrid();
