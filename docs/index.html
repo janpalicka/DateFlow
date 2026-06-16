@@ -171,24 +171,13 @@ createCalendarPicker(input, {
 import { cs } from "@/calendar/locales";
 
 createCalendarPicker(input, {
+  showWeekNumbers: true,
   locale: {
     ...cs,
     weekNumberHeader: "Tý",
   },
 });</code></pre>
           <div class="showcase-card__mount" data-demo="locale-partial"></div>
-          
-        </article>
-        <article class="showcase-card">
-          <h3 class="showcase-card__title">ISO week numbers</h3>
-          <p class="showcase-card__desc">showWeekNumbers adds an ISO week column. Override the header via locale.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
-  showWeekNumbers: true,
-  locale: {
-    weekNumberHeader: "KW", // default: "Wk"
-  },
-});</code></pre>
-          <div class="showcase-card__mount" data-demo="week-numbers"></div>
           
         </article>
         </div>
@@ -201,6 +190,7 @@ createCalendarPicker(input, {
           <h3 class="showcase-card__title">Min and max date</h3>
           <p class="showcase-card__desc">Only days within the inclusive range are selectable.</p>
           <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  value: new Date(2026, 2, 15),
   minDate: new Date(2026, 2, 10),
   maxDate: new Date(2026, 2, 25),
   onChange: (date) => { /* … */ },
@@ -212,6 +202,7 @@ createCalendarPicker(input, {
           <h3 class="showcase-card__title">Disabled dates (array)</h3>
           <p class="showcase-card__desc">Block specific dates — useful for holidays or closures.</p>
           <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  value: new Date(2026, 2, 15),
   disabledDates: [
     new Date(2026, 2, 17),
     new Date(2026, 2, 18),
@@ -241,6 +232,7 @@ createCalendarPicker(input, {
 );
 
 createCalendarPicker(input, {
+  value: new Date(2026, 2, 12),
   enabledDatesOnly: allowed,
 });</code></pre>
           <div class="showcase-card__mount" data-demo="enabled-array"></div>
@@ -405,7 +397,7 @@ createCalendarPicker(input, {
   mode: "range",
   showTime: true,
   outputFormat: "dd.MM.yyyy HH:mm",
-  rangeOutputSeparator: " — ",
+  rangeOutputSeparator: " → ",
   range: {
     start: new Date(2026, 8, 1, 8, 0),
     end: new Date(2026, 8, 7, 20, 0),

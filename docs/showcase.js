@@ -47,7 +47,7 @@ function mountFloatingCalendarDemo(opts, hooks = {}) {
         : options.showTime
           ? defaultTimeFormat()
           : "yyyy-MM-dd";
-      const sep = options.rangeOutputSeparator ?? " → ";
+      const sep = options.rangeOutputSeparator ?? "—";
       hooks.onRangeChange?.(formatRangeLine(r, fmt, sep));
     },
   });
@@ -74,20 +74,18 @@ function mountDemo(key) {
       return mountFloatingCalendarDemo({ locale: fr }).wrap;
     case "locale-partial":
       return mountFloatingCalendarDemo({
-        locale: { ...cs, weekNumberHeader: "Tý" },
-      }).wrap;
-    case "week-numbers":
-      return mountFloatingCalendarDemo({
         showWeekNumbers: true,
-        locale: de,
+        locale: { ...cs, weekNumberHeader: "Tý" },
       }).wrap;
     case "min-max":
       return mountFloatingCalendarDemo({
+        value: new Date(2026, 2, 15),
         minDate: new Date(2026, 2, 10),
         maxDate: new Date(2026, 2, 25),
       }).wrap;
     case "disabled-array":
       return mountFloatingCalendarDemo({
+        value: new Date(2026, 2, 15),
         disabledDates: [new Date(2026, 2, 17), new Date(2026, 2, 18), new Date(2026, 2, 19)],
       }).wrap;
     case "disabled-predicate":
@@ -96,6 +94,7 @@ function mountDemo(key) {
       }).wrap;
     case "enabled-array":
       return mountFloatingCalendarDemo({
+        value: new Date(2026, 2, 12),
         enabledDatesOnly: [5, 12, 19, 26].map((day) => new Date(2026, 2, day)),
       }).wrap;
     case "enabled-predicate":
@@ -173,7 +172,7 @@ function mountDemo(key) {
         mode: "range",
         showTime: true,
         outputFormat: "dd.MM.yyyy HH:mm",
-        rangeOutputSeparator: " — ",
+        rangeOutputSeparator: " → ",
         range: {
           start: new Date(2026, 8, 1, 8, 0),
           end: new Date(2026, 8, 7, 20, 0),

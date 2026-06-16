@@ -140,6 +140,7 @@ export const createCalendarPicker = (
       return;
     }
     container.hidden = true;
+    onPanelClosed();
   };
 
   const durationTipIdBase = `cal-dur-${Math.random().toString(36).slice(2, 11)}`;
@@ -152,6 +153,15 @@ export const createCalendarPicker = (
   let committedRangeEnd: Date | null = null;
   /** Tentative end while choosing a range (pointer hover). */
   let rangeHoverEnd: Date | null = null;
+
+  function onPanelClosed(): void {
+    if (mode() !== "range") return;
+    if (!rangeStart || rangeEnd) return;
+    clearRangeHover();
+    rangeStart = committedRangeStart ? new Date(committedRangeStart.getTime()) : null;
+    rangeEnd = committedRangeEnd ? new Date(committedRangeEnd.getTime()) : null;
+    render();
+  }
 
   if (mode() === "single") {
     selected = options.value ?? null;
@@ -421,6 +431,7 @@ export const createCalendarPicker = (
   if (options.popover ?? true) {
     popover = attachCalendarPopover(valueInput, container, {
       floating: !(options.inline ?? false),
+      onClose: onPanelClosed,
     });
   }
 
@@ -461,7 +472,7 @@ export const createCalendarPicker = (
   };
 
   const formatRangeForInput = (): string => {
-    const sep = options.rangeOutputSeparator ?? " → ";
+    const sep = options.rangeOutputSeparator ?? "—";
     const fmt = effectiveOutputFormat(options);
     if (!rangeStart) return "";
     const start = format(dateOnlyIfNeeded(options, rangeStart), fmt);
@@ -529,7 +540,7 @@ export const createCalendarPicker = (
     const ref = selected ?? rangeStart ?? new Date();
 
     if (mode() === "range") {
-      const sep = options.rangeOutputSeparator ?? " → ";
+      const sep = options.rangeOutputSeparator ?? "—";
       const trimmed = text.trim();
       if (!trimmed) {
         clearRangeHover();

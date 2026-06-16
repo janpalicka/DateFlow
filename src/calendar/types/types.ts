@@ -73,7 +73,7 @@ export interface CalendarOptions {
    * `"yyyy-MM-dd hh:mm a"` with 12h time, with `:ss` when `showSeconds` is enabled.
    */
   outputFormat?: string;
-  /** Between start and end when `mode === "range"` and both ends exist. Default: `" → "`. */
+  /** Between start and end when `mode === "range"` and both ends exist. Default: `"—"`. */
   rangeOutputSeparator?: string;
   /** Show ISO week numbers in the first column. Default: `false`. */
   showWeekNumbers?: boolean;

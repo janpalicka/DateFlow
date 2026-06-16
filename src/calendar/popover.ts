@@ -9,7 +9,13 @@ export interface CalendarPopover {
 export function attachCalendarPopover(
   input: HTMLInputElement,
   panel: HTMLElement,
-  { floating }: { floating: boolean },
+  {
+    floating,
+    onClose,
+  }: {
+    floating: boolean;
+    onClose?: () => void;
+  },
 ): CalendarPopover {
   input.setAttribute("aria-expanded", "false");
   if (floating) {
@@ -36,6 +42,7 @@ export function attachCalendarPopover(
     cleanupAutoUpdate?.();
     cleanupAutoUpdate = null;
     input.setAttribute("aria-expanded", "false");
+    onClose?.();
   };
 
   const open = (): void => {
