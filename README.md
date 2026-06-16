@@ -1,4 +1,6 @@
-# DateFlow
+<p align="center">
+  <img src="./assets/logo.png" alt="DateFlow — pick, select, flow" width="320" />
+</p>
 
 Lightweight date and date-range calendar picker for the web. Vanilla TypeScript, no framework required. Built-in popover positioning via [Floating UI](https://floating-ui.com/).
 

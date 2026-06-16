@@ -6,6 +6,7 @@ const rootDir = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
   root: path.resolve(rootDir, "docs"),
+  publicDir: path.resolve(rootDir, "assets"),
   resolve: {
     alias: {
       "@": path.resolve(rootDir, "src"),

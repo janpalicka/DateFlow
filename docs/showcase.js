@@ -299,8 +299,40 @@ function mountQuickStartDemo() {
   });
 }
 
+function initTocSpy() {
+  const links = [...document.querySelectorAll(".showcase-toc__link")];
+  const sectionIds = links
+    .map((link) => link.getAttribute("href")?.slice(1))
+    .filter((id) => id);
+  const sections = sectionIds
+    .map((id) => document.getElementById(id))
+    .filter((el) => el instanceof HTMLElement);
+
+  if (!sections.length) return;
+
+  const setActive = (id) => {
+    for (const link of links) {
+      link.classList.toggle("is-active", link.getAttribute("href") === `#${id}`);
+    }
+  };
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      const visible = entries
+        .filter((entry) => entry.isIntersecting)
+        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+      if (visible?.target.id) setActive(visible.target.id);
+    },
+    { rootMargin: "-25% 0px -55% 0px", threshold: [0, 0.15, 0.4] },
+  );
+
+  for (const section of sections) observer.observe(section);
+  setActive(sectionIds[0]);
+}
+
 function initShowcase() {
   mountQuickStartDemo();
+  initTocSpy();
   for (const mount of document.querySelectorAll("[data-demo]")) {
     const key = mount.dataset.demo;
     if (!key) continue;

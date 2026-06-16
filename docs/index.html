@@ -3,35 +3,78 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Calendar picker — documentation</title>
+    <meta
+      name="description"
+      content="DateFlow — lightweight date and range calendar picker for the web. Interactive API reference and live examples."
+    />
+    <meta name="theme-color" content="#1e3a5f" />
+    <title>DateFlow — documentation</title>
+    <link rel="icon" href="/logo.png" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="/showcase.css" />
   </head>
   <body>
-    <main class="showcase">
-      <header class="showcase__hero">
-        <h1>Calendar picker</h1>
-        <p>
-          Interactive reference for <code>createCalendarPicker</code>. Start with the
-          <a href="#quick-start">quick start example</a>, then browse options below.
-        </p>
+    <div class="showcase-shell">
+      <header class="site-header">
+        <a class="site-header__brand" href="#top" aria-label="DateFlow home">
+          <img class="site-header__logo" src="/logo.png" alt="" width="88" />
+        </a>
+        <nav class="site-header__nav" aria-label="External links">
+          <a
+            class="site-header__link"
+            href="https://github.com/janpalicka/DateFlow"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GitHub
+          </a>
+          <a class="site-header__link site-header__link--primary" href="#quick-start">
+            Quick start
+          </a>
+        </nav>
       </header>
 
-      <nav class="showcase-toc" aria-label="Documentation sections">
-        <h2 class="showcase-toc__title">On this page</h2>
-        <div class="showcase-toc__list">
-          <a class="showcase-toc__link" href="#quick-start">Quick start</a>
-          <a class="showcase-toc__link" href="#getting-started">Getting started</a>
-          <a class="showcase-toc__link" href="#localization">Localization</a>
-          <a class="showcase-toc__link" href="#constraints">Constraining dates</a>
-          <a class="showcase-toc__link" href="#time">Time selection</a>
-          <a class="showcase-toc__link" href="#allow-input">Direct text input</a>
-          <a class="showcase-toc__link" href="#ranges">Date ranges</a>
-          <a class="showcase-toc__link" href="#formatting">Formatting</a>
-          <a class="showcase-toc__link" href="#theming">Theming &amp; accessibility</a>
+      <section class="showcase-hero" id="top" aria-labelledby="hero-title">
+        <div class="showcase-hero__glow" aria-hidden="true"></div>
+        <div class="showcase-hero__inner">
+          <p class="showcase-hero__eyebrow">Vanilla TypeScript · Floating UI</p>
+          <h1 id="hero-title" class="showcase-hero__title">Date &amp; range picker for the web</h1>
+          <p class="showcase-hero__lead">
+            Interactive reference for <code>createCalendarPicker</code> — single dates, ranges,
+            time selection, locales, and theming. No framework required.
+          </p>
+          <div class="showcase-hero__actions">
+            <a class="showcase-hero__cta" href="#quick-start">Try the live demo</a>
+            <code class="showcase-hero__install">npm install dateflow</code>
+          </div>
         </div>
-      </nav>
+      </section>
 
-      <div class="showcase__content">
+      <div class="showcase-layout">
+        <aside class="showcase-sidebar">
+          <nav class="showcase-toc" aria-label="Documentation sections">
+            <h2 class="showcase-toc__title">On this page</h2>
+            <ol class="showcase-toc__list">
+              <li><a class="showcase-toc__link" href="#quick-start">Quick start</a></li>
+              <li><a class="showcase-toc__link" href="#getting-started">Getting started</a></li>
+              <li><a class="showcase-toc__link" href="#localization">Localization</a></li>
+              <li><a class="showcase-toc__link" href="#constraints">Constraining dates</a></li>
+              <li><a class="showcase-toc__link" href="#time">Time selection</a></li>
+              <li><a class="showcase-toc__link" href="#allow-input">Direct text input</a></li>
+              <li><a class="showcase-toc__link" href="#ranges">Date ranges</a></li>
+              <li><a class="showcase-toc__link" href="#formatting">Formatting</a></li>
+              <li><a class="showcase-toc__link" href="#theming">Theming &amp; accessibility</a></li>
+            </ol>
+          </nav>
+        </aside>
+
+        <main class="showcase-main">
+          <div class="showcase__content">
       <section id="quick-start" class="showcase-quickstart" aria-labelledby="quick-start-title">
         <div class="showcase-quickstart__intro">
           <p class="showcase-quickstart__eyebrow">Quick start</p>
@@ -538,8 +581,17 @@ createCalendarPicker(input, {
         </article>
         </div>
       </section>
+          </div>
+        </main>
       </div>
-    </main>
+
+      <footer class="site-footer">
+        <p>
+          <a href="https://github.com/janpalicka/DateFlow">DateFlow</a>
+          — MIT License
+        </p>
+      </footer>
+    </div>
     <script type="module" src="/showcase.js"></script>
   </body>
 </html>
