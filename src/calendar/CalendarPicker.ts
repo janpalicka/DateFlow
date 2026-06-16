@@ -13,7 +13,7 @@ import {
 import type {
   CalendarMode,
   CalendarOptions,
-  CalendarPickerAPI,
+  CalendarPickerInstance,
   DateRangeValue,
 } from "@/calendar/types";
 import {
@@ -29,6 +29,7 @@ import {
   shouldShowTimeOn,
   yearRange,
 } from "@/calendar/utils";
+import { attachCalendarPopover, type CalendarPopover } from "./popover";
 import "./calendar.css";
 
 const fillSecond = (selectS: HTMLSelectElement): void => {
@@ -110,10 +111,37 @@ const applyHM = (
 };
 
 export const createCalendarPicker = (
-  container: HTMLElement,
+  input: HTMLInputElement,
   initial: CalendarOptions = {},
-): CalendarPickerAPI => {
+): CalendarPickerInstance => {
+  if (!(input instanceof HTMLInputElement)) {
+    throw new TypeError("createCalendarPicker expects an HTMLInputElement");
+  }
+
   let options: CalendarOptions = { ...initial };
+  const valueInput = input;
+  valueInput.classList.add("cal__input");
+  if (!valueInput.type) valueInput.type = "text";
+  valueInput.spellcheck = false;
+
+  const container = document.createElement("div");
+  container.className = "cal-anchor";
+  container.hidden = true;
+  if (options.inline) {
+    valueInput.insertAdjacentElement("afterend", container);
+  } else {
+    (options.appendTo ?? document.body).append(container);
+  }
+
+  let popover: CalendarPopover | null = null;
+  const hidePanel = (): void => {
+    if (popover) {
+      popover.close();
+      return;
+    }
+    container.hidden = true;
+  };
+
   const durationTipIdBase = `cal-dur-${Math.random().toString(36).slice(2, 11)}`;
   const mode = (): CalendarMode => options.mode ?? "single";
 
@@ -147,12 +175,6 @@ export const createCalendarPicker = (
   const anchor = selected ?? rangeStart ?? rangeEnd ?? now;
   viewYear = anchor.getFullYear();
   viewMonth = anchor.getMonth();
-
-  const valueInput = document.createElement("input");
-  valueInput.type = "text";
-  valueInput.className = "cal__input";
-  valueInput.setAttribute("aria-label", "Selected date");
-  valueInput.spellcheck = false;
 
   const root = document.createElement("div");
   root.className = ["cal", options.className].filter(Boolean).join(" ");
@@ -396,6 +418,12 @@ export const createCalendarPicker = (
   root.append(panes, rangeActions, timeWrap);
   container.append(root);
 
+  if (options.popover ?? true) {
+    popover = attachCalendarPopover(valueInput, container, {
+      floating: !(options.inline ?? false),
+    });
+  }
+
   fillHourMinute(hourSingle, minuteSingle, meridiemSingle, options.use12HourTime ?? false);
   fillHourMinute(hourStart, minuteStart, meridiemStart, options.use12HourTime ?? false);
   fillHourMinute(hourEnd, minuteEnd, meridiemEnd, options.use12HourTime ?? false);
@@ -594,7 +622,7 @@ export const createCalendarPicker = (
     const committed = commitTypedInput();
     valueInput.blur();
     if (committed && !(options.keepOpenOnAllowInputEnter ?? false)) {
-      container.hidden = true;
+      hidePanel();
     }
   };
 
@@ -889,7 +917,7 @@ export const createCalendarPicker = (
             : dayOnly;
           emitSingle();
           if (options.hideOnSingleSelect ?? true) {
-            container.hidden = true;
+            hidePanel();
           }
         } else {
           const clicked = new Date(cellYear, cellMonth, dayNum, 0, 0, 0, 0);
@@ -1084,7 +1112,7 @@ export const createCalendarPicker = (
     clearRangeHover();
     syncCommittedRange();
     emitRange();
-    container.hidden = true;
+    hidePanel();
     render();
   });
 
@@ -1095,7 +1123,7 @@ export const createCalendarPicker = (
     rangeEnd = null;
     syncCommittedRange();
     emitRange();
-    container.hidden = true;
+    hidePanel();
     render();
   });
 
@@ -1317,11 +1345,20 @@ export const createCalendarPicker = (
     getInputElement(): HTMLInputElement {
       return valueInput;
     },
+    getCalendarElement(): HTMLElement {
+      return container;
+    },
+    open(): void {
+      popover?.open();
+    },
+    close(): void {
+      hidePanel();
+    },
     destroy(): void {
+      popover?.destroy();
       valueInput.removeEventListener("blur", onInputBlur);
       valueInput.removeEventListener("keydown", onInputKeydown);
-      valueInput.remove();
-      root.remove();
+      container.remove();
     },
   };
 };

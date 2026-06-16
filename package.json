@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vp dev",
+    "dev": "vp dev --open /index.html",
     "build": "vp build",
-    "preview": "vp preview",
+    "preview": "vp preview --open /index.html",
     "check": "vp check",
     "fix": "vp check --fix",
     "fmt": "vp fmt",

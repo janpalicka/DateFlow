@@ -5,14 +5,15 @@ import { defineConfig } from "vite-plus";
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
-  root: ".",
+  root: path.resolve(rootDir, "docs"),
   resolve: {
     alias: {
       "@": path.resolve(rootDir, "src"),
     },
   },
   build: {
-    outDir: "dist",
+    outDir: path.resolve(rootDir, "dist"),
+    emptyOutDir: true,
     sourcemap: true,
   },
   preview: {
@@ -21,7 +22,7 @@ export default defineConfig({
   },
   // Oxlint (ESLint-compatible `import/*` rules). Import *order* is enforced by Oxfmt `sortImports` below.
   lint: {
-    ignorePatterns: ["dist/**", "node_modules/**", ".vscode/**"],
+    ignorePatterns: ["dist/**", "node_modules/**", ".vscode/**", "docs/**"],
     plugins: ["import"],
     options: {
       typeAware: true,
@@ -51,7 +52,7 @@ export default defineConfig({
     },
   },
   fmt: {
-    ignorePatterns: ["dist/**", "node_modules/**", ".vscode/**"],
+    ignorePatterns: ["dist/**", "node_modules/**", ".vscode/**", "docs/**"],
     sortPackageJson: true,
     sortImports: {
       tsconfig: { rootDir: "." },

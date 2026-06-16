@@ -407,8 +407,14 @@
 
 /* `hidden` must beat `.cal__time { display: flex }` or all time rows stay visible. */
 .cal__time-wrap[hidden],
-.cal__time[hidden] {
+.cal__time[hidden],
+.cal-anchor[hidden] {
   display: none !important;
+}
+
+.cal-anchor--floating {
+  position: fixed;
+  z-index: 9999;
 }
 
 .cal__time {

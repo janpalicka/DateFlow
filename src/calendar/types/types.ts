@@ -109,17 +109,38 @@ export interface CalendarOptions {
   resetInputLabel?: string;
   /** Accessible label for the calendar region */
   ariaLabel?: string;
+  /**
+   * Where the calendar panel is mounted when `inline` is false.
+   * Default: `document.body`.
+   */
+  appendTo?: HTMLElement;
+  /**
+   * Insert the calendar panel as the next sibling of the input.
+   * Default: `false` (panel is appended to `appendTo`).
+   */
+  inline?: boolean;
+  /**
+   * Open the panel on input focus/click, position it with Floating UI when not `inline`,
+   * and close on outside click or Escape. Default: `true`.
+   */
+  popover?: boolean;
 }
 
-export interface CalendarPickerAPI {
+export interface CalendarPickerInstance {
   getValue(): Date | null;
   setValue(date: Date | null): void;
   getRange(): DateRangeValue;
   setRange(range: DateRangeValue): void;
   /** Merge options and re-render (e.g. change locale or constraints). */
   setOptions(partial: Partial<CalendarOptions>): void;
-  /** Value input created by the picker; append to your layout and use as the calendar anchor. */
+  /** The input element passed to {@link createCalendarPicker}. */
   getInputElement(): HTMLInputElement;
+  /** Root wrapper for the calendar panel (initially hidden). */
+  getCalendarElement(): HTMLElement;
+  /** Show the calendar panel (no-op when `popover` is false). */
+  open(): void;
+  /** Hide the calendar panel. */
+  close(): void;
   destroy(): void;
 }
 

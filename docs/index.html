@@ -1,0 +1,549 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Calendar picker — documentation</title>
+    <link rel="stylesheet" href="/showcase.css" />
+  </head>
+  <body>
+    <main class="showcase">
+      <header class="showcase__hero">
+        <h1>Calendar picker</h1>
+        <p>
+          Interactive reference for <code>createCalendarPicker</code>. Start with the
+          <a href="#quick-start">quick start example</a>, then browse options below.
+        </p>
+      </header>
+
+      <nav class="showcase-toc" aria-label="Documentation sections">
+        <h2 class="showcase-toc__title">On this page</h2>
+        <div class="showcase-toc__list">
+          <a class="showcase-toc__link" href="#quick-start">Quick start</a>
+          <a class="showcase-toc__link" href="#getting-started">Getting started</a>
+          <a class="showcase-toc__link" href="#localization">Localization</a>
+          <a class="showcase-toc__link" href="#constraints">Constraining dates</a>
+          <a class="showcase-toc__link" href="#time">Time selection</a>
+          <a class="showcase-toc__link" href="#allow-input">Direct text input</a>
+          <a class="showcase-toc__link" href="#ranges">Date ranges</a>
+          <a class="showcase-toc__link" href="#formatting">Formatting</a>
+          <a class="showcase-toc__link" href="#theming">Theming &amp; accessibility</a>
+        </div>
+      </nav>
+
+      <div class="showcase__content">
+      <section id="quick-start" class="showcase-quickstart" aria-labelledby="quick-start-title">
+        <div class="showcase-quickstart__intro">
+          <p class="showcase-quickstart__eyebrow">Quick start</p>
+          <h2 id="quick-start-title" class="showcase-quickstart__title">Minimal setup</h2>
+          <p class="showcase-quickstart__lead">
+            A date-only picker with a floating calendar — focus the field to open it, copy
+            the source on the right.
+          </p>
+          <div class="showcase-quickstart__actions">
+            <a class="showcase-quickstart__cta showcase-quickstart__cta--ghost" href="#getting-started">More examples</a>
+          </div>
+        </div>
+        <div class="showcase-quickstart__panels">
+          <div class="showcase-quickstart__preview">
+            <div class="showcase-quickstart__preview-bar">
+              <span class="showcase-quickstart__preview-dot"></span>
+              <span class="showcase-quickstart__preview-dot"></span>
+              <span class="showcase-quickstart__preview-dot"></span>
+              <span class="showcase-quickstart__preview-label">Live preview</span>
+            </div>
+            <div class="showcase-quickstart__preview-body">
+              <div class="showcase-quickstart-preview__card">
+                <p class="showcase-quickstart-preview__eyebrow">Quick start</p>
+                <h3 class="showcase-quickstart-preview__title">Date picker</h3>
+                <p class="showcase-quickstart-preview__lead">
+                  Default date-only mode. Focus the field to open the calendar.
+                </p>
+                <label for="quick-start-date-field">Pick a date</label>
+                <input
+                  type="text"
+                  id="quick-start-date-field"
+                  class="showcase-card__input showcase-quickstart-preview__input"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="showcase-quickstart__code-wrap">
+            <div class="showcase-quickstart__code-label">Source</div>
+            <pre class="showcase-quickstart__code"><code>&lt;!doctype html&gt;
+&lt;html lang="en"&gt;
+  &lt;head&gt;
+    &lt;meta charset="UTF-8" /&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1" /&gt;
+    &lt;title&gt;Calendar picker&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;label for="date-field"&gt;Pick a date&lt;/label&gt;
+    &lt;input type="text" id="date-field" /&gt;
+
+    &lt;script type="module"&gt;
+      import { createCalendarPicker } from "./path/to/calendar/index.ts";
+
+      const input = document.getElementById("date-field");
+      createCalendarPicker(input, {
+        value: new Date(2026, 5, 8),
+        onChange: (date) => console.log("Selected:", date),
+      });
+    &lt;/script&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</code></pre>
+          </div>
+        </div>
+      </section>
+      <section id="getting-started" class="showcase-section">
+        <h2 class="showcase-section__title">Getting started</h2>
+        <p class="showcase-section__lead">Pass a text input to the picker and react to changes.</p>
+        <div class="showcase__grid">
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Basic picker with time</h3>
+          <p class="showcase-card__desc">Pass your text input to createCalendarPicker. Focus it to open the calendar panel.</p>
+          <pre class="showcase-card__code"><code>import { createCalendarPicker } from "@/calendar";
+
+const input = document.getElementById("date-field");
+const picker = createCalendarPicker(input, {
+  value: new Date(2026, 2, 15, 12, 30),
+  showTime: true,
+  onChange: (date) => {
+    // date: Date | null
+  },
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="basic-time"></div>
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Runtime setOptions</h3>
+          <p class="showcase-card__desc">Update locale, time, or mode without destroying the picker.</p>
+          <pre class="showcase-card__code"><code>const picker = createCalendarPicker(input, { onChange });
+
+picker.setOptions({ locale: germanLocale });
+picker.setOptions({ showTime: true });
+
+picker.setOptions({
+  mode: "range",
+  range: { start: picker.getValue(), end: null },
+});
+
+picker.setOptions({ mode: "single", value: picker.getRange().start });</code></pre>
+          <div class="showcase-card__mount" data-demo="set-options"></div>
+                    <div class="showcase-card__actions" id="set-options-actions">
+            <button type="button" data-action="locale-de">Locale → German</button>
+            <button type="button" data-action="locale-fr">Locale → French</button>
+            <button type="button" data-action="toggle-time">Toggle time</button>
+            <button type="button" data-action="toggle-range">Toggle range mode</button>
+          </div>
+        </article>
+        </div>
+      </section>
+      <section id="localization" class="showcase-section">
+        <h2 class="showcase-section__title">Localization</h2>
+        <p class="showcase-section__lead">Pass a full locale object or merge partial overrides. Inspired by flatpickr localization.</p>
+        <div class="showcase__grid">
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">German locale</h3>
+          <p class="showcase-card__desc">German month names and Monday as the first day of the week.</p>
+          <pre class="showcase-card__code"><code>import { createCalendarPicker, germanLocale } from "@/calendar";
+
+createCalendarPicker(input, {
+  locale: germanLocale,
+  onChange: (date) => { /* … */ },
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="locale-de"></div>
+          
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">French locale</h3>
+          <p class="showcase-card__desc">Another full locale with Monday as the first weekday.</p>
+          <pre class="showcase-card__code"><code>import { createCalendarPicker, frenchLocale } from "@/calendar";
+
+createCalendarPicker(input, {
+  locale: frenchLocale,
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="locale-fr"></div>
+          
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Partial locale override</h3>
+          <p class="showcase-card__desc">Merge over defaults — here Czech labels with a custom week-number header.</p>
+          <pre class="showcase-card__code"><code>import { createCalendarPicker, czechLocale } from "@/calendar";
+
+createCalendarPicker(input, {
+  locale: {
+    ...czechLocale,
+    weekNumberHeader: "Tý",
+  },
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="locale-partial"></div>
+          
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">ISO week numbers</h3>
+          <p class="showcase-card__desc">showWeekNumbers adds an ISO week column. Override the header via locale.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  showWeekNumbers: true,
+  locale: {
+    weekNumberHeader: "KW", // default: "Wk"
+  },
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="week-numbers"></div>
+          
+        </article>
+        </div>
+      </section>
+      <section id="constraints" class="showcase-section">
+        <h2 class="showcase-section__title">Constraining dates</h2>
+        <p class="showcase-section__lead">Limit which calendar days can be selected.</p>
+        <div class="showcase__grid">
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Min and max date</h3>
+          <p class="showcase-card__desc">Only days within the inclusive range are selectable.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  minDate: new Date(2026, 2, 10),
+  maxDate: new Date(2026, 2, 25),
+  onChange: (date) => { /* … */ },
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="min-max"></div>
+          
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Disabled dates (array)</h3>
+          <p class="showcase-card__desc">Block specific dates — useful for holidays or closures.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  disabledDates: [
+    new Date(2026, 2, 17),
+    new Date(2026, 2, 18),
+    new Date(2026, 2, 19),
+  ],
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="disabled-array"></div>
+          
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Disabled dates (predicate)</h3>
+          <p class="showcase-card__desc">Disable weekends with a function.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  disabledDates: (date) => {
+    const day = date.getDay();
+    return day === 0 || day === 6;
+  },
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="disabled-predicate"></div>
+          
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Allowed dates only (array)</h3>
+          <p class="showcase-card__desc">Whitelist mode — only listed dates are selectable.</p>
+          <pre class="showcase-card__code"><code>const allowed = [5, 12, 19, 26].map(
+  (day) => new Date(2026, 2, day),
+);
+
+createCalendarPicker(input, {
+  enabledDatesOnly: allowed,
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="enabled-array"></div>
+          
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Allowed dates only (predicate)</h3>
+          <p class="showcase-card__desc">Only odd-numbered calendar days are selectable.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  enabledDatesOnly: (date) => date.getDate() % 2 === 1,
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="enabled-predicate"></div>
+          
+        </article>
+        </div>
+      </section>
+      <section id="time" class="showcase-section">
+        <h2 class="showcase-section__title">Time selection</h2>
+        <p class="showcase-section__lead">Optional hour and minute selectors; 12-hour mode and seconds are supported.</p>
+        <div class="showcase__grid">
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">24-hour time</h3>
+          <p class="showcase-card__desc">Hour 0–23 and minute 0–59 combined with the selected day.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  showTime: true,
+  value: new Date(2026, 2, 20, 14, 45),
+  // default outputFormat: "yyyy-MM-dd HH:mm"
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="time-24h"></div>
+          
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">12-hour time</h3>
+          <p class="showcase-card__desc">Hour 1–12 with an AM/PM selector.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  showTime: true,
+  use12HourTime: true,
+  value: new Date(2026, 6, 9, 15, 30),
+  // default outputFormat: "yyyy-MM-dd hh:mm a"
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="time-12h"></div>
+          
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Seconds (24-hour)</h3>
+          <p class="showcase-card__desc">showSeconds adds a seconds dropdown when showTime is enabled.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  showTime: true,
+  showSeconds: true,
+  value: new Date(2026, 2, 15, 14, 30, 45),
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="time-seconds-24h"></div>
+          
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Seconds (12-hour)</h3>
+          <p class="showcase-card__desc">Hour, minute, second, and AM/PM selectors together.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  showTime: true,
+  showSeconds: true,
+  use12HourTime: true,
+  value: new Date(2026, 2, 15, 15, 30, 45),
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="time-seconds-12h"></div>
+          
+        </article>
+        </div>
+      </section>
+      <section id="allow-input" class="showcase-section">
+        <h2 class="showcase-section__title">Direct text input</h2>
+        <p class="showcase-section__lead">allowInput lets users type values into the picker input. By default the input is read-only.</p>
+        <div class="showcase__grid">
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">allowInput — date</h3>
+          <p class="showcase-card__desc">Type a date using outputFormat. Blur or Enter commits; Enter closes the calendar by default.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  allowInput: true,
+  outputFormat: "yyyy-MM-dd",
+  value: new Date(2026, 2, 15),
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="allow-input-date"></div>
+          
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">allowInput — 24-hour datetime</h3>
+          <p class="showcase-card__desc">Default outputFormat includes time when showTime is true.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  allowInput: true,
+  showTime: true,
+  value: new Date(2026, 2, 15, 14, 30),
+  // outputFormat: "yyyy-MM-dd HH:mm"
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="allow-input-time-24h"></div>
+          
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">allowInput — 12-hour datetime</h3>
+          <p class="showcase-card__desc">Use use12HourTime for AM/PM parsing and display.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  allowInput: true,
+  showTime: true,
+  use12HourTime: true,
+  value: new Date(2026, 2, 15, 15, 30),
+  // outputFormat: "yyyy-MM-dd hh:mm a"
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="allow-input-time-12h"></div>
+          
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Keep calendar open on Enter</h3>
+          <p class="showcase-card__desc">keepOpenOnAllowInputEnter keeps the panel open after a successful Enter commit.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  allowInput: true,
+  keepOpenOnAllowInputEnter: true,
+  showTime: true,
+  value: new Date(2026, 2, 15, 14, 30),
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="allow-input-keep-open"></div>
+          
+        </article>
+        </div>
+      </section>
+      <section id="ranges" class="showcase-section">
+        <h2 class="showcase-section__title">Date ranges</h2>
+        <p class="showcase-section__lead">Range mode with optional separate start/end times and custom output formatting.</p>
+        <div class="showcase__grid">
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Basic range</h3>
+          <p class="showcase-card__desc">First click starts a range, second completes it. Use onRangeChange for updates.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  mode: "range",
+  range: {
+    start: new Date(2026, 2, 5),
+    end: new Date(2026, 2, 18),
+  },
+  outputFormat: "yyyy-MM-dd",
+  onRangeChange: ({ start, end }) => { /* … */ },
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="range-basic"></div>
+          
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Range with start & end time</h3>
+          <p class="showcase-card__desc">Separate time controls under each calendar pane in range mode.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  mode: "range",
+  showTime: true,
+  range: {
+    start: new Date(2026, 3, 10, 9, 30),
+    end: new Date(2026, 3, 14, 17, 45),
+  },
+  outputFormat: "yyyy-MM-dd HH:mm",
+  onRangeChange: ({ start, end }) => { /* … */ },
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="range-time"></div>
+          
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Range separator & format</h3>
+          <p class="showcase-card__desc">rangeOutputSeparator and outputFormat shape the value input string.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  mode: "range",
+  showTime: true,
+  outputFormat: "dd.MM.yyyy HH:mm",
+  rangeOutputSeparator: " — ",
+  range: {
+    start: new Date(2026, 8, 1, 8, 0),
+    end: new Date(2026, 8, 7, 20, 0),
+  },
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="range-format"></div>
+          
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Range + week numbers</h3>
+          <p class="showcase-card__desc">Combine range mode with ISO week column.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  mode: "range",
+  showWeekNumbers: true,
+  locale: { weekNumberHeader: "KW" },
+  range: {
+    start: new Date(2026, 0, 6),
+    end: new Date(2026, 0, 20),
+  },
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="range-weeks"></div>
+          
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Range + dark theme</h3>
+          <p class="showcase-card__desc">theme: "dark" sets data-cal-theme on the calendar root.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  mode: "range",
+  theme: "dark",
+  range: {
+    start: new Date(2026, 4, 12),
+    end: new Date(2026, 4, 26),
+  },
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="range-dark"></div>
+          
+        </article>
+        </div>
+      </section>
+      <section id="formatting" class="showcase-section">
+        <h2 class="showcase-section__title">Formatting</h2>
+        <p class="showcase-section__lead">Control how selected values appear in the input using date-fns patterns.</p>
+        <div class="showcase__grid">
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Custom outputFormat</h3>
+          <p class="showcase-card__desc">outputFormat is a date-fns pattern synced to the value input.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  showTime: true,
+  outputFormat: "EEEE, d MMMM yyyy 'at' HH:mm",
+  value: new Date(2026, 7, 19, 15, 0),
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="output-format"></div>
+          
+        </article>
+        </div>
+      </section>
+      <section id="theming" class="showcase-section">
+        <h2 class="showcase-section__title">Theming &amp; accessibility</h2>
+        <p class="showcase-section__lead">Built-in theme presets, CSS variables, and accessibility options.</p>
+        <div class="showcase__grid">
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Dark theme preset</h3>
+          <p class="showcase-card__desc">Sets data-cal-theme="dark" and bundled CSS variables.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  theme: "dark",
+  showTime: true,
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="theme-dark"></div>
+          
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">High-contrast preset</h3>
+          <p class="showcase-card__desc">theme: "contrast" — strong borders and yellow accent.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  theme: "contrast",
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="theme-contrast"></div>
+          
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Custom CSS variables</h3>
+          <p class="showcase-card__desc">Override --cal-* variables on the panel parent — no new theme name required.</p>
+          <pre class="showcase-card__code"><code>const picker = createCalendarPicker(input, { /* … */ });
+const panel = picker.getCalendarElement();
+panel.style.setProperty("--cal-bg", "#fff7ed");
+panel.style.setProperty("--cal-accent", "#c2410c");</code></pre>
+          <div class="showcase-card__mount" data-demo="theme-custom-vars"></div>
+          
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Forest theme + constraints</h3>
+          <p class="showcase-card__desc">Combine theme, locale, min/max, and disabledDates.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  theme: "forest",
+  locale: germanLocale,
+  minDate: new Date(2026, 2, 1),
+  maxDate: new Date(2026, 3, 30),
+  disabledDates: (d) => d.getDay() === 3,
+  showTime: true,
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="theme-forest-combined"></div>
+          
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">aria-label</h3>
+          <p class="showcase-card__desc">Custom accessible name for the calendar region.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  ariaLabel: "Delivery date",
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="aria-label"></div>
+          
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Reset button</h3>
+          <p class="showcase-card__desc">showResetButton adds a header icon that clears the selection.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  showResetButton: true,
+  resetInputLabel: "Reset",
+  value: new Date(2026, 2, 13, 14, 15),
+  showTime: true,
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="reset-button"></div>
+          
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Year dropdown span</h3>
+          <p class="showcase-card__desc">yearDropdownRadius limits how many years appear in the select (default ±50).</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  yearDropdownRadius: 3,
+  value: new Date(2026, 5, 1),
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="year-radius"></div>
+          
+        </article>
+        </div>
+      </section>
+      </div>
+    </main>
+    <script type="module" src="/showcase.js"></script>
+  </body>
+</html>
