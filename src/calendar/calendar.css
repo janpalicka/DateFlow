@@ -348,6 +348,30 @@
   border-color: transparent;
 }
 
+.cal__day--range-start:not(.cal__day--range-single)::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -7px;
+  transform: translateY(-50%);
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-left: 7px solid var(--cal-accent);
+  z-index: 2;
+}
+
+.cal__day--range-end:not(.cal__day--range-single)::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -7px;
+  transform: translateY(-50%);
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-right: 7px solid var(--cal-accent);
+  z-index: 2;
+}
+
 .cal__day__num {
   position: relative;
   z-index: 1;
