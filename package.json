@@ -1,25 +1,76 @@
 {
-  "name": "@local/calendar-picker",
+  "name": "dateflow",
   "version": "0.1.0",
-  "private": true,
+  "description": "DateFlow — lightweight date and range calendar picker for the web",
+  "keywords": [
+    "calendar",
+    "date-picker",
+    "date-range",
+    "datepicker",
+    "datetime",
+    "floating-ui",
+    "vanilla-js"
+  ],
+  "homepage": "https://github.com/janpalicka/DateFlow#readme",
+  "bugs": {
+    "url": "https://github.com/janpalicka/DateFlow/issues"
+  },
+  "license": "MIT",
+  "author": "Jan Palicka",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/janpalicka/DateFlow.git"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs",
+      "default": "./dist/index.mjs"
+    },
+    "./locales": {
+      "types": "./dist/locales/index.d.mts",
+      "import": "./dist/locales/index.mjs",
+      "default": "./dist/locales/index.mjs"
+    },
+    "./style.css": "./dist/style.css",
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "dev": "vp dev --open /index.html",
-    "build": "vp build",
+    "build": "vp pack --from-vite",
+    "build:docs": "vp build",
+    "pack": "vp pack --from-vite",
+    "pack:watch": "vp pack --from-vite --watch",
     "preview": "vp preview --open /index.html",
+    "prepublishOnly": "pnpm run build",
     "check": "vp check",
     "fix": "vp check --fix",
     "fmt": "vp fmt",
     "lint": "vp lint"
   },
-  "dependencies": {
-    "@floating-ui/dom": "^1.7.6",
-    "date-fns": "^4.4.0"
-  },
   "devDependencies": {
+    "@floating-ui/dom": "^1.7.6",
+    "@tsdown/css": "^0.22.3",
     "@types/node": "^25.9.3",
+    "date-fns": "^4.4.0",
     "typescript": "~6.0.3",
     "vite-plus": "^0.1.24"
+  },
+  "peerDependencies": {
+    "@floating-ui/dom": "^1.6.0",
+    "date-fns": "^4.0.0"
   },
   "packageManager": "pnpm@10.28.0"
 }

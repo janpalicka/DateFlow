@@ -10,12 +10,7 @@ import {
   parse,
   startOfDay,
 } from "date-fns";
-import type {
-  CalendarMode,
-  CalendarOptions,
-  CalendarPickerInstance,
-  DateRangeValue,
-} from "@/calendar/types";
+import { attachCalendarPopover, type CalendarPopover } from "./popover";
 import {
   cloneRange,
   compareCalendarDay,
@@ -27,8 +22,13 @@ import {
   mergeLocale,
   parseCalendarDay,
   shouldShowTimeOn,
-} from "@/calendar/utils";
-import { attachCalendarPopover, type CalendarPopover } from "./popover";
+} from "./utils";
+import type {
+  CalendarMode,
+  CalendarOptions,
+  CalendarPickerInstance,
+  DateRangeValue,
+} from "./types";
 import "./calendar.css";
 
 const fillSecond = (selectS: HTMLSelectElement): void => {

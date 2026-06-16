@@ -12,9 +12,17 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: path.resolve(rootDir, "dist"),
+    outDir: path.resolve(rootDir, "dist-docs"),
     emptyOutDir: true,
     sourcemap: true,
+  },
+  pack: {
+    entry: ["src/calendar/index.ts", "src/calendar/locales/index.ts"],
+    dts: true,
+    sourcemap: true,
+    deps: {
+      neverBundle: ["date-fns", "@floating-ui/dom"],
+    },
   },
   preview: {
     port: 5173,
