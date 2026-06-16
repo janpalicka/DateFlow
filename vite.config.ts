@@ -15,6 +15,10 @@ export default defineConfig({
     outDir: "dist",
     sourcemap: true,
   },
+  preview: {
+    port: 5173,
+    host: "0.0.0.0",
+  },
   // Oxlint (ESLint-compatible `import/*` rules). Import *order* is enforced by Oxfmt `sortImports` below.
   lint: {
     ignorePatterns: ["dist/**", "node_modules/**", ".vscode/**"],
