@@ -1,8 +1,9 @@
 /**
- * Theme via CSS custom properties on `.cal` or `[data-cal-theme="…"]`.
- * Override in your stylesheet after importing this file.
+ * Theme via CSS custom properties on `.cal-anchor`, `.cal`, or `[data-cal-theme="…"]`.
+ * Override in your stylesheet after importing this file, or set properties on
+ * `picker.getCalendarElement()` (the `.cal-anchor` wrapper).
  */
-.cal {
+.cal-anchor {
   --cal-bg: #ffffff;
   --cal-surface: #f4f4f5;
   --cal-text: #18181b;
@@ -17,7 +18,9 @@
   --cal-day-size: 2.75rem;
   --cal-font:
     system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", sans-serif;
+}
 
+.cal {
   box-sizing: border-box;
   font-family: var(--cal-font);
   color: var(--cal-text);

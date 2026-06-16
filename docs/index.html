@@ -480,7 +480,7 @@ createCalendarPicker(input, {
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Custom CSS variables</h3>
-          <p class="showcase-card__desc">Override --cal-* variables on the panel parent — no new theme name required.</p>
+          <p class="showcase-card__desc">Override --cal-* variables on the panel wrapper (<code>getCalendarElement()</code>) — no theme name required.</p>
           <pre class="showcase-card__code"><code>const picker = createCalendarPicker(input, { /* … */ });
 const panel = picker.getCalendarElement();
 panel.style.setProperty("--cal-bg", "#fff7ed");

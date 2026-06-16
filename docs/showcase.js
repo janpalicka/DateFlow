@@ -206,18 +206,16 @@ function mountDemo(key) {
       return mountFloatingCalendarDemo({ theme: "contrast" }).wrap;
     case "theme-custom-vars":
       return mountFloatingCalendarDemo(
-        { className: "showcase-card__mount--inline-theme" },
+        {},
         {
-          setupFloating: (floating) => {
-            floating.style.cssText = `
-      --cal-bg: #fff7ed;
-      --cal-surface: #ffedd5;
-      --cal-text: #431407;
-      --cal-muted: #9a3412;
-      --cal-border: #fdba74;
-      --cal-accent: #c2410c;
-      --cal-accent-contrast: #fff7ed;
-    `;
+          setupFloating: (panel) => {
+            panel.style.setProperty("--cal-bg", "#fff7ed");
+            panel.style.setProperty("--cal-surface", "#ffedd5");
+            panel.style.setProperty("--cal-text", "#431407");
+            panel.style.setProperty("--cal-muted", "#9a3412");
+            panel.style.setProperty("--cal-border", "#fdba74");
+            panel.style.setProperty("--cal-accent", "#c2410c");
+            panel.style.setProperty("--cal-accent-contrast", "#fff7ed");
           },
         },
       ).wrap;
