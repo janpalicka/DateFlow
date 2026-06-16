@@ -247,6 +247,12 @@
   padding-top: 0.15rem;
 }
 
+.cal__day-spacer {
+  width: 100%;
+  aspect-ratio: 1;
+  max-height: var(--cal-day-size);
+}
+
 .cal__day {
   position: relative;
   width: 100%;
@@ -328,6 +334,14 @@
   background: color-mix(in srgb, var(--cal-accent) 22%, transparent);
   color: var(--cal-text);
   border-radius: 0;
+  border-color: transparent;
+}
+
+.cal__day--range-preview-start {
+  background: color-mix(in srgb, var(--cal-accent) 38%, transparent);
+  color: var(--cal-text);
+  font-weight: 600;
+  border-radius: 10px 0 0 10px;
   border-color: transparent;
 }
 

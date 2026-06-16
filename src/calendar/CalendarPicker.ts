@@ -472,7 +472,7 @@ export const createCalendarPicker = (
   };
 
   const formatRangeForInput = (): string => {
-    const sep = options.rangeOutputSeparator ?? "—";
+    const sep = options.rangeOutputSeparator ?? " — ";
     const fmt = effectiveOutputFormat(options);
     if (!rangeStart) return "";
     const start = format(dateOnlyIfNeeded(options, rangeStart), fmt);
@@ -540,7 +540,7 @@ export const createCalendarPicker = (
     const ref = selected ?? rangeStart ?? new Date();
 
     if (mode() === "range") {
-      const sep = options.rangeOutputSeparator ?? "—";
+      const sep = options.rangeOutputSeparator ?? " — ";
       const trimmed = text.trim();
       if (!trimmed) {
         clearRangeHover();
@@ -737,238 +737,223 @@ export const createCalendarPicker = (
 
     const first = new Date(panelYear, panelMonth, 1);
     const startWeekday = (first.getDay() - (locale.firstDayOfWeek % 7) + 7) % 7;
-    const dim = getDaysInMonth(new Date(panelYear, panelMonth, 1));
-    const prevDim = getDaysInMonth(new Date(panelYear, panelMonth - 1, 1));
+    const dim = getDaysInMonth(first);
+    const lastCell = startWeekday + dim;
+    const numRows = Math.ceil(lastCell / 7);
 
-    const totalCells = 42;
+    const appendSpacer = (): void => {
+      const spacer = document.createElement("div");
+      spacer.className = "cal__day-spacer";
+      spacer.setAttribute("aria-hidden", "true");
+      target.append(spacer);
+    };
 
-    for (let i = 0; i < totalCells; i += 1) {
-      if (showWk && i % 7 === 0) {
-        const rowFirstIdx = i;
-        let dayNum0: number;
-        let cellMonth0: number;
-        let cellYear0: number;
-        if (rowFirstIdx < startWeekday) {
-          cellMonth0 = panelMonth - 1;
-          cellYear0 = panelYear;
-          if (cellMonth0 < 0) {
-            cellMonth0 = 11;
-            cellYear0 -= 1;
+    for (let row = 0; row < numRows; row += 1) {
+      const rowStart = row * 7;
+
+      if (showWk) {
+        let weekRef: Date | null = null;
+        for (let col = 0; col < 7; col += 1) {
+          const i = rowStart + col;
+          if (i >= startWeekday && i < startWeekday + dim) {
+            weekRef = new Date(panelYear, panelMonth, i - startWeekday + 1);
+            break;
           }
-          dayNum0 = prevDim - (startWeekday - rowFirstIdx - 1);
-        } else if (rowFirstIdx < startWeekday + dim) {
-          cellMonth0 = panelMonth;
-          cellYear0 = panelYear;
-          dayNum0 = rowFirstIdx - startWeekday + 1;
+        }
+        if (weekRef) {
+          const wkCell = document.createElement("div");
+          wkCell.className = "cal__weeknum";
+          wkCell.textContent = String(getISOWeek(weekRef));
+          target.append(wkCell);
         } else {
-          cellMonth0 = panelMonth + 1;
-          cellYear0 = panelYear;
-          if (cellMonth0 > 11) {
-            cellMonth0 = 0;
-            cellYear0 += 1;
-          }
-          dayNum0 = rowFirstIdx - (startWeekday + dim) + 1;
+          appendSpacer();
         }
-        const weekRef = new Date(cellYear0, cellMonth0, dayNum0);
-        const wkCell = document.createElement("div");
-        wkCell.className = "cal__weeknum";
-        wkCell.textContent = String(getISOWeek(weekRef));
-        target.append(wkCell);
       }
 
-      let dayNum: number;
-      let cellMonth: number;
-      let cellYear: number;
-      let muted = false;
-
-      if (i < startWeekday) {
-        muted = true;
-        cellMonth = panelMonth - 1;
-        cellYear = panelYear;
-        if (cellMonth < 0) {
-          cellMonth = 11;
-          cellYear -= 1;
+      for (let col = 0; col < 7; col += 1) {
+        const i = rowStart + col;
+        if (i < startWeekday || i >= startWeekday + dim) {
+          appendSpacer();
+          continue;
         }
-        dayNum = prevDim - (startWeekday - i - 1);
-      } else if (i < startWeekday + dim) {
-        cellMonth = panelMonth;
-        cellYear = panelYear;
-        dayNum = i - startWeekday + 1;
-      } else {
-        muted = true;
-        cellMonth = panelMonth + 1;
-        cellYear = panelYear;
-        if (cellMonth > 11) {
-          cellMonth = 0;
-          cellYear += 1;
-        }
-        dayNum = i - (startWeekday + dim) + 1;
-      }
 
-      const dayDate = new Date(cellYear, cellMonth, dayNum);
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "cal__day";
-      const dayNumEl = document.createElement("span");
-      dayNumEl.className = "cal__day__num";
-      dayNumEl.textContent = String(dayNum);
-      btn.append(dayNumEl);
-      btn.dataset.date = format(startOfDay(dayDate), "yyyy-MM-dd");
-      if (muted) btn.classList.add("cal__day--muted");
+        const dayNum = i - startWeekday + 1;
+        const cellYear = panelYear;
+        const cellMonth = panelMonth;
+        const dayDate = new Date(cellYear, cellMonth, dayNum);
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "cal__day";
+        const dayNumEl = document.createElement("span");
+        dayNumEl.className = "cal__day__num";
+        dayNumEl.textContent = String(dayNum);
+        btn.append(dayNumEl);
+        btn.dataset.date = format(startOfDay(dayDate), "yyyy-MM-dd");
 
-      const selectable = isSelectable(
-        dayDate,
-        options.minDate ?? null,
-        options.maxDate ?? null,
-        options.enabledDatesOnly ? undefined : options.disabledDates,
-        options.enabledDatesOnly,
-      );
-      if (!selectable) {
-        btn.disabled = true;
-        btn.classList.add("cal__day--disabled");
-      }
-
-      if (mode() === "single") {
-        if (selected && isSameDay(dayDate, selected)) {
-          btn.classList.add("cal__day--selected");
-          btn.setAttribute("aria-selected", "true");
-        } else {
-          btn.setAttribute("aria-selected", "false");
-        }
-      } else if (rangeStart && rangeEnd) {
-        const rs = rangeStart;
-        const re = rangeEnd;
-        if (isSameDay(dayDate, rs) && isSameDay(dayDate, re)) {
-          btn.classList.add("cal__day--range-single");
-        } else if (isSameDay(dayDate, rs)) {
-          btn.classList.add("cal__day--range-start");
-        } else if (isSameDay(dayDate, re)) {
-          btn.classList.add("cal__day--range-end");
-        } else if (dayInInclusiveRange(dayDate, rs, re)) {
-          btn.classList.add("cal__day--range-between");
-        }
-        btn.setAttribute(
-          "aria-selected",
-          isSameDay(dayDate, rs) || isSameDay(dayDate, re) ? "true" : "false",
+        const selectable = isSelectable(
+          dayDate,
+          options.minDate ?? null,
+          options.maxDate ?? null,
+          options.enabledDatesOnly ? undefined : options.disabledDates,
+          options.enabledDatesOnly,
         );
-      } else if (rangeStart && !rangeEnd) {
-        const anchor = startOfDay(rangeStart);
-        const hover = rangeHoverEnd ? startOfDay(rangeHoverEnd) : null;
+        if (!selectable) {
+          btn.disabled = true;
+          btn.classList.add("cal__day--disabled");
+        }
 
-        if (!hover || isSameDay(anchor, hover)) {
-          if (isSameDay(dayDate, anchor)) {
-            btn.classList.add("cal__day--range-start");
+        if (mode() === "single") {
+          if (selected && isSameDay(dayDate, selected)) {
+            btn.classList.add("cal__day--selected");
             btn.setAttribute("aria-selected", "true");
-            if (hover && isSameDay(anchor, hover)) {
-              const tipEl = document.createElement("span");
-              tipEl.className = "cal__range-duration-tip";
-              tipEl.id = `${durationTipIdBase}-hover`;
-              tipEl.setAttribute("role", "tooltip");
-              tipEl.textContent = formatRangeDurationLabel(mergeLocale(options.locale), 1);
-              btn.setAttribute("aria-describedby", tipEl.id);
-              btn.append(tipEl);
-            }
           } else {
             btn.setAttribute("aria-selected", "false");
           }
-        } else {
-          let lo = anchor;
-          let hi = hover;
-          if (compareAsc(lo, hi) > 0) {
-            const t = lo;
-            lo = hi;
-            hi = t;
+        } else if (rangeStart && rangeEnd) {
+          const rs = rangeStart;
+          const re = rangeEnd;
+          if (isSameDay(dayDate, rs) && isSameDay(dayDate, re)) {
+            btn.classList.add("cal__day--range-single");
+          } else if (isSameDay(dayDate, rs)) {
+            btn.classList.add("cal__day--range-start");
+          } else if (isSameDay(dayDate, re)) {
+            btn.classList.add("cal__day--range-end");
+          } else if (dayInInclusiveRange(dayDate, rs, re)) {
+            btn.classList.add("cal__day--range-between");
           }
+          btn.setAttribute(
+            "aria-selected",
+            isSameDay(dayDate, rs) || isSameDay(dayDate, re) ? "true" : "false",
+          );
+        } else if (rangeStart && !rangeEnd) {
+          const anchor = startOfDay(rangeStart);
+          const hover = rangeHoverEnd ? startOfDay(rangeHoverEnd) : null;
 
-          if (dayInInclusiveRange(dayDate, lo, hi)) {
-            const spanDays = differenceInCalendarDays(hi, lo) + 1;
+          if (!hover || isSameDay(anchor, hover)) {
             if (isSameDay(dayDate, anchor)) {
               btn.classList.add("cal__day--range-start");
-            } else if (isSameDay(dayDate, hover)) {
-              btn.classList.add("cal__day--range-preview-end");
-              const tipEl = document.createElement("span");
-              tipEl.className = "cal__range-duration-tip";
-              tipEl.id = `${durationTipIdBase}-hover`;
-              tipEl.setAttribute("role", "tooltip");
-              tipEl.textContent = formatRangeDurationLabel(mergeLocale(options.locale), spanDays);
-              btn.setAttribute("aria-describedby", tipEl.id);
-              btn.append(tipEl);
+              btn.setAttribute("aria-selected", "true");
+              if (hover && isSameDay(anchor, hover)) {
+                const tipEl = document.createElement("span");
+                tipEl.className = "cal__range-duration-tip";
+                tipEl.id = `${durationTipIdBase}-hover`;
+                tipEl.setAttribute("role", "tooltip");
+                tipEl.textContent = formatRangeDurationLabel(mergeLocale(options.locale), 1);
+                btn.setAttribute("aria-describedby", tipEl.id);
+                btn.append(tipEl);
+              }
             } else {
-              btn.classList.add("cal__day--range-preview-between");
+              btn.setAttribute("aria-selected", "false");
             }
-            btn.setAttribute(
-              "aria-selected",
-              isSameDay(dayDate, anchor) || isSameDay(dayDate, hover) ? "true" : "false",
-            );
           } else {
-            btn.setAttribute("aria-selected", "false");
-          }
-        }
-      } else {
-        btn.setAttribute("aria-selected", "false");
-      }
-
-      if (isSameDay(dayDate, now)) {
-        btn.classList.add("cal__day--today");
-      }
-
-      btn.addEventListener("click", () => {
-        if (!selectable) return;
-        if (mode() === "single") {
-          const dayOnly = new Date(cellYear, cellMonth, dayNum, 0, 0, 0, 0);
-          selected = shouldShowTimeOn(options)
-            ? applyHM(
-                dayOnly,
-                hourSingle,
-                minuteSingle,
-                meridiemSingle,
-                secondForSingle(),
-                use12Hour(),
-              )
-            : dayOnly;
-          emitSingle();
-          if (options.hideOnSingleSelect ?? true) {
-            hidePanel();
-          }
-        } else {
-          const clicked = new Date(cellYear, cellMonth, dayNum, 0, 0, 0, 0);
-          if (!rangeStart || (rangeStart && rangeEnd)) {
-            rangeStart = shouldShowTimeOn(options)
-              ? applyHM(
-                  clicked,
-                  hourStart,
-                  minuteStart,
-                  meridiemStart,
-                  secondForStart(),
-                  use12Hour(),
-                )
-              : clicked;
-            rangeEnd = null;
-            rangeHoverEnd = startOfDay(rangeStart);
-            setHM(hourEnd, minuteEnd, meridiemEnd, secondForEnd(), rangeStart, use12Hour());
-          } else {
-            clearRangeHover();
-            const d0 = startOfDay(rangeStart);
-            const d1 = startOfDay(clicked);
-            let lo = d0;
-            let hi = d1;
+            let lo = anchor;
+            let hi = hover;
             if (compareAsc(lo, hi) > 0) {
               const t = lo;
               lo = hi;
               hi = t;
             }
-            rangeStart = shouldShowTimeOn(options)
-              ? applyHM(lo, hourStart, minuteStart, meridiemStart, secondForStart(), use12Hour())
-              : lo;
-            rangeEnd = shouldShowTimeOn(options)
-              ? applyHM(hi, hourEnd, minuteEnd, meridiemEnd, secondForEnd(), use12Hour())
-              : hi;
-          }
-        }
-        render();
-      });
 
-      target.append(btn);
+            if (dayInInclusiveRange(dayDate, lo, hi)) {
+              const spanDays = differenceInCalendarDays(hi, lo) + 1;
+              if (isSameDay(dayDate, lo)) {
+                if (isSameDay(anchor, lo)) {
+                  btn.classList.add("cal__day--range-start");
+                } else {
+                  btn.classList.add("cal__day--range-preview-start");
+                }
+              } else if (isSameDay(dayDate, hi)) {
+                if (isSameDay(anchor, hi)) {
+                  btn.classList.add("cal__day--range-end");
+                } else {
+                  btn.classList.add("cal__day--range-preview-end");
+                }
+              } else {
+                btn.classList.add("cal__day--range-preview-between");
+              }
+              if (isSameDay(dayDate, hover)) {
+                const tipEl = document.createElement("span");
+                tipEl.className = "cal__range-duration-tip";
+                tipEl.id = `${durationTipIdBase}-hover`;
+                tipEl.setAttribute("role", "tooltip");
+                tipEl.textContent = formatRangeDurationLabel(mergeLocale(options.locale), spanDays);
+                btn.setAttribute("aria-describedby", tipEl.id);
+                btn.append(tipEl);
+              }
+              btn.setAttribute(
+                "aria-selected",
+                isSameDay(dayDate, anchor) || isSameDay(dayDate, hover) ? "true" : "false",
+              );
+            } else {
+              btn.setAttribute("aria-selected", "false");
+            }
+          }
+        } else {
+          btn.setAttribute("aria-selected", "false");
+        }
+
+        if (isSameDay(dayDate, now)) {
+          btn.classList.add("cal__day--today");
+        }
+
+        btn.addEventListener("click", () => {
+          if (!selectable) return;
+          if (mode() === "single") {
+            const dayOnly = new Date(cellYear, cellMonth, dayNum, 0, 0, 0, 0);
+            selected = shouldShowTimeOn(options)
+              ? applyHM(
+                  dayOnly,
+                  hourSingle,
+                  minuteSingle,
+                  meridiemSingle,
+                  secondForSingle(),
+                  use12Hour(),
+                )
+              : dayOnly;
+            emitSingle();
+            if (options.hideOnSingleSelect ?? true) {
+              hidePanel();
+            }
+          } else {
+            const clicked = new Date(cellYear, cellMonth, dayNum, 0, 0, 0, 0);
+            if (!rangeStart || (rangeStart && rangeEnd)) {
+              rangeStart = shouldShowTimeOn(options)
+                ? applyHM(
+                    clicked,
+                    hourStart,
+                    minuteStart,
+                    meridiemStart,
+                    secondForStart(),
+                    use12Hour(),
+                  )
+                : clicked;
+              rangeEnd = null;
+              rangeHoverEnd = startOfDay(rangeStart);
+              setHM(hourEnd, minuteEnd, meridiemEnd, secondForEnd(), rangeStart, use12Hour());
+            } else {
+              clearRangeHover();
+              const d0 = startOfDay(rangeStart);
+              const d1 = startOfDay(clicked);
+              let lo = d0;
+              let hi = d1;
+              if (compareAsc(lo, hi) > 0) {
+                const t = lo;
+                lo = hi;
+                hi = t;
+              }
+              rangeStart = shouldShowTimeOn(options)
+                ? applyHM(lo, hourStart, minuteStart, meridiemStart, secondForStart(), use12Hour())
+                : lo;
+              rangeEnd = shouldShowTimeOn(options)
+                ? applyHM(hi, hourEnd, minuteEnd, meridiemEnd, secondForEnd(), use12Hour())
+                : hi;
+            }
+          }
+          render();
+        });
+
+        target.append(btn);
+      }
     }
   };
 
