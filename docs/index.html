@@ -150,7 +150,7 @@ createCalendarPicker(input, {
   onChange: (date) => { /* … */ },
 });</code></pre>
           <div class="showcase-card__mount" data-demo="locale-de"></div>
-          
+
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">French locale</h3>
@@ -162,7 +162,7 @@ createCalendarPicker(input, {
   locale: fr,
 });</code></pre>
           <div class="showcase-card__mount" data-demo="locale-fr"></div>
-          
+
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Partial locale override</h3>
@@ -178,7 +178,7 @@ createCalendarPicker(input, {
   },
 });</code></pre>
           <div class="showcase-card__mount" data-demo="locale-partial"></div>
-          
+
         </article>
         </div>
       </section>
@@ -196,7 +196,7 @@ createCalendarPicker(input, {
   onChange: (date) => { /* … */ },
 });</code></pre>
           <div class="showcase-card__mount" data-demo="min-max"></div>
-          
+
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Disabled dates (array)</h3>
@@ -210,7 +210,7 @@ createCalendarPicker(input, {
   ],
 });</code></pre>
           <div class="showcase-card__mount" data-demo="disabled-array"></div>
-          
+
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Disabled dates (predicate)</h3>
@@ -222,7 +222,7 @@ createCalendarPicker(input, {
   },
 });</code></pre>
           <div class="showcase-card__mount" data-demo="disabled-predicate"></div>
-          
+
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Allowed dates only (array)</h3>
@@ -236,7 +236,7 @@ createCalendarPicker(input, {
   enabledDatesOnly: allowed,
 });</code></pre>
           <div class="showcase-card__mount" data-demo="enabled-array"></div>
-          
+
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Allowed dates only (predicate)</h3>
@@ -245,7 +245,7 @@ createCalendarPicker(input, {
   enabledDatesOnly: (date) => date.getDate() % 2 === 1,
 });</code></pre>
           <div class="showcase-card__mount" data-demo="enabled-predicate"></div>
-          
+
         </article>
         </div>
       </section>
@@ -255,14 +255,15 @@ createCalendarPicker(input, {
         <div class="showcase__grid">
         <article class="showcase-card">
           <h3 class="showcase-card__title">24-hour time</h3>
-          <p class="showcase-card__desc">Hour 0–23 and minute 0–59 combined with the selected day.</p>
+          <p class="showcase-card__desc">Hour 0–23 and minute in 5-minute steps (customize with minuteStep).</p>
           <pre class="showcase-card__code"><code>createCalendarPicker(input, {
   showTime: true,
+  minuteStep: 1,
   value: new Date(2026, 2, 20, 14, 45),
   // default outputFormat: "yyyy-MM-dd HH:mm"
 });</code></pre>
           <div class="showcase-card__mount" data-demo="time-24h"></div>
-          
+
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">12-hour time</h3>
@@ -274,7 +275,7 @@ createCalendarPicker(input, {
   // default outputFormat: "yyyy-MM-dd hh:mm a"
 });</code></pre>
           <div class="showcase-card__mount" data-demo="time-12h"></div>
-          
+
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Seconds (24-hour)</h3>
@@ -285,7 +286,7 @@ createCalendarPicker(input, {
   value: new Date(2026, 2, 15, 14, 30, 45),
 });</code></pre>
           <div class="showcase-card__mount" data-demo="time-seconds-24h"></div>
-          
+
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Seconds (12-hour)</h3>
@@ -297,7 +298,7 @@ createCalendarPicker(input, {
   value: new Date(2026, 2, 15, 15, 30, 45),
 });</code></pre>
           <div class="showcase-card__mount" data-demo="time-seconds-12h"></div>
-          
+
         </article>
         </div>
       </section>
@@ -314,7 +315,7 @@ createCalendarPicker(input, {
   value: new Date(2026, 2, 15),
 });</code></pre>
           <div class="showcase-card__mount" data-demo="allow-input-date"></div>
-          
+
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">allowInput — 24-hour datetime</h3>
@@ -326,7 +327,7 @@ createCalendarPicker(input, {
   // outputFormat: "yyyy-MM-dd HH:mm"
 });</code></pre>
           <div class="showcase-card__mount" data-demo="allow-input-time-24h"></div>
-          
+
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">allowInput — 12-hour datetime</h3>
@@ -339,7 +340,7 @@ createCalendarPicker(input, {
   // outputFormat: "yyyy-MM-dd hh:mm a"
 });</code></pre>
           <div class="showcase-card__mount" data-demo="allow-input-time-12h"></div>
-          
+
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Keep calendar open on Enter</h3>
@@ -351,7 +352,7 @@ createCalendarPicker(input, {
   value: new Date(2026, 2, 15, 14, 30),
 });</code></pre>
           <div class="showcase-card__mount" data-demo="allow-input-keep-open"></div>
-          
+
         </article>
         </div>
       </section>
@@ -372,7 +373,7 @@ createCalendarPicker(input, {
   onRangeChange: ({ start, end }) => { /* … */ },
 });</code></pre>
           <div class="showcase-card__mount" data-demo="range-basic"></div>
-          
+
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Range with start & end time</h3>
@@ -388,7 +389,7 @@ createCalendarPicker(input, {
   onRangeChange: ({ start, end }) => { /* … */ },
 });</code></pre>
           <div class="showcase-card__mount" data-demo="range-time"></div>
-          
+
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Range separator & format</h3>
@@ -404,7 +405,7 @@ createCalendarPicker(input, {
   },
 });</code></pre>
           <div class="showcase-card__mount" data-demo="range-format"></div>
-          
+
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Range + week numbers</h3>
@@ -419,7 +420,7 @@ createCalendarPicker(input, {
   },
 });</code></pre>
           <div class="showcase-card__mount" data-demo="range-weeks"></div>
-          
+
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Range + dark theme</h3>
@@ -433,7 +434,7 @@ createCalendarPicker(input, {
   },
 });</code></pre>
           <div class="showcase-card__mount" data-demo="range-dark"></div>
-          
+
         </article>
         </div>
       </section>
@@ -450,7 +451,7 @@ createCalendarPicker(input, {
   value: new Date(2026, 7, 19, 15, 0),
 });</code></pre>
           <div class="showcase-card__mount" data-demo="output-format"></div>
-          
+
         </article>
         </div>
       </section>
@@ -466,7 +467,7 @@ createCalendarPicker(input, {
   showTime: true,
 });</code></pre>
           <div class="showcase-card__mount" data-demo="theme-dark"></div>
-          
+
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">High-contrast preset</h3>
@@ -475,7 +476,7 @@ createCalendarPicker(input, {
   theme: "contrast",
 });</code></pre>
           <div class="showcase-card__mount" data-demo="theme-contrast"></div>
-          
+
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Custom CSS variables</h3>
@@ -485,7 +486,7 @@ const panel = picker.getCalendarElement();
 panel.style.setProperty("--cal-bg", "#fff7ed");
 panel.style.setProperty("--cal-accent", "#c2410c");</code></pre>
           <div class="showcase-card__mount" data-demo="theme-custom-vars"></div>
-          
+
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Forest theme + constraints</h3>
@@ -501,7 +502,7 @@ createCalendarPicker(input, {
   showTime: true,
 });</code></pre>
           <div class="showcase-card__mount" data-demo="theme-forest-combined"></div>
-          
+
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">aria-label</h3>
@@ -510,7 +511,7 @@ createCalendarPicker(input, {
   ariaLabel: "Delivery date",
 });</code></pre>
           <div class="showcase-card__mount" data-demo="aria-label"></div>
-          
+
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Reset button</h3>
@@ -522,7 +523,7 @@ createCalendarPicker(input, {
   showTime: true,
 });</code></pre>
           <div class="showcase-card__mount" data-demo="reset-button"></div>
-          
+
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Year dropdown span</h3>
@@ -532,7 +533,7 @@ createCalendarPicker(input, {
   value: new Date(2026, 5, 1),
 });</code></pre>
           <div class="showcase-card__mount" data-demo="year-radius"></div>
-          
+
         </article>
         </div>
       </section>

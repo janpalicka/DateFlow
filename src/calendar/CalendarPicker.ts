@@ -42,11 +42,24 @@ const fillSecond = (selectS: HTMLSelectElement): void => {
   }
 };
 
+const normalizeMinuteStep = (step?: number): number => {
+  if (step === undefined) return 5;
+  if (!Number.isFinite(step) || step < 1) return 5;
+  return Math.min(60, Math.max(1, Math.floor(step)));
+};
+
+const snapMinuteToStep = (minute: number, step: number): number => {
+  const max = 60 - (60 % step || step);
+  const snapped = Math.round(minute / step) * step;
+  return Math.min(max, Math.max(0, snapped));
+};
+
 const fillHourMinute = (
   selectH: HTMLSelectElement,
   selectM: HTMLSelectElement,
   selectMeridiem: HTMLSelectElement,
   use12HourTime: boolean,
+  minuteStep: number,
 ): void => {
   selectH.replaceChildren();
   selectM.replaceChildren();
@@ -59,7 +72,7 @@ const fillHourMinute = (
     o.textContent = h < 10 ? `0${String(h)}` : String(h);
     selectH.append(o);
   }
-  for (let m = 0; m < 60; m += 1) {
+  for (let m = 0; m < 60; m += minuteStep) {
     const o = document.createElement("option");
     o.value = String(m);
     o.textContent = m < 10 ? `0${String(m)}` : String(m);
@@ -80,6 +93,7 @@ const setHM = (
   selectS: HTMLSelectElement | null,
   d: Date,
   use12HourTime: boolean,
+  minuteStep: number,
 ): void => {
   const h = d.getHours();
   if (use12HourTime) {
@@ -91,7 +105,7 @@ const setHM = (
     selectH.value = String(h);
     selectMeridiem.value = h >= 12 ? "PM" : "AM";
   }
-  selectM.value = String(d.getMinutes());
+  selectM.value = String(snapMinuteToStep(d.getMinutes(), minuteStep));
   if (selectS) selectS.value = String(d.getSeconds());
 };
 
@@ -435,11 +449,30 @@ export const createCalendarPicker = (
     });
   }
 
-  fillHourMinute(hourSingle, minuteSingle, meridiemSingle, options.use12HourTime ?? false);
-  fillHourMinute(hourStart, minuteStart, meridiemStart, options.use12HourTime ?? false);
-  fillHourMinute(hourEnd, minuteEnd, meridiemEnd, options.use12HourTime ?? false);
+  fillHourMinute(
+    hourSingle,
+    minuteSingle,
+    meridiemSingle,
+    options.use12HourTime ?? false,
+    normalizeMinuteStep(options.minuteStep),
+  );
+  fillHourMinute(
+    hourStart,
+    minuteStart,
+    meridiemStart,
+    options.use12HourTime ?? false,
+    normalizeMinuteStep(options.minuteStep),
+  );
+  fillHourMinute(
+    hourEnd,
+    minuteEnd,
+    meridiemEnd,
+    options.use12HourTime ?? false,
+    normalizeMinuteStep(options.minuteStep),
+  );
 
   const showSecondsOn = (): boolean => options.showSeconds ?? false;
+  const minuteStepOn = (): number => normalizeMinuteStep(options.minuteStep);
   const use12Hour = (): boolean => options.use12HourTime ?? false;
   const secondForSingle = (): HTMLSelectElement | null => (showSecondsOn() ? secondSingle : null);
   const secondForStart = (): HTMLSelectElement | null => (showSecondsOn() ? secondStart : null);
@@ -929,7 +962,15 @@ export const createCalendarPicker = (
                 : clicked;
               rangeEnd = null;
               rangeHoverEnd = startOfDay(rangeStart);
-              setHM(hourEnd, minuteEnd, meridiemEnd, secondForEnd(), rangeStart, use12Hour());
+              setHM(
+                hourEnd,
+                minuteEnd,
+                meridiemEnd,
+                secondForEnd(),
+                rangeStart,
+                use12Hour(),
+                minuteStepOn(),
+              );
             } else {
               clearRangeHover();
               const d0 = startOfDay(rangeStart);
@@ -965,9 +1006,27 @@ export const createCalendarPicker = (
 
   function syncTimeSelectsFromValue(): void {
     const use12 = use12Hour();
-    fillHourMinute(hourSingle, minuteSingle, meridiemSingle, use12);
-    fillHourMinute(hourStart, minuteStart, meridiemStart, use12);
-    fillHourMinute(hourEnd, minuteEnd, meridiemEnd, use12);
+    const step = minuteStepOn();
+
+    const snapStoredMinutes = (date: Date | null): Date | null => {
+      if (!date || !shouldShowTimeOn(options)) return date;
+      const snapped = snapMinuteToStep(date.getMinutes(), step);
+      if (snapped === date.getMinutes()) return date;
+      const next = new Date(date);
+      next.setMinutes(snapped, 0, 0);
+      return next;
+    };
+
+    if (mode() === "single") {
+      selected = snapStoredMinutes(selected);
+    } else {
+      rangeStart = snapStoredMinutes(rangeStart);
+      rangeEnd = snapStoredMinutes(rangeEnd);
+    }
+
+    fillHourMinute(hourSingle, minuteSingle, meridiemSingle, use12, step);
+    fillHourMinute(hourStart, minuteStart, meridiemStart, use12, step);
+    fillHourMinute(hourEnd, minuteEnd, meridiemEnd, use12, step);
     if (showSecondsOn()) {
       fillSecond(secondSingle);
       fillSecond(secondStart);
@@ -975,13 +1034,13 @@ export const createCalendarPicker = (
     }
     if (mode() === "single") {
       const base = selected ?? now;
-      setHM(hourSingle, minuteSingle, meridiemSingle, secondForSingle(), base, use12);
+      setHM(hourSingle, minuteSingle, meridiemSingle, secondForSingle(), base, use12, step);
       return;
     }
     const s = rangeStart ?? now;
     const e = rangeEnd ?? rangeStart ?? now;
-    setHM(hourStart, minuteStart, meridiemStart, secondForStart(), s, use12);
-    setHM(hourEnd, minuteEnd, meridiemEnd, secondForEnd(), e, use12);
+    setHM(hourStart, minuteStart, meridiemStart, secondForStart(), s, use12, step);
+    setHM(hourEnd, minuteEnd, meridiemEnd, secondForEnd(), e, use12, step);
   }
 
   function canGoPrevMonth(): boolean {
@@ -1198,7 +1257,7 @@ export const createCalendarPicker = (
     );
     if (rangeEnd && compareCalendarDay(rangeEnd, rangeStart) < 0) {
       rangeEnd = new Date(rangeStart);
-      setHM(hourEnd, minuteEnd, meridiemEnd, secondForEnd(), rangeEnd, use12Hour());
+      setHM(hourEnd, minuteEnd, meridiemEnd, secondForEnd(), rangeEnd, use12Hour(), minuteStepOn());
     }
     render();
   };
@@ -1208,7 +1267,15 @@ export const createCalendarPicker = (
     rangeEnd = applyHM(rangeEnd, hourEnd, minuteEnd, meridiemEnd, secondForEnd(), use12Hour());
     if (rangeStart && compareCalendarDay(rangeEnd, rangeStart) < 0) {
       rangeStart = new Date(rangeEnd);
-      setHM(hourStart, minuteStart, meridiemStart, secondForStart(), rangeStart, use12Hour());
+      setHM(
+        hourStart,
+        minuteStart,
+        meridiemStart,
+        secondForStart(),
+        rangeStart,
+        use12Hour(),
+        minuteStepOn(),
+      );
     }
     render();
   };

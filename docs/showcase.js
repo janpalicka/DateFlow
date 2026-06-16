@@ -105,6 +105,7 @@ function mountDemo(key) {
       return mountFloatingCalendarDemo({
         showTime: true,
         value: new Date(2026, 2, 20, 14, 45),
+        minuteStep: 1,
       }).wrap;
     case "time-12h":
       return mountFloatingCalendarDemo({
