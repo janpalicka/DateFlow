@@ -526,10 +526,11 @@ createCalendarPicker(input, {
 
         </article>
         <article class="showcase-card">
-          <h3 class="showcase-card__title">Year dropdown span</h3>
-          <p class="showcase-card__desc">yearDropdownRadius limits how many years appear in the select (default ±50).</p>
+          <h3 class="showcase-card__title">Year text input</h3>
+          <p class="showcase-card__desc">Type a year directly; values are clamped to minDate and maxDate when set.</p>
           <pre class="showcase-card__code"><code>createCalendarPicker(input, {
-  yearDropdownRadius: 3,
+  minDate: new Date(2026, 2, 1),
+  maxDate: new Date(2026, 8, 30),
   value: new Date(2026, 5, 1),
 });</code></pre>
           <div class="showcase-card__mount" data-demo="year-radius"></div>

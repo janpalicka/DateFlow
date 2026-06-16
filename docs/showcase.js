@@ -241,7 +241,8 @@ function mountDemo(key) {
       }).wrap;
     case "year-radius":
       return mountFloatingCalendarDemo({
-        yearDropdownRadius: 3,
+        minDate: new Date(2026, 2, 1),
+        maxDate: new Date(2026, 8, 30),
         value: new Date(2026, 5, 1),
       }).wrap;
     default:

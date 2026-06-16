@@ -104,11 +104,6 @@ export interface CalendarOptions {
   className?: string;
   /** Sets `data-cal-theme` on the root for styling. */
   theme?: string;
-  /**
-   * Half-width of the year dropdown around the focused year when `minDate`/`maxDate`
-   * do not constrain it. Default `50` → roughly ±50 years.
-   */
-  yearDropdownRadius?: number;
   /** Show reset icon button in header. Default: `false`. */
   showResetButton?: boolean;
   /**

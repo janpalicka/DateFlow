@@ -27,7 +27,6 @@ import {
   mergeLocale,
   parseCalendarDay,
   shouldShowTimeOn,
-  yearRange,
 } from "@/calendar/utils";
 import { attachCalendarPopover, type CalendarPopover } from "./popover";
 import "./calendar.css";
@@ -236,11 +235,15 @@ export const createCalendarPicker = (
   monthSelect.className = "cal__select cal__select--month";
   monthSelect.setAttribute("aria-label", "Month");
 
-  const yearSelect = document.createElement("select");
-  yearSelect.className = "cal__select cal__select--year";
-  yearSelect.setAttribute("aria-label", "Year");
+  const yearInput = document.createElement("input");
+  yearInput.type = "text";
+  yearInput.inputMode = "numeric";
+  yearInput.className = "cal__year-input";
+  yearInput.setAttribute("aria-label", "Year");
+  yearInput.maxLength = 4;
+  yearInput.spellcheck = false;
 
-  selectsWrap.append(monthSelect, yearSelect);
+  selectsWrap.append(monthSelect, yearInput);
   header.append(btnPrev, selectsWrap, btnNext, btnReset);
 
   const headerRight = document.createElement("div");
@@ -250,10 +253,14 @@ export const createCalendarPicker = (
   const monthSelectRight = document.createElement("select");
   monthSelectRight.className = "cal__select cal__select--month";
   monthSelectRight.setAttribute("aria-label", "Month");
-  const yearSelectRight = document.createElement("select");
-  yearSelectRight.className = "cal__select cal__select--year";
-  yearSelectRight.setAttribute("aria-label", "Year");
-  selectsWrapRight.append(monthSelectRight, yearSelectRight);
+  const yearInputRight = document.createElement("input");
+  yearInputRight.type = "text";
+  yearInputRight.inputMode = "numeric";
+  yearInputRight.className = "cal__year-input";
+  yearInputRight.setAttribute("aria-label", "Year");
+  yearInputRight.maxLength = 4;
+  yearInputRight.spellcheck = false;
+  selectsWrapRight.append(monthSelectRight, yearInputRight);
   headerRight.append(selectsWrapRight);
 
   const weekdaysRow = document.createElement("div");
@@ -705,31 +712,65 @@ export const createCalendarPicker = (
     monthSelect.value = String(viewMonth);
     const rightView = addMonths(new Date(viewYear, viewMonth, 1), 1);
     monthSelectRight.value = String(rightView.getMonth());
+    syncYearInputs();
+  };
 
-    yearSelect.replaceChildren();
-    yearSelectRight.replaceChildren();
-    const radius = options.yearDropdownRadius ?? 50;
-    const { from, to } = yearRange(viewYear, options.minDate, options.maxDate, radius);
-    for (let y = from; y <= to; y += 1) {
-      const o = document.createElement("option");
-      o.value = String(y);
-      o.textContent = String(y);
-      yearSelect.append(o);
+  let syncingYearInput = false;
+
+  const clampYear = (year: number): number => {
+    let y = year;
+    if (options.minDate) y = Math.max(y, options.minDate.getFullYear());
+    if (options.maxDate) y = Math.min(y, options.maxDate.getFullYear());
+    return y;
+  };
+
+  const parseYearInput = (text: string): number | null => {
+    const trimmed = text.trim();
+    if (!/^\d{1,4}$/.test(trimmed)) return null;
+    const year = Number.parseInt(trimmed, 10);
+    if (!Number.isFinite(year) || year < 1 || year > 9999) return null;
+    return year;
+  };
+
+  const restoreYearInput = (input: HTMLInputElement, forRightPane: boolean): void => {
+    if (forRightPane) {
+      const rightView = addMonths(new Date(viewYear, viewMonth, 1), 1);
+      input.value = String(rightView.getFullYear());
+      return;
     }
-    yearSelect.value = String(viewYear);
-    const { from: rightFrom, to: rightTo } = yearRange(
-      rightView.getFullYear(),
-      options.minDate,
-      options.maxDate,
-      radius,
-    );
-    for (let y = rightFrom; y <= rightTo; y += 1) {
-      const o = document.createElement("option");
-      o.value = String(y);
-      o.textContent = String(y);
-      yearSelectRight.append(o);
+    input.value = String(viewYear);
+  };
+
+  const syncYearInputs = (): void => {
+    syncingYearInput = true;
+    if (document.activeElement !== yearInput) {
+      yearInput.value = String(viewYear);
     }
-    yearSelectRight.value = String(rightView.getFullYear());
+    const rightView = addMonths(new Date(viewYear, viewMonth, 1), 1);
+    if (document.activeElement !== yearInputRight) {
+      yearInputRight.value = String(rightView.getFullYear());
+    }
+    syncingYearInput = false;
+  };
+
+  const commitYearInput = (input: HTMLInputElement, forRightPane: boolean): void => {
+    if (syncingYearInput) return;
+    const parsed = parseYearInput(input.value);
+    if (parsed === null) {
+      restoreYearInput(input, forRightPane);
+      return;
+    }
+    clearRangeHover();
+    const year = clampYear(parsed);
+    if (forRightPane) {
+      const nextMonth = Number.parseInt(monthSelectRight.value, 10);
+      const left = addMonths(new Date(year, nextMonth, 1), -1);
+      viewYear = left.getFullYear();
+      viewMonth = left.getMonth();
+    } else {
+      viewYear = year;
+    }
+    render();
   };
 
   const renderWeekdaysRow = (target: HTMLDivElement): void => {
@@ -1213,30 +1254,38 @@ export const createCalendarPicker = (
     render();
   });
 
-  yearSelect.addEventListener("change", (): void => {
-    clearRangeHover();
-    viewYear = Number.parseInt(yearSelect.value, 10);
-    render();
+  yearInput.addEventListener("blur", (): void => {
+    commitYearInput(yearInput, false);
+  });
+  yearInput.addEventListener("keydown", (e): void => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    commitYearInput(yearInput, false);
+    yearInput.blur();
   });
 
   monthSelectRight.addEventListener("change", (): void => {
     clearRangeHover();
     const nextMonth = Number.parseInt(monthSelectRight.value, 10);
-    const nextYear = Number.parseInt(yearSelectRight.value, 10);
-    const left = addMonths(new Date(nextYear, nextMonth, 1), -1);
+    const parsedYear = parseYearInput(yearInputRight.value);
+    if (parsedYear === null) {
+      restoreYearInput(yearInputRight, true);
+      return;
+    }
+    const left = addMonths(new Date(clampYear(parsedYear), nextMonth, 1), -1);
     viewYear = left.getFullYear();
     viewMonth = left.getMonth();
     render();
   });
 
-  yearSelectRight.addEventListener("change", (): void => {
-    clearRangeHover();
-    const nextMonth = Number.parseInt(monthSelectRight.value, 10);
-    const nextYear = Number.parseInt(yearSelectRight.value, 10);
-    const left = addMonths(new Date(nextYear, nextMonth, 1), -1);
-    viewYear = left.getFullYear();
-    viewMonth = left.getMonth();
-    render();
+  yearInputRight.addEventListener("blur", (): void => {
+    commitYearInput(yearInputRight, true);
+  });
+  yearInputRight.addEventListener("keydown", (e): void => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    commitYearInput(yearInputRight, true);
+    yearInputRight.blur();
   });
 
   const onTimeSingleChange = (): void => {
