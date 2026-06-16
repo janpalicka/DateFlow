@@ -40,4 +40,6 @@ export const fr: CalendarLocale = {
   rangeDurationOther: "{n} jours",
   inputPlaceholder: "Choisir une date",
   rangeInputPlaceholder: "Choisir une plage de dates",
+  rangeCancel: "Annuler",
+  rangeApply: "Appliquer",
 };

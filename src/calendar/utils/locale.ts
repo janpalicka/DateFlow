@@ -17,6 +17,8 @@ const mergeLocale = (partial: Partial<CalendarLocale> | undefined): CalendarLoca
       partial.inputPlaceholder ??
       DEFAULT_LOCALE.inputPlaceholder ??
       "Select date range",
+    rangeCancel: partial.rangeCancel ?? DEFAULT_LOCALE.rangeCancel ?? "Cancel",
+    rangeApply: partial.rangeApply ?? DEFAULT_LOCALE.rangeApply ?? "Apply",
   };
 };
 

@@ -27,4 +27,6 @@ export const cs: CalendarLocale = {
   rangeDurationOther: "{n} dní",
   inputPlaceholder: "Vyberte datum",
   rangeInputPlaceholder: "Vyberte rozsah dat",
+  rangeCancel: "Zrušit",
+  rangeApply: "Použít",
 };

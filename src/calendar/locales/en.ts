@@ -28,4 +28,6 @@ export const en: CalendarLocale = {
   rangeDurationOther: "{n} days",
   inputPlaceholder: "Select date",
   rangeInputPlaceholder: "Select date range",
+  rangeCancel: "Cancel",
+  rangeApply: "Apply",
 };

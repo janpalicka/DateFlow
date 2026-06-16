@@ -1107,6 +1107,12 @@ export const createCalendarPicker = (
     headerRight.classList.remove("cal__header--range-end");
   }
 
+  function syncRangeActionLabels(): void {
+    const locale = mergeLocale(options.locale);
+    btnCancelRange.textContent = locale.rangeCancel ?? "Cancel";
+    btnApplyRange.textContent = locale.rangeApply ?? "Apply";
+  }
+
   function render(): void {
     const isRange = mode() === "range";
     const hasRangeSelection = Boolean(rangeStart || rangeEnd);
@@ -1120,6 +1126,7 @@ export const createCalendarPicker = (
     syncTimeSelectsFromValue();
     updateTimeVisibility();
     updateResetVisibility();
+    syncRangeActionLabels();
     btnPrev.disabled = !canGoPrevMonth();
     btnNext.disabled = !canGoNextMonth();
     applyInputMode();

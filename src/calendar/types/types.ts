@@ -23,6 +23,10 @@ export interface CalendarLocale {
   inputPlaceholder?: string;
   /** Value input placeholder when no range is selected. Defaults to `inputPlaceholder`. */
   rangeInputPlaceholder?: string;
+  /** Range mode cancel button label. Default: `"Cancel"`. */
+  rangeCancel?: string;
+  /** Range mode apply button label. Default: `"Apply"`. */
+  rangeApply?: string;
 }
 
 export type DatePredicate = (date: Date) => boolean;

@@ -27,4 +27,6 @@ export const de: CalendarLocale = {
   rangeDurationOther: "{n} Tage",
   inputPlaceholder: "Datum wählen",
   rangeInputPlaceholder: "Datumsbereich wählen",
+  rangeCancel: "Abbrechen",
+  rangeApply: "Übernehmen",
 };
