@@ -1,6 +1,6 @@
 import type { CalendarLocale } from "../types/types";
 
-export const englishLocale: CalendarLocale = {
+export const en: CalendarLocale = {
   weekdays: {
     shorthand: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
     longhand: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],

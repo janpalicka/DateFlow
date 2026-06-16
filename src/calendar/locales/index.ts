@@ -1,9 +1,9 @@
-export { englishLocale } from "./en";
-export { germanLocale } from "./de";
-export { frenchLocale } from "./fr";
-export { czechLocale } from "./cs";
+export { cs } from "./cs";
+export { de } from "./de";
+export { en } from "./en";
+export { fr } from "./fr";
 
-import { englishLocale } from "./en";
+import { en } from "./en";
 
 /** Default English (US) locale; `firstDayOfWeek` is Sunday. */
-export const DEFAULT_LOCALE = englishLocale;
+export const DEFAULT_LOCALE = en;

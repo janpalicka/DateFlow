@@ -108,9 +108,6 @@ const input = document.getElementById("date-field");
 const picker = createCalendarPicker(input, {
   value: new Date(2026, 2, 15, 12, 30),
   showTime: true,
-  onChange: (date) => {
-    // date: Date | null
-  },
 });</code></pre>
           <div class="showcase-card__mount" data-demo="basic-time"></div>
         </article>
@@ -119,7 +116,7 @@ const picker = createCalendarPicker(input, {
           <p class="showcase-card__desc">Update locale, time, or mode without destroying the picker.</p>
           <pre class="showcase-card__code"><code>const picker = createCalendarPicker(input, { onChange });
 
-picker.setOptions({ locale: germanLocale });
+picker.setOptions({ locale: de });
 picker.setOptions({ showTime: true });
 
 picker.setOptions({
@@ -145,10 +142,11 @@ picker.setOptions({ mode: "single", value: picker.getRange().start });</code></p
         <article class="showcase-card">
           <h3 class="showcase-card__title">German locale</h3>
           <p class="showcase-card__desc">German month names and Monday as the first day of the week.</p>
-          <pre class="showcase-card__code"><code>import { createCalendarPicker, germanLocale } from "@/calendar";
+          <pre class="showcase-card__code"><code>import { createCalendarPicker } from "@/calendar";
+import { de } from "@/calendar/locales";
 
 createCalendarPicker(input, {
-  locale: germanLocale,
+  locale: de,
   onChange: (date) => { /* … */ },
 });</code></pre>
           <div class="showcase-card__mount" data-demo="locale-de"></div>
@@ -157,10 +155,11 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">French locale</h3>
           <p class="showcase-card__desc">Another full locale with Monday as the first weekday.</p>
-          <pre class="showcase-card__code"><code>import { createCalendarPicker, frenchLocale } from "@/calendar";
+          <pre class="showcase-card__code"><code>import { createCalendarPicker } from "@/calendar";
+import { fr } from "@/calendar/locales";
 
 createCalendarPicker(input, {
-  locale: frenchLocale,
+  locale: fr,
 });</code></pre>
           <div class="showcase-card__mount" data-demo="locale-fr"></div>
           
@@ -168,11 +167,12 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">Partial locale override</h3>
           <p class="showcase-card__desc">Merge over defaults — here Czech labels with a custom week-number header.</p>
-          <pre class="showcase-card__code"><code>import { createCalendarPicker, czechLocale } from "@/calendar";
+          <pre class="showcase-card__code"><code>import { createCalendarPicker } from "@/calendar";
+import { cs } from "@/calendar/locales";
 
 createCalendarPicker(input, {
   locale: {
-    ...czechLocale,
+    ...cs,
     weekNumberHeader: "Tý",
   },
 });</code></pre>
@@ -498,9 +498,11 @@ panel.style.setProperty("--cal-accent", "#c2410c");</code></pre>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Forest theme + constraints</h3>
           <p class="showcase-card__desc">Combine theme, locale, min/max, and disabledDates.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>import { de } from "@/calendar/locales";
+
+createCalendarPicker(input, {
   theme: "forest",
-  locale: germanLocale,
+  locale: de,
   minDate: new Date(2026, 2, 1),
   maxDate: new Date(2026, 3, 30),
   disabledDates: (d) => d.getDay() === 3,

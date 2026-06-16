@@ -1,6 +1,6 @@
 import type { CalendarLocale } from "../types/types";
 
-export const germanLocale: CalendarLocale = {
+export const de: CalendarLocale = {
   weekdays: {
     shorthand: ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"],
     longhand: ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"],

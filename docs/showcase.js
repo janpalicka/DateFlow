@@ -1,10 +1,6 @@
 import { format } from "date-fns";
-import {
-  createCalendarPicker,
-  czechLocale,
-  frenchLocale,
-  germanLocale,
-} from "../src/calendar/index.ts";
+import { createCalendarPicker } from "../src/calendar/index.ts";
+import { cs, de, fr } from "../src/calendar/locales/index.ts";
 
 /** @param {import('../src/calendar/types/types.ts').DateRangeValue} r */
 function formatRangeLine(r, fmt, sep) {
@@ -73,17 +69,17 @@ function mountDemo(key) {
     case "set-options":
       return mountSetOptionsDemo();
     case "locale-de":
-      return mountFloatingCalendarDemo({ locale: germanLocale }).wrap;
+      return mountFloatingCalendarDemo({ locale: de }).wrap;
     case "locale-fr":
-      return mountFloatingCalendarDemo({ locale: frenchLocale }).wrap;
+      return mountFloatingCalendarDemo({ locale: fr }).wrap;
     case "locale-partial":
       return mountFloatingCalendarDemo({
-        locale: { ...czechLocale, weekNumberHeader: "Tý" },
+        locale: { ...cs, weekNumberHeader: "Tý" },
       }).wrap;
     case "week-numbers":
       return mountFloatingCalendarDemo({
         showWeekNumbers: true,
-        locale: germanLocale,
+        locale: de,
       }).wrap;
     case "min-max":
       return mountFloatingCalendarDemo({
@@ -228,7 +224,7 @@ function mountDemo(key) {
     case "theme-forest-combined":
       return mountFloatingCalendarDemo({
         theme: "forest",
-        locale: germanLocale,
+        locale: de,
         minDate: new Date(2026, 2, 1),
         maxDate: new Date(2026, 3, 30),
         disabledDates: (d) => d.getDay() === 3,
@@ -263,10 +259,10 @@ function mountSetOptionsDemo() {
   if (!actions) return wrap;
 
   actions.querySelector('[data-action="locale-de"]')?.addEventListener("click", () => {
-    picker?.setOptions({ locale: germanLocale });
+    picker?.setOptions({ locale: de });
   });
   actions.querySelector('[data-action="locale-fr"]')?.addEventListener("click", () => {
-    picker?.setOptions({ locale: frenchLocale });
+    picker?.setOptions({ locale: fr });
   });
 
   let timeOn = false;

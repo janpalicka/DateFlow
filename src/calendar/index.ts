@@ -8,10 +8,3 @@ export type {
   DatePredicate,
   DateRangeValue,
 } from "./types/types";
-export {
-  czechLocale,
-  DEFAULT_LOCALE,
-  englishLocale,
-  frenchLocale,
-  germanLocale,
-} from "./locales/index";
