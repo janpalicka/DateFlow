@@ -105,6 +105,8 @@ export const createCalendarPicker = (
   let selected: Date | null = null;
   let rangeStart: Date | null = null;
   let rangeEnd: Date | null = null;
+  let committedRangeStart: Date | null = null;
+  let committedRangeEnd: Date | null = null;
   /** Tentative end while choosing a range (pointer hover). */
   let rangeHoverEnd: Date | null = null;
 
@@ -120,6 +122,8 @@ export const createCalendarPicker = (
       if (rangeStart) rangeStart = startOfDay(rangeStart);
       if (rangeEnd) rangeEnd = startOfDay(rangeEnd);
     }
+    committedRangeStart = rangeStart ? new Date(rangeStart.getTime()) : null;
+    committedRangeEnd = rangeEnd ? new Date(rangeEnd.getTime()) : null;
   }
 
   let viewYear: number;
@@ -241,6 +245,17 @@ export const createCalendarPicker = (
 
   const timeWrap = document.createElement("div");
   timeWrap.className = "cal__time-wrap";
+  const rangeActions = document.createElement("div");
+  rangeActions.className = "cal__range-actions";
+  const btnCancelRange = document.createElement("button");
+  btnCancelRange.type = "button";
+  btnCancelRange.className = "cal__action-btn cal__action-btn--ghost";
+  btnCancelRange.textContent = "Cancel";
+  const btnApplyRange = document.createElement("button");
+  btnApplyRange.type = "button";
+  btnApplyRange.className = "cal__action-btn cal__action-btn--primary";
+  btnApplyRange.textContent = "Apply";
+  rangeActions.append(btnCancelRange, btnApplyRange);
   const timeWrapRangeStart = document.createElement("div");
   timeWrapRangeStart.className = "cal__time-wrap cal__time-wrap--pane";
   const timeWrapRangeEnd = document.createElement("div");
@@ -315,7 +330,7 @@ export const createCalendarPicker = (
   panes.className = "cal__panes";
   panes.append(paneLeft, paneRight);
 
-  root.append(panes, timeWrap);
+  root.append(panes, rangeActions, timeWrap);
   container.append(root);
 
   fillHourMinute(hourSingle, minuteSingle, meridiemSingle, options.use12HourTime ?? false);
@@ -335,6 +350,11 @@ export const createCalendarPicker = (
       start: rangeStart ? new Date(dateOnlyIfNeeded(options, rangeStart).getTime()) : null,
       end: rangeEnd ? new Date(dateOnlyIfNeeded(options, rangeEnd).getTime()) : null,
     });
+  };
+
+  const syncCommittedRange = (): void => {
+    committedRangeStart = rangeStart ? new Date(rangeStart.getTime()) : null;
+    committedRangeEnd = rangeEnd ? new Date(rangeEnd.getTime()) : null;
   };
 
   const normalizeStoredDatesIfDateOnly = (): void => {
@@ -654,7 +674,6 @@ export const createCalendarPicker = (
               ? applyHM(hi, hourEnd, minuteEnd, meridiemEnd, options.use12HourTime ?? false)
               : hi;
           }
-          emitRange();
         }
         render();
       });
@@ -727,8 +746,51 @@ export const createCalendarPicker = (
 
   function render(): void {
     const isRange = mode() === "range";
+    const hasRangeSelection = Boolean(rangeStart || rangeEnd);
+    // #region agent log
+    fetch("http://127.0.0.1:7608/ingest/4e070bc7-e576-4360-bee6-1fc059d18598", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "e61a4a" },
+      body: JSON.stringify({
+        sessionId: "e61a4a",
+        runId: "non-range-actions-debug",
+        hypothesisId: "H1-H2-H3",
+        location: "CalendarPicker.ts:render",
+        message: "render visibility state",
+        data: {
+          mode: mode(),
+          isRange,
+          hasRangeSelection,
+          rangeStart: Boolean(rangeStart),
+          rangeEnd: Boolean(rangeEnd),
+        },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+    // #endregion
     root.classList.toggle("cal--range", isRange);
     paneRight.hidden = !isRange;
+    rangeActions.hidden = !isRange || !hasRangeSelection;
+    // #region agent log
+    fetch("http://127.0.0.1:7608/ingest/4e070bc7-e576-4360-bee6-1fc059d18598", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "e61a4a" },
+      body: JSON.stringify({
+        sessionId: "e61a4a",
+        runId: "non-range-actions-debug",
+        hypothesisId: "H5",
+        location: "CalendarPicker.ts:render:afterVisibilitySet",
+        message: "post-visibility DOM state",
+        data: {
+          mode: mode(),
+          rangeActionsHiddenProp: rangeActions.hidden,
+          rangeActionsDisplay: getComputedStyle(rangeActions).display,
+          paneRightHiddenProp: paneRight.hidden,
+        },
+        timestamp: Date.now(),
+      }),
+    }).catch(() => {});
+    // #endregion
     fillMonthYearSelects();
     renderWeekdays();
     renderGrid();
@@ -771,8 +833,45 @@ export const createCalendarPicker = (
     } else {
       rangeStart = null;
       rangeEnd = null;
-      emitRange();
     }
+    render();
+  });
+
+  btnApplyRange.addEventListener("click", (): void => {
+    if (mode() !== "range") return;
+    const hoverAtApply = rangeHoverEnd ? new Date(rangeHoverEnd.getTime()) : null;
+    if (rangeStart && !rangeEnd && hoverAtApply) {
+      const d0 = startOfDay(rangeStart);
+      const d1 = startOfDay(hoverAtApply);
+      let lo = d0;
+      let hi = d1;
+      if (compareAsc(lo, hi) > 0) {
+        const t = lo;
+        lo = hi;
+        hi = t;
+      }
+      rangeStart = shouldShowTimeOn(options)
+        ? applyHM(lo, hourStart, minuteStart, meridiemStart, options.use12HourTime ?? false)
+        : lo;
+      rangeEnd = shouldShowTimeOn(options)
+        ? applyHM(hi, hourEnd, minuteEnd, meridiemEnd, options.use12HourTime ?? false)
+        : hi;
+    }
+    clearRangeHover();
+    syncCommittedRange();
+    emitRange();
+    container.hidden = true;
+    render();
+  });
+
+  btnCancelRange.addEventListener("click", (): void => {
+    if (mode() !== "range") return;
+    clearRangeHover();
+    rangeStart = null;
+    rangeEnd = null;
+    syncCommittedRange();
+    emitRange();
+    container.hidden = true;
     render();
   });
 
@@ -833,7 +932,7 @@ export const createCalendarPicker = (
       rangeEnd = new Date(rangeStart);
       setHM(hourEnd, minuteEnd, meridiemEnd, rangeEnd, options.use12HourTime ?? false);
     }
-    emitRange();
+    render();
   };
 
   const onTimeRangeEndChange = (): void => {
@@ -849,7 +948,7 @@ export const createCalendarPicker = (
       rangeStart = new Date(rangeEnd);
       setHM(hourStart, minuteStart, meridiemStart, rangeStart, options.use12HourTime ?? false);
     }
-    emitRange();
+    render();
   };
 
   hourSingle.addEventListener("change", onTimeSingleChange);
@@ -890,8 +989,8 @@ export const createCalendarPicker = (
         });
       }
       return cloneRange({
-        start: rangeStart ? dateOnlyIfNeeded(options, rangeStart) : null,
-        end: rangeEnd ? dateOnlyIfNeeded(options, rangeEnd) : null,
+        start: committedRangeStart ? dateOnlyIfNeeded(options, committedRangeStart) : null,
+        end: committedRangeEnd ? dateOnlyIfNeeded(options, committedRangeEnd) : null,
       });
     },
     setRange(range: DateRangeValue): void {
@@ -919,9 +1018,29 @@ export const createCalendarPicker = (
         viewYear = a.getFullYear();
         viewMonth = a.getMonth();
       }
+      syncCommittedRange();
       render();
     },
     setOptions(partial: Partial<CalendarOptions>): void {
+      // #region agent log
+      fetch("http://127.0.0.1:7608/ingest/4e070bc7-e576-4360-bee6-1fc059d18598", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "e61a4a" },
+        body: JSON.stringify({
+          sessionId: "e61a4a",
+          runId: "non-range-actions-debug",
+          hypothesisId: "H4",
+          location: "CalendarPicker.ts:setOptions:entry",
+          message: "setOptions called",
+          data: {
+            partialMode: partial.mode ?? null,
+            currentMode: mode(),
+            hasPartialRange: partial.range !== undefined,
+          },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+      // #endregion
       options = { ...options, ...partial };
       if (partial.mode !== undefined || partial.range !== undefined) {
         clearRangeHover();
@@ -930,6 +1049,8 @@ export const createCalendarPicker = (
         if ((options.mode ?? "single") === "single") {
           rangeStart = null;
           rangeEnd = null;
+          committedRangeStart = null;
+          committedRangeEnd = null;
           selected =
             options.value === undefined || options.value === null
               ? null
@@ -942,6 +1063,7 @@ export const createCalendarPicker = (
           selected = null;
           rangeStart = options.range?.start ? new Date(options.range.start.getTime()) : null;
           rangeEnd = options.range?.end ? new Date(options.range.end.getTime()) : null;
+          syncCommittedRange();
           const a = rangeStart ?? rangeEnd;
           if (a) {
             viewYear = a.getFullYear();
@@ -959,6 +1081,7 @@ export const createCalendarPicker = (
       if (partial.range !== undefined && mode() === "range") {
         rangeStart = partial.range.start ? new Date(partial.range.start.getTime()) : null;
         rangeEnd = partial.range.end ? new Date(partial.range.end.getTime()) : null;
+        syncCommittedRange();
         const a = rangeStart ?? rangeEnd;
         if (a) {
           viewYear = a.getFullYear();
@@ -976,6 +1099,28 @@ export const createCalendarPicker = (
         root.setAttribute("aria-label", partial.ariaLabel);
       }
       normalizeStoredDatesIfDateOnly();
+      if (mode() === "range") {
+        syncCommittedRange();
+      }
+      // #region agent log
+      fetch("http://127.0.0.1:7608/ingest/4e070bc7-e576-4360-bee6-1fc059d18598", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-Debug-Session-Id": "e61a4a" },
+        body: JSON.stringify({
+          sessionId: "e61a4a",
+          runId: "non-range-actions-debug",
+          hypothesisId: "H4",
+          location: "CalendarPicker.ts:setOptions:exit",
+          message: "setOptions applied",
+          data: {
+            modeAfter: mode(),
+            rangeStart: Boolean(rangeStart),
+            rangeEnd: Boolean(rangeEnd),
+          },
+          timestamp: Date.now(),
+        }),
+      }).catch(() => {});
+      // #endregion
       render();
     },
     destroy(): void {

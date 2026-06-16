@@ -447,6 +447,37 @@
   font-variant-numeric: tabular-nums;
 }
 
+.cal__range-actions {
+  margin-top: 0.75rem;
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.cal__action-btn {
+  min-height: 2.25rem;
+  padding: 0 0.9rem;
+  border-radius: 8px;
+  border: 1px solid var(--cal-border);
+  background: var(--cal-bg);
+  color: var(--cal-text);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cal__action-btn--primary {
+  border-color: var(--cal-accent);
+  background: var(--cal-accent);
+  color: var(--cal-accent-contrast);
+}
+
+.cal__action-btn--ghost:hover,
+.cal__action-btn--primary:hover {
+  opacity: 0.9;
+}
+
 /* --- Preset themes (data-cal-theme) --- */
 .cal[data-cal-theme="dark"] {
   --cal-bg: #18181b;
