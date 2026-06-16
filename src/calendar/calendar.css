@@ -7,6 +7,7 @@
   --cal-surface: #f4f4f5;
   --cal-text: #18181b;
   --cal-muted: #71717a;
+  --cal-input-placeholder: color-mix(in srgb, var(--cal-muted) 58%, var(--cal-bg));
   --cal-border: #e4e4e7;
   --cal-header-select-border: #c5ceda;
   --cal-accent: #2563eb;
@@ -448,12 +449,37 @@
   color: var(--cal-muted);
 }
 
-.cal__output {
+.cal__input {
+  --cal-text: #18181b;
+  --cal-muted: #71717a;
+  --cal-bg: #ffffff;
+  --cal-border: #e4e4e7;
+  --cal-input-placeholder: color-mix(in srgb, var(--cal-muted) 58%, var(--cal-bg));
   display: block;
-  margin-top: 0.65rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--cal-border);
+  border-radius: 8px;
+  font: inherit;
   font-size: 0.85rem;
-  color: var(--cal-muted);
   font-variant-numeric: tabular-nums;
+  color: var(--cal-text);
+  background: var(--cal-bg);
+}
+
+.cal__input:read-only {
+  cursor: default;
+}
+
+.cal__input::placeholder {
+  color: var(--cal-input-placeholder);
+  opacity: 1;
+}
+
+.cal__input:focus-visible {
+  outline: 2px solid var(--cal-accent);
+  outline-offset: 2px;
 }
 
 .cal__range-actions {
@@ -497,6 +523,7 @@
   --cal-surface: #27272a;
   --cal-text: #fafafa;
   --cal-muted: #a1a1aa;
+  --cal-input-placeholder: color-mix(in srgb, var(--cal-muted) 52%, var(--cal-bg));
   --cal-border: #3f3f46;
   --cal-header-select-border: #52525b;
   --cal-accent: #38bdf8;

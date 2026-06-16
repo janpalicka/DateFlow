@@ -19,6 +19,10 @@ export interface CalendarLocale {
   rangeDurationOne?: string;
   /** Range tooltip for longer spans; `{n}` is replaced with the inclusive day count. Default: `"{n} days"`. */
   rangeDurationOther?: string;
+  /** Value input placeholder when nothing is selected (single mode). Default: `"Select date"`. */
+  inputPlaceholder?: string;
+  /** Value input placeholder when no range is selected. Defaults to `inputPlaceholder`. */
+  rangeInputPlaceholder?: string;
 }
 
 export type DatePredicate = (date: Date) => boolean;
@@ -78,6 +82,11 @@ export interface CalendarOptions {
    * Default: `true`.
    */
   hideOnSingleSelect?: boolean;
+  /**
+   * Allows typing a date directly into the picker’s value input.
+   * Default: `false` (input is read-only; pick dates from the calendar only).
+   */
+  allowInput?: boolean;
   className?: string;
   /** Sets `data-cal-theme` on the root for styling. */
   theme?: string;
@@ -104,6 +113,8 @@ export interface CalendarPickerAPI {
   setRange(range: DateRangeValue): void;
   /** Merge options and re-render (e.g. change locale or constraints). */
   setOptions(partial: Partial<CalendarOptions>): void;
+  /** Value input created by the picker; append to your layout and use as the calendar anchor. */
+  getInputElement(): HTMLInputElement;
   destroy(): void;
 }
 

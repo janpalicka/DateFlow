@@ -26,4 +26,6 @@ export const englishLocale: CalendarLocale = {
   weekNumberHeader: "Wk",
   rangeDurationOne: "1 day",
   rangeDurationOther: "{n} days",
+  inputPlaceholder: "Select date",
+  rangeInputPlaceholder: "Select date range",
 };

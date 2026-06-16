@@ -25,4 +25,6 @@ export const germanLocale: CalendarLocale = {
   firstDayOfWeek: 1,
   rangeDurationOne: "1 Tag",
   rangeDurationOther: "{n} Tage",
+  inputPlaceholder: "Datum wählen",
+  rangeInputPlaceholder: "Datumsbereich wählen",
 };

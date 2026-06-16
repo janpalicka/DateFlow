@@ -70,17 +70,6 @@ function mountFloatingCalendarDemo(
       return format(date, defaultTimeFormat());
     });
 
-  const trigger = document.createElement("pre");
-  trigger.className = "showcase-card__log showcase-card__log--trigger";
-  trigger.tabIndex = 0;
-  trigger.setAttribute("role", "button");
-  trigger.setAttribute("aria-label", "Open calendar");
-  const setTriggerValue = (value: string): void => {
-    trigger.textContent = value;
-  };
-  setTriggerValue("No date selected");
-  wrap.append(trigger);
-
   const floating = document.createElement("div");
   floating.className = "showcase-floating";
   floating.hidden = true;
@@ -91,9 +80,7 @@ function mountFloatingCalendarDemo(
     ...options,
     onChange: (d) => {
       options.onChange?.(d);
-      const value = singleFormatter(d);
-      setTriggerValue(value);
-      onValueChange(value);
+      onValueChange(singleFormatter(d));
     },
     onRangeChange: (r) => {
       options.onRangeChange?.(r);
@@ -104,13 +91,17 @@ function mountFloatingCalendarDemo(
           : "yyyy-MM-dd";
       const sep = options.rangeOutputSeparator ?? " → ";
       const value = formatRangeLine(r, fmt, sep);
-      setTriggerValue(value);
       onRangeChange?.(value);
     },
   });
   onReady?.(api);
 
-  const syncFromInitial = (): void => {
+  const trigger = api.getInputElement();
+  trigger.classList.add("showcase-card__input", "showcase-card__input--trigger");
+  trigger.setAttribute("aria-expanded", "false");
+  wrap.append(trigger);
+
+  const syncLogFromInitial = (): void => {
     if ((options.mode ?? "single") === "range") {
       const fmt = options.outputFormat
         ? options.outputFormat
@@ -120,16 +111,12 @@ function mountFloatingCalendarDemo(
       const sep = options.rangeOutputSeparator ?? " → ";
       const initial = api.getRange();
       const value = formatRangeLine(initial, fmt, sep);
-      setTriggerValue(value);
       onRangeChange?.(value);
       return;
     }
-    const initial = api.getValue();
-    const value = singleFormatter(initial);
-    setTriggerValue(value);
-    onValueChange(value);
+    onValueChange(singleFormatter(api.getValue()));
   };
-  syncFromInitial();
+  syncLogFromInitial();
 
   let cleanupAutoUpdate: (() => void) | null = null;
   const updatePosition = (): void => {
@@ -153,26 +140,18 @@ function mountFloatingCalendarDemo(
   };
 
   const open = (): void => {
+    if (!floating.hidden) return;
     floating.hidden = false;
     trigger.setAttribute("aria-expanded", "true");
     cleanupAutoUpdate = autoUpdate(trigger, floating, updatePosition);
     updatePosition();
   };
 
-  const toggle = (): void => {
-    if (floating.hidden) open();
-    else close();
-  };
+  trigger.addEventListener("focus", open);
+  trigger.addEventListener("click", open);
 
-  trigger.addEventListener("click", toggle);
   trigger.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      toggle();
-    }
-    if (e.key === "Escape") {
-      close();
-    }
+    if (e.key === "Escape") close();
   });
 
   document.addEventListener("pointerdown", (e) => {
@@ -225,8 +204,8 @@ export function mountShowcase(root: HTMLElement): void {
     );
     grid.append(
       card(
-        "1. Floating calendar (click the log line)",
-        "Calendar opens as a floating panel anchored to the log `pre` element. Click outside or press Escape to close it.",
+        "1. Floating calendar (focus the input)",
+        "Each picker exposes a value `input` via `getInputElement()`. Focus or click it to open the floating calendar. By default the input is read-only (`allowInput: false`).",
         m,
         [],
       ),
@@ -1031,6 +1010,26 @@ export function mountShowcase(root: HTMLElement): void {
       card(
         "29. Time selection with seconds (12-hour)",
         "`showSeconds: true` with `use12HourTime: true` — hour, minute, second, and AM/PM selectors.",
+        m,
+        [],
+      ),
+    );
+  }
+
+  /* 30 — Direct date input (allowInput) */
+  {
+    const m = mountFloatingCalendarDemo(
+      {
+        value: new Date(2026, 2, 15),
+        outputFormat: "yyyy-MM-dd",
+        allowInput: true,
+      },
+      () => {},
+    );
+    grid.append(
+      card(
+        "30. Direct date input (`allowInput`)",
+        "`allowInput: true` lets users type dates directly into the value input using `outputFormat` (blur or Enter to commit). Default is `false` (read-only).",
         m,
         [],
       ),

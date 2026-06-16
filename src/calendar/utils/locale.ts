@@ -10,6 +10,13 @@ const mergeLocale = (partial: Partial<CalendarLocale> | undefined): CalendarLoca
     weekNumberHeader: partial.weekNumberHeader ?? DEFAULT_LOCALE.weekNumberHeader ?? "Wk",
     rangeDurationOne: partial.rangeDurationOne ?? DEFAULT_LOCALE.rangeDurationOne,
     rangeDurationOther: partial.rangeDurationOther ?? DEFAULT_LOCALE.rangeDurationOther,
+    inputPlaceholder: partial.inputPlaceholder ?? DEFAULT_LOCALE.inputPlaceholder ?? "Select date",
+    rangeInputPlaceholder:
+      partial.rangeInputPlaceholder ??
+      DEFAULT_LOCALE.rangeInputPlaceholder ??
+      partial.inputPlaceholder ??
+      DEFAULT_LOCALE.inputPlaceholder ??
+      "Select date range",
   };
 };
 

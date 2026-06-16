@@ -38,4 +38,6 @@ export const frenchLocale: CalendarLocale = {
   firstDayOfWeek: 1,
   rangeDurationOne: "1 jour",
   rangeDurationOther: "{n} jours",
+  inputPlaceholder: "Choisir une date",
+  rangeInputPlaceholder: "Choisir une plage de dates",
 };

@@ -6,6 +6,8 @@ import {
   getDaysInMonth,
   getISOWeek,
   isSameDay,
+  isValid,
+  parse,
   startOfDay,
 } from "date-fns";
 import type {
@@ -19,6 +21,7 @@ import {
   compareCalendarDay,
   dateOnlyIfNeeded,
   dayInInclusiveRange,
+  effectiveOutputFormat,
   formatRangeDurationLabel,
   isSelectable,
   mergeLocale,
@@ -144,6 +147,12 @@ export const createCalendarPicker = (
   const anchor = selected ?? rangeStart ?? rangeEnd ?? now;
   viewYear = anchor.getFullYear();
   viewMonth = anchor.getMonth();
+
+  const valueInput = document.createElement("input");
+  valueInput.type = "text";
+  valueInput.className = "cal__input";
+  valueInput.setAttribute("aria-label", "Selected date");
+  valueInput.spellcheck = false;
 
   const root = document.createElement("div");
   root.className = ["cal", options.className].filter(Boolean).join(" ");
@@ -400,9 +409,11 @@ export const createCalendarPicker = (
   const emitSingle = (): void => {
     if (!selected) {
       options.onChange?.(null);
+      syncInputFromState();
       return;
     }
     options.onChange?.(new Date(dateOnlyIfNeeded(options, selected).getTime()));
+    syncInputFromState();
   };
 
   const emitRange = (): void => {
@@ -410,7 +421,181 @@ export const createCalendarPicker = (
       start: rangeStart ? new Date(dateOnlyIfNeeded(options, rangeStart).getTime()) : null,
       end: rangeEnd ? new Date(dateOnlyIfNeeded(options, rangeEnd).getTime()) : null,
     });
+    syncInputFromState();
   };
+
+  const allowInputOn = (): boolean => options.allowInput ?? false;
+  let syncingInput = false;
+
+  const formatSingleForInput = (d: Date | null): string => {
+    if (!d) return "";
+    return format(dateOnlyIfNeeded(options, d), effectiveOutputFormat(options));
+  };
+
+  const formatRangeForInput = (): string => {
+    const sep = options.rangeOutputSeparator ?? " → ";
+    const fmt = effectiveOutputFormat(options);
+    if (!rangeStart) return "";
+    const start = format(dateOnlyIfNeeded(options, rangeStart), fmt);
+    if (!rangeEnd) return `${start} …`;
+    const end = format(dateOnlyIfNeeded(options, rangeEnd), fmt);
+    return `${start}${sep}${end}`;
+  };
+
+  const inputPlaceholderFor = (): string => {
+    const locale = mergeLocale(options.locale);
+    if (mode() === "range") {
+      return locale.rangeInputPlaceholder ?? locale.inputPlaceholder ?? "Select date range";
+    }
+    return locale.inputPlaceholder ?? "Select date";
+  };
+
+  const syncInputPlaceholder = (): void => {
+    valueInput.placeholder = inputPlaceholderFor();
+  };
+
+  const syncInputFromState = (): void => {
+    syncingInput = true;
+    valueInput.value = mode() === "range" ? formatRangeForInput() : formatSingleForInput(selected);
+    syncInputPlaceholder();
+    syncingInput = false;
+  };
+
+  const applyInputMode = (): void => {
+    valueInput.readOnly = !allowInputOn();
+  };
+
+  const tryParseDate = (text: string, ref: Date): Date | null => {
+    const trimmed = text.trim();
+    if (!trimmed) return null;
+    try {
+      const d = parse(trimmed, effectiveOutputFormat(options), ref);
+      return isValid(d) ? d : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const applyParsedSingle = (d: Date): boolean => {
+    const normalized = dateOnlyIfNeeded(options, d);
+    if (
+      !isSelectable(
+        normalized,
+        options.minDate ?? null,
+        options.maxDate ?? null,
+        options.enabledDatesOnly ? undefined : options.disabledDates,
+        options.enabledDatesOnly,
+      )
+    ) {
+      return false;
+    }
+    selected = shouldShowTimeOn(options) ? d : startOfDay(d);
+    viewYear = selected.getFullYear();
+    viewMonth = selected.getMonth();
+    return true;
+  };
+
+  const commitTypedInput = (): void => {
+    if (syncingInput || !allowInputOn()) return;
+    const text = valueInput.value;
+    const ref = selected ?? rangeStart ?? new Date();
+
+    if (mode() === "range") {
+      const sep = options.rangeOutputSeparator ?? " → ";
+      const trimmed = text.trim();
+      if (!trimmed) {
+        clearRangeHover();
+        rangeStart = null;
+        rangeEnd = null;
+        syncCommittedRange();
+        emitRange();
+        render();
+        return;
+      }
+      const parts = trimmed.split(sep);
+      const start = tryParseDate(parts[0] ?? "", ref);
+      if (!start) {
+        syncInputFromState();
+        return;
+      }
+      let end: Date | null = null;
+      const endPart = (parts[1] ?? "").trim();
+      if (endPart && endPart !== "…") {
+        end = tryParseDate(endPart, ref);
+        if (!end) {
+          syncInputFromState();
+          return;
+        }
+      }
+      const startNorm = dateOnlyIfNeeded(options, start);
+      const endNorm = end ? dateOnlyIfNeeded(options, end) : null;
+      if (
+        !isSelectable(
+          startNorm,
+          options.minDate ?? null,
+          options.maxDate ?? null,
+          options.enabledDatesOnly ? undefined : options.disabledDates,
+          options.enabledDatesOnly,
+        )
+      ) {
+        syncInputFromState();
+        return;
+      }
+      if (
+        endNorm &&
+        !isSelectable(
+          endNorm,
+          options.minDate ?? null,
+          options.maxDate ?? null,
+          options.enabledDatesOnly ? undefined : options.disabledDates,
+          options.enabledDatesOnly,
+        )
+      ) {
+        syncInputFromState();
+        return;
+      }
+      clearRangeHover();
+      rangeStart = shouldShowTimeOn(options) ? start : startOfDay(start);
+      rangeEnd = end ? (shouldShowTimeOn(options) ? end : startOfDay(end)) : null;
+      if (rangeStart) {
+        viewYear = rangeStart.getFullYear();
+        viewMonth = rangeStart.getMonth();
+      }
+      syncCommittedRange();
+      emitRange();
+      render();
+      return;
+    }
+
+    const trimmed = text.trim();
+    if (!trimmed) {
+      selected = null;
+      emitSingle();
+      render();
+      return;
+    }
+    const parsed = tryParseDate(trimmed, ref);
+    if (!parsed || !applyParsedSingle(parsed)) {
+      syncInputFromState();
+      return;
+    }
+    emitSingle();
+    render();
+  };
+
+  const onInputBlur = (): void => {
+    commitTypedInput();
+  };
+
+  const onInputKeydown = (e: KeyboardEvent): void => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    commitTypedInput();
+    valueInput.blur();
+  };
+
+  valueInput.addEventListener("blur", onInputBlur);
+  valueInput.addEventListener("keydown", onInputKeydown);
 
   const syncCommittedRange = (): void => {
     committedRangeStart = rangeStart ? new Date(rangeStart.getTime()) : null;
@@ -832,6 +1017,8 @@ export const createCalendarPicker = (
     updateResetVisibility();
     btnPrev.disabled = !canGoPrevMonth();
     btnNext.disabled = !canGoNextMonth();
+    applyInputMode();
+    syncInputFromState();
   }
 
   btnPrev.addEventListener("click", (): void => {
@@ -993,6 +1180,9 @@ export const createCalendarPicker = (
   secondEnd.addEventListener("change", onTimeRangeEndChange);
   meridiemEnd.addEventListener("change", onTimeRangeEndChange);
 
+  applyInputMode();
+  syncInputFromState();
+
   render();
 
   return {
@@ -1111,13 +1301,22 @@ export const createCalendarPicker = (
       if (partial.ariaLabel !== undefined) {
         root.setAttribute("aria-label", partial.ariaLabel);
       }
+      if (partial.allowInput !== undefined) {
+        applyInputMode();
+      }
       normalizeStoredDatesIfDateOnly();
       if (mode() === "range") {
         syncCommittedRange();
       }
       render();
     },
+    getInputElement(): HTMLInputElement {
+      return valueInput;
+    },
     destroy(): void {
+      valueInput.removeEventListener("blur", onInputBlur);
+      valueInput.removeEventListener("keydown", onInputKeydown);
+      valueInput.remove();
       root.remove();
     },
   };

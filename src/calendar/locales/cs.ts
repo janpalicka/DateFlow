@@ -25,4 +25,6 @@ export const czechLocale: CalendarLocale = {
   firstDayOfWeek: 1,
   rangeDurationOne: "1 den",
   rangeDurationOther: "{n} dní",
+  inputPlaceholder: "Vyberte datum",
+  rangeInputPlaceholder: "Vyberte rozsah dat",
 };
