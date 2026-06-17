@@ -946,6 +946,9 @@ const buildCalendarPicker = (
         if (!selectable) {
           btn.disabled = true;
           btn.classList.add("cal__day--disabled");
+          if (options.disabledDatesStrikeThrough) {
+            btn.classList.add("cal__day--disabled-strike");
+          }
         }
 
         if (mode() === "single") {

@@ -349,11 +349,13 @@
   background: transparent;
 }
 
-/* Range mode: subtle today marker when not a range endpoint. */
+/* Range mode: subtle today marker when not part of the current range. */
 .cal.cal--range
   .cal__day--today:not(.cal__day--range-start):not(.cal__day--range-end):not(
     .cal__day--range-single
-  ) {
+  ):not(.cal__day--range-between):not(.cal__day--range-preview-between):not(
+    .cal__day--range-preview-start
+  ):not(.cal__day--range-preview-end) {
   border-color: var(--cal-border);
   background: var(--cal-surface);
 }
@@ -457,6 +459,9 @@
 .cal__day:disabled {
   opacity: 0.35;
   cursor: not-allowed;
+}
+
+.cal__day--disabled-strike .cal__day__num {
   text-decoration: line-through;
 }
 

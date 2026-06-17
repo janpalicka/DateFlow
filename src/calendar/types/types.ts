@@ -81,6 +81,11 @@ export interface CalendarOptions {
   maxDate?: Date | null;
   /** Blocked dates or predicate (ignored when `enabledDatesOnly` is set). */
   disabledDates?: DateFilter;
+  /**
+   * When `true`, non-selectable days show a strike-through on the day number.
+   * Default: `false`.
+   */
+  disabledDatesStrikeThrough?: boolean;
   /** When set, only these dates (or predicate true) are selectable. */
   enabledDatesOnly?: DateFilter;
   /**
