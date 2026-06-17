@@ -1,6 +1,7 @@
 node_modules
 dist
 dist-docs
+coverage
 .DS_Store
 *.local
 .vscode
