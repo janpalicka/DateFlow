@@ -769,33 +769,57 @@ function mountQuickStartDemo() {
 
 function initTocSpy() {
   const links = [...document.querySelectorAll(".showcase-toc__link")];
-  const sectionIds = links
-    .map((link) => link.getAttribute("href")?.slice(1))
-    .filter((id) => id);
-  const sections = sectionIds
-    .map((id) => document.getElementById(id))
-    .filter((el) => el instanceof HTMLElement);
+  const sections = links
+    .map((link) => {
+      const id = link.getAttribute("href")?.slice(1);
+      const el = id ? document.getElementById(id) : null;
+      return el instanceof HTMLElement ? { id, el, link } : null;
+    })
+    .filter(Boolean);
 
   if (!sections.length) return;
 
   const setActive = (id) => {
-    for (const link of links) {
-      link.classList.toggle("is-active", link.getAttribute("href") === `#${id}`);
+    for (const section of sections) {
+      section.link.classList.toggle("is-active", section.id === id);
     }
   };
 
-  const observer = new IntersectionObserver(
-    (entries) => {
-      const visible = entries
-        .filter((entry) => entry.isIntersecting)
-        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-      if (visible?.target.id) setActive(visible.target.id);
-    },
-    { rootMargin: "-25% 0px -55% 0px", threshold: [0, 0.15, 0.4] },
-  );
+  const scrollOffset = () => {
+    const header = document.querySelector(".site-header");
+    return (header instanceof HTMLElement ? header.offsetHeight : 64) + 48;
+  };
 
-  for (const section of sections) observer.observe(section);
-  setActive(sectionIds[0]);
+  const updateActive = () => {
+    const offset = scrollOffset();
+    let activeId = sections[0].id;
+
+    for (const section of sections) {
+      if (section.el.getBoundingClientRect().top <= offset) {
+        activeId = section.id;
+      }
+    }
+    setActive(activeId);
+  };
+
+  let ticking = false;
+  const onScroll = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      updateActive();
+      ticking = false;
+    });
+  };
+
+  for (const section of sections) {
+    section.link.addEventListener("click", () => setActive(section.id));
+  }
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll, { passive: true });
+  window.addEventListener("hashchange", updateActive);
+  updateActive();
 }
 
 function initShowcase() {
