@@ -167,6 +167,8 @@ export const createCalendarPicker = (
   /** Tentative end while choosing a range (pointer hover). */
   let rangeHoverEnd: Date | null = null;
 
+  const shouldPseudoSelectToday = (): boolean => mode() === "single" && selected === null;
+
   function onPanelClosed(): void {
     if (mode() !== "range") return;
     if (!rangeStart || rangeEnd) return;
@@ -177,7 +179,7 @@ export const createCalendarPicker = (
   }
 
   if (mode() === "single") {
-    selected = options.value ?? null;
+    selected = options.value != null ? new Date(options.value.getTime()) : null;
     if (selected && !shouldShowTimeOn(options)) {
       selected = startOfDay(selected);
     }
@@ -880,6 +882,9 @@ export const createCalendarPicker = (
           if (selected && isSameDay(dayDate, selected)) {
             btn.classList.add("cal__day--selected");
             btn.setAttribute("aria-selected", "true");
+          } else if (shouldPseudoSelectToday() && isSameDay(dayDate, now)) {
+            btn.classList.add("cal__day--pseudo-selected");
+            btn.setAttribute("aria-selected", "false");
           } else {
             btn.setAttribute("aria-selected", "false");
           }
@@ -1423,10 +1428,10 @@ export const createCalendarPicker = (
           rangeEnd = null;
           committedRangeStart = null;
           committedRangeEnd = null;
-          selected =
-            options.value === undefined || options.value === null
-              ? null
-              : new Date(options.value.getTime());
+          selected = options.value != null ? new Date(options.value.getTime()) : null;
+          if (selected && !shouldShowTimeOn(options)) {
+            selected = startOfDay(selected);
+          }
           if (selected) {
             viewYear = selected.getFullYear();
             viewMonth = selected.getMonth();
