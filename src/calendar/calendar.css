@@ -345,10 +345,10 @@
 
 /* Today outside selection/range highlight: plain cell like any other day. */
 .cal__day--today:not(.cal__day--selected):not(.cal__day--pseudo-selected):not(
-  .cal__day--range-start
-):not(.cal__day--range-end):not(.cal__day--range-single):not(.cal__day--range-between):not(
-  .cal__day--range-preview-between
-):not(.cal__day--range-preview-start):not(.cal__day--range-preview-end) {
+    .cal__day--range-start
+  ):not(.cal__day--range-end):not(.cal__day--range-single):not(.cal__day--range-between):not(
+    .cal__day--range-preview-between
+  ):not(.cal__day--range-preview-start):not(.cal__day--range-preview-end) {
   border-color: transparent;
   background: transparent;
   color: rgb(70, 114, 235);

@@ -45,7 +45,7 @@
           <p class="showcase-hero__eyebrow">Vanilla TypeScript · Floating UI</p>
           <h1 id="hero-title" class="showcase-hero__title">Date &amp; range picker for the web</h1>
           <p class="showcase-hero__lead">
-            Interactive reference for <code>createCalendarPicker</code> — single dates, ranges,
+            Interactive reference for <code>dateFlow</code> — single dates, ranges,
             time selection, locales, and theming. No framework required.
           </p>
           <div class="showcase-hero__actions">
@@ -132,10 +132,11 @@
     &lt;input type="text" id="date-field" /&gt;
 
     &lt;script type="module"&gt;
-      import { createCalendarPicker } from "./path/to/calendar/index.ts";
+      import { dateFlow } from "dateflow";
+      import "dateflow/style.css";
 
       const input = document.getElementById("date-field");
-      createCalendarPicker(input, {
+      dateFlow(input, {
         value: new Date(2026, 5, 8),
         onChange: (date) => console.log("Selected:", date),
       });
@@ -154,11 +155,11 @@
         <div class="showcase__grid">
         <article class="showcase-card">
           <h3 class="showcase-card__title">Basic picker with time</h3>
-          <p class="showcase-card__desc">Pass your text input to createCalendarPicker. Focus it to open the calendar panel.</p>
-          <pre class="showcase-card__code"><code>import { createCalendarPicker } from "@/calendar";
+          <p class="showcase-card__desc">Pass your text input to dateFlow. Focus it to open the calendar panel.</p>
+          <pre class="showcase-card__code"><code>import { dateFlow } from "@/calendar";
 
 const input = document.getElementById("date-field");
-const picker = createCalendarPicker(input, {
+const picker = dateFlow(input, {
   value: new Date(2026, 2, 15, 12, 30),
   showTime: true,
 });</code></pre>
@@ -169,7 +170,7 @@ const picker = createCalendarPicker(input, {
           <p class="showcase-card__desc">Pass <code>#my-id</code> instead of an element — one picker for that input.</p>
           <pre class="showcase-card__code"><code>&lt;input type="text" id="trip-date" /&gt;
 
-createCalendarPicker("#trip-date", {
+dateFlow("#trip-date", {
   value: new Date(2026, 2, 20),
 });</code></pre>
           <div class="showcase-card__mount" data-demo="selector-id"></div>
@@ -180,7 +181,7 @@ createCalendarPicker("#trip-date", {
           <pre class="showcase-card__code"><code>&lt;input type="text" class="booking-date" /&gt;
 &lt;input type="text" class="booking-date" /&gt;
 
-const pickers = createCalendarPicker(".booking-date", {
+const pickers = dateFlow(".booking-date", {
   value: new Date(2026, 2, 20),
 });</code></pre>
           <div class="showcase-card__mount" data-demo="selector-class"></div>
@@ -188,7 +189,7 @@ const pickers = createCalendarPicker(".booking-date", {
         <article class="showcase-card">
           <h3 class="showcase-card__title">Runtime setOptions</h3>
           <p class="showcase-card__desc">Update locale, time, or mode without destroying the picker.</p>
-          <pre class="showcase-card__code"><code>const picker = createCalendarPicker(input, { onChange });
+          <pre class="showcase-card__code"><code>const picker = dateFlow(input, { onChange });
 
 picker.setOptions({ locale: de });
 picker.setOptions({ showTime: true });
@@ -221,7 +222,7 @@ picker.setOptions({ mode: "single", value: picker.getRange().start });</code></p
           <p class="showcase-card__desc">
             <code>{ selectedDate: Date | null }</code>
           </p>
-          <pre class="showcase-card__code"><code>const picker = createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>const picker = dateFlow(input, {
   value: new Date(2026, 2, 15),
 });
 
@@ -234,7 +235,7 @@ picker.selectedDates;
           <p class="showcase-card__desc">
             <code>{ start: Date | null, end: Date | null }</code>
           </p>
-          <pre class="showcase-card__code"><code>const picker = createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>const picker = dateFlow(input, {
   mode: "range",
   range: {
     start: new Date(2026, 2, 5),
@@ -303,7 +304,7 @@ picker.changeMonth(0, false); // June (5) → January (0)</code></pre>
             <code>picker.clear()</code> — clears the current selection. Same behavior as the header
             reset button when <code>showResetButton</code> is enabled.
           </p>
-          <pre class="showcase-card__code"><code>const picker = createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>const picker = dateFlow(input, {
   value: new Date(2026, 2, 15),
   showResetButton: true,
 });
@@ -412,7 +413,7 @@ picker.setDate(
             <code>picker.close()</code> hides it. Calling either when already in that state is a
             no-op. Both work with the default popover behavior (Floating UI positioning).
           </p>
-          <pre class="showcase-card__code"><code>const picker = createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>const picker = dateFlow(input, {
   value: new Date(2026, 2, 15),
 });
 
@@ -433,10 +434,10 @@ picker.close(); // hide calendar</code></pre>
         <article class="showcase-card">
           <h3 class="showcase-card__title">German locale</h3>
           <p class="showcase-card__desc">German month names and Monday as the first day of the week.</p>
-          <pre class="showcase-card__code"><code>import { createCalendarPicker } from "@/calendar";
+          <pre class="showcase-card__code"><code>import { dateFlow } from "@/calendar";
 import { de } from "@/calendar/locales";
 
-createCalendarPicker(input, {
+dateFlow(input, {
   locale: de,
 });</code></pre>
           <div class="showcase-card__mount" data-demo="locale-de"></div>
@@ -445,10 +446,10 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">French locale</h3>
           <p class="showcase-card__desc">Another full locale with Monday as the first weekday.</p>
-          <pre class="showcase-card__code"><code>import { createCalendarPicker } from "@/calendar";
+          <pre class="showcase-card__code"><code>import { dateFlow } from "@/calendar";
 import { fr } from "@/calendar/locales";
 
-createCalendarPicker(input, {
+dateFlow(input, {
   locale: fr,
 });</code></pre>
           <div class="showcase-card__mount" data-demo="locale-fr"></div>
@@ -457,10 +458,10 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">Partial locale override</h3>
           <p class="showcase-card__desc">Merge over defaults — here Czech labels with a custom week-number header.</p>
-          <pre class="showcase-card__code"><code>import { createCalendarPicker } from "@/calendar";
+          <pre class="showcase-card__code"><code>import { dateFlow } from "@/calendar";
 import { cs } from "@/calendar/locales";
 
-createCalendarPicker(input, {
+dateFlow(input, {
   showWeekNumbers: true,
   locale: {
     ...cs,
@@ -479,7 +480,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">Min and max date</h3>
           <p class="showcase-card__desc">Only days within the inclusive range are selectable.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   value: new Date(2026, 2, 15),
   minDate: new Date(2026, 2, 10),
   maxDate: new Date(2026, 2, 25),
@@ -490,7 +491,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">Disabled dates (array)</h3>
           <p class="showcase-card__desc">Block specific dates — useful for holidays or closures. By default disabled days are dimmed only; pass <code>disabledDatesStrikeThrough: true</code> to add a strike-through.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   value: new Date(2026, 2, 15),
   disabledDates: [
     new Date(2026, 2, 17),
@@ -504,7 +505,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">Disabled dates strike-through</h3>
           <p class="showcase-card__desc">Same blocked dates with <code>disabledDatesStrikeThrough: true</code>. Text color stays the same as the default disabled style.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   value: new Date(2026, 2, 15),
   disabledDatesStrikeThrough: true,
   disabledDates: [
@@ -519,7 +520,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">Disabled dates (predicate)</h3>
           <p class="showcase-card__desc">Disable weekends with a function.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   disabledDates: (date) => {
     const day = date.getDay();
     return day === 0 || day === 6;
@@ -535,7 +536,7 @@ createCalendarPicker(input, {
   (day) => new Date(2026, 2, day),
 );
 
-createCalendarPicker(input, {
+dateFlow(input, {
   value: new Date(2026, 2, 12),
   enabledDatesOnly: allowed,
 });</code></pre>
@@ -545,7 +546,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">Allowed dates only (predicate)</h3>
           <p class="showcase-card__desc">Only odd-numbered calendar days are selectable.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   enabledDatesOnly: (date) => date.getDate() % 2 === 1,
 });</code></pre>
           <div class="showcase-card__mount" data-demo="enabled-predicate"></div>
@@ -560,7 +561,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">24-hour time</h3>
           <p class="showcase-card__desc">Hour 0–23 and minute in 5-minute steps (customize with minuteStep).</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   showTime: true,
   minuteStep: 1,
   value: new Date(2026, 2, 20, 14, 45),
@@ -572,7 +573,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">12-hour time</h3>
           <p class="showcase-card__desc">Hour 1–12 with an AM/PM selector.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   showTime: true,
   use12HourTime: true,
   value: new Date(2026, 6, 9, 15, 30),
@@ -584,7 +585,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">Seconds (24-hour)</h3>
           <p class="showcase-card__desc">showSeconds adds a seconds dropdown when showTime is enabled.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   showTime: true,
   showSeconds: true,
   value: new Date(2026, 2, 15, 14, 30, 45),
@@ -595,7 +596,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">Seconds (12-hour)</h3>
           <p class="showcase-card__desc">Hour, minute, second, and AM/PM selectors together.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   showTime: true,
   showSeconds: true,
   use12HourTime: true,
@@ -613,7 +614,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">allowInput — date</h3>
           <p class="showcase-card__desc">Type a date using outputFormat. Blur or Enter commits; Enter closes the calendar by default.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   allowInput: true,
   outputFormat: "yyyy-MM-dd",
   value: new Date(2026, 2, 15),
@@ -624,7 +625,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">allowInput — 24-hour datetime</h3>
           <p class="showcase-card__desc">Default outputFormat includes time when showTime is true.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   allowInput: true,
   showTime: true,
   value: new Date(2026, 2, 15, 14, 30),
@@ -636,7 +637,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">allowInput — 12-hour datetime</h3>
           <p class="showcase-card__desc">Use use12HourTime for AM/PM parsing and display.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   allowInput: true,
   showTime: true,
   use12HourTime: true,
@@ -649,7 +650,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">Keep calendar open on Enter</h3>
           <p class="showcase-card__desc">keepOpenOnAllowInputEnter keeps the panel open after a successful Enter commit.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   allowInput: true,
   keepOpenOnAllowInputEnter: true,
   showTime: true,
@@ -667,7 +668,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">Basic range</h3>
           <p class="showcase-card__desc">First click starts a range, second completes it. Use onRangeChange for updates.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   mode: "range",
   range: {
     start: new Date(2026, 2, 5),
@@ -681,7 +682,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">Range with start & end time</h3>
           <p class="showcase-card__desc">Separate time controls under each calendar pane in range mode.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   mode: "range",
   showTime: true,
   range: {
@@ -696,7 +697,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">Range separator & format</h3>
           <p class="showcase-card__desc">rangeOutputSeparator and outputFormat shape the value input string.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   mode: "range",
   showTime: true,
   outputFormat: "dd.MM.yyyy HH:mm",
@@ -712,7 +713,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">Range + week numbers</h3>
           <p class="showcase-card__desc">Combine range mode with ISO week column.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   mode: "range",
   showWeekNumbers: true,
   locale: { weekNumberHeader: "KW" },
@@ -727,7 +728,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">Range + dark theme</h3>
           <p class="showcase-card__desc">theme: "dark" sets data-cal-theme on the calendar root.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   mode: "range",
   theme: "dark",
   range: {
@@ -747,7 +748,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">Custom outputFormat</h3>
           <p class="showcase-card__desc">outputFormat is a date-fns pattern synced to the value input.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   showTime: true,
   outputFormat: "EEEE, d MMMM yyyy 'at' HH:mm",
   value: new Date(2026, 7, 19, 15, 0),
@@ -764,7 +765,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">Dark theme preset</h3>
           <p class="showcase-card__desc">Sets data-cal-theme="dark" and bundled CSS variables.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   theme: "dark",
   showTime: true,
 });</code></pre>
@@ -774,7 +775,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">High-contrast preset</h3>
           <p class="showcase-card__desc">theme: "contrast" — strong borders and yellow accent.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   theme: "contrast",
 });</code></pre>
           <div class="showcase-card__mount" data-demo="theme-contrast"></div>
@@ -783,7 +784,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">Custom CSS variables</h3>
           <p class="showcase-card__desc">Override --cal-* variables on the panel wrapper (<code>getCalendarElement()</code>) — no theme name required.</p>
-          <pre class="showcase-card__code"><code>const picker = createCalendarPicker(input, { /* … */ });
+          <pre class="showcase-card__code"><code>const picker = dateFlow(input, { /* … */ });
 const panel = picker.getCalendarElement();
 panel.style.setProperty("--cal-bg", "#fff7ed");
 panel.style.setProperty("--cal-accent", "#c2410c");</code></pre>
@@ -795,7 +796,7 @@ panel.style.setProperty("--cal-accent", "#c2410c");</code></pre>
           <p class="showcase-card__desc">Combine theme, locale, min/max, and disabledDates.</p>
           <pre class="showcase-card__code"><code>import { de } from "@/calendar/locales";
 
-createCalendarPicker(input, {
+dateFlow(input, {
   theme: "forest",
   locale: de,
   minDate: new Date(2026, 2, 1),
@@ -809,7 +810,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">aria-label</h3>
           <p class="showcase-card__desc">Custom accessible name for the calendar region.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   ariaLabel: "Delivery date",
 });</code></pre>
           <div class="showcase-card__mount" data-demo="aria-label"></div>
@@ -818,7 +819,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">Reset button</h3>
           <p class="showcase-card__desc">showResetButton adds a header icon that clears the selection.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   showResetButton: true,
   resetInputLabel: "Reset",
   value: new Date(2026, 2, 13, 14, 15),
@@ -830,7 +831,7 @@ createCalendarPicker(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">Year text input</h3>
           <p class="showcase-card__desc">Type a year directly; values are clamped to minDate and maxDate when set.</p>
-          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+          <pre class="showcase-card__code"><code>dateFlow(input, {
   minDate: new Date(2026, 2, 1),
   maxDate: new Date(2026, 8, 30),
   value: new Date(2026, 5, 1),

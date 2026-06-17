@@ -19,12 +19,12 @@ npm install dateflow date-fns @floating-ui/dom
 ```
 
 ```ts
-import { createCalendarPicker } from "dateflow";
+import { dateFlow } from "dateflow";
 import "dateflow/style.css";
 
 const input = document.querySelector<HTMLInputElement>("#trip")!;
 
-createCalendarPicker(input, {
+dateFlow(input, {
   value: new Date(),
   popover: true, // default — opens below the input
 });
@@ -35,11 +35,11 @@ createCalendarPicker(input, {
 Locales are a separate entry so you only pay for what you import:
 
 ```ts
-import { createCalendarPicker } from "dateflow";
+import { dateFlow } from "dateflow";
 import { de } from "dateflow/locales";
 import "dateflow/style.css";
 
-createCalendarPicker(input, { locale: de });
+dateFlow(input, { locale: de });
 ```
 
 Built-in locales: `en`, `de`, `cs`, `fr`. Pass a partial `CalendarLocale` object to override individual strings.

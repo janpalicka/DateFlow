@@ -38,20 +38,18 @@ import "./calendar.css";
 const resolveCalendarInputs = (anchor: CalendarPickerAnchor): HTMLInputElement[] => {
   if (anchor instanceof HTMLInputElement) return [anchor];
   if (typeof anchor !== "string") {
-    throw new TypeError(
-      "createCalendarPicker expects an HTMLInputElement or a CSS selector string",
-    );
+    throw new TypeError("dateFlow expects an HTMLInputElement or a CSS selector string");
   }
 
   const selector = anchor.trim();
   if (!selector.startsWith("#") && !selector.startsWith(".")) {
-    throw new TypeError("createCalendarPicker selector must start with # (id) or . (class)");
+    throw new TypeError("dateFlow selector must start with # (id) or . (class)");
   }
 
   if (selector.startsWith("#")) {
     const el = document.querySelector(selector);
     if (!(el instanceof HTMLInputElement)) {
-      throw new TypeError(`createCalendarPicker: no input element matches ${selector}`);
+      throw new TypeError(`dateFlow: no input element matches ${selector}`);
     }
     return [el];
   }
@@ -60,7 +58,7 @@ const resolveCalendarInputs = (anchor: CalendarPickerAnchor): HTMLInputElement[]
     (node): node is HTMLInputElement => node instanceof HTMLInputElement,
   );
   if (inputs.length === 0) {
-    throw new TypeError(`createCalendarPicker: no input elements match ${selector}`);
+    throw new TypeError(`dateFlow: no input elements match ${selector}`);
   }
   return inputs;
 };
@@ -1653,19 +1651,16 @@ const buildCalendarPicker = (
   };
 };
 
-export function createCalendarPicker(
+export function dateFlow(
   anchor: HTMLInputElement,
   initial?: CalendarOptions,
 ): CalendarPickerInstance;
-export function createCalendarPicker(
-  selector: `#${string}`,
-  initial?: CalendarOptions,
-): CalendarPickerInstance;
-export function createCalendarPicker(
+export function dateFlow(selector: `#${string}`, initial?: CalendarOptions): CalendarPickerInstance;
+export function dateFlow(
   selector: `.${string}`,
   initial?: CalendarOptions,
 ): CalendarPickerInstance[];
-export function createCalendarPicker(
+export function dateFlow(
   anchor: CalendarPickerAnchor,
   initial: CalendarOptions = {},
 ): CalendarPickerInstance | CalendarPickerInstance[] {

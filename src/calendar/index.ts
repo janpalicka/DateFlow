@@ -1,4 +1,4 @@
-export { createCalendarPicker } from "./CalendarPicker";
+export { dateFlow } from "./CalendarPicker";
 export type {
   CalendarLocale,
   CalendarMode,
