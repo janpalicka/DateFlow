@@ -39,6 +39,33 @@ export interface DateRangeValue {
   end: Date | null;
 }
 
+export type CalendarSelectedDatesSingle = {
+  selectedDate: Date | null;
+};
+
+export type CalendarSelectedDatesRange = {
+  start: Date | null;
+  end: Date | null;
+};
+
+export type CalendarSelectedDates = CalendarSelectedDatesSingle | CalendarSelectedDatesRange;
+
+export type CalendarCurrentYearSingle = {
+  currentYear: number;
+};
+
+export type CalendarCurrentYearRange = {
+  startYear: number;
+  endYear: number;
+};
+
+export type CalendarCurrentYear = CalendarCurrentYearSingle | CalendarCurrentYearRange;
+
+export type CalendarPickerAnchor = HTMLInputElement | `#${string}` | `.${string}`;
+
+/** One date per entry in single mode; start and optional end in range mode. */
+export type CalendarSetDateInput = readonly (Date | string)[];
+
 export interface CalendarOptions {
   /** Partial locale merges over {@link DEFAULT_LOCALE} */
   locale?: Partial<CalendarLocale>;
@@ -54,6 +81,11 @@ export interface CalendarOptions {
   maxDate?: Date | null;
   /** Blocked dates or predicate (ignored when `enabledDatesOnly` is set). */
   disabledDates?: DateFilter;
+  /**
+   * When `true`, non-selectable days show a strike-through on the day number.
+   * Default: `false`.
+   */
+  disabledDatesStrikeThrough?: boolean;
   /** When set, only these dates (or predicate true) are selectable. */
   enabledDatesOnly?: DateFilter;
   /**
@@ -131,8 +163,32 @@ export interface CalendarOptions {
 }
 
 export interface CalendarPickerInstance {
+  /** Currently selected date(s); shape depends on {@link CalendarOptions.mode}. */
+  readonly selectedDates: CalendarSelectedDates;
+  /** Year(s) currently displayed in the calendar view. */
+  readonly currentYear: CalendarCurrentYear;
+  /**
+   * Shift the visible month by `months` when `relative` is true (default), or jump to month
+   * index `months` (0 = January … 11 = December) in the current view year when false.
+   *
+   * @param months - Relative offset when `relative` is true; absolute month index (0–11) when false.
+   * @param relative - When true (default), add `months` to the current view month; when false, set
+   *   the view to month index `months` in the current view year.
+   */
+  changeMonth(months: number, relative?: boolean): void;
+  /** Clear the current selection — same behavior as the header reset button. */
+  clear(): void;
   getValue(): Date | null;
   setValue(date: Date | null): void;
+  /**
+   * Set selected date(s) programmatically.
+   * Single mode uses the first entry; range mode uses start and optional end.
+   *
+   * @param newDate - `Date` instances or strings parsed with `format` (or the calendar output format).
+   * @param format - date-fns pattern for string entries; required when strings do not match the calendar format.
+   * @param silent - When true, skips `onChange` / `onRangeChange`. Default: `false`.
+   */
+  setDate(newDate: CalendarSetDateInput, format?: string, silent?: boolean): void;
   getRange(): DateRangeValue;
   setRange(range: DateRangeValue): void;
   /** Merge options and re-render (e.g. change locale or constraints). */
@@ -141,9 +197,9 @@ export interface CalendarPickerInstance {
   getInputElement(): HTMLInputElement;
   /** Root wrapper for the calendar panel (initially hidden). */
   getCalendarElement(): HTMLElement;
-  /** Show the calendar panel (no-op when `popover` is false). */
+  /** Show the calendar panel programmatically; no-op if already open. */
   open(): void;
-  /** Hide the calendar panel. */
+  /** Hide the calendar panel; no-op if already closed. */
   close(): void;
   destroy(): void;
 }

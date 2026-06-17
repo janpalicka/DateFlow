@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="/showcase.css" />
   </head>
   <body>
-    <div class="showcase-shell">
+    <div class="showcase-shell" id="top">
       <header class="site-header">
         <a class="site-header__brand" href="#top" aria-label="DateFlow home">
           <img class="site-header__logo" src="/logo.png" alt="" width="88" />
@@ -39,7 +39,7 @@
         </nav>
       </header>
 
-      <section class="showcase-hero" id="top" aria-labelledby="hero-title">
+      <section class="showcase-hero" aria-labelledby="hero-title">
         <div class="showcase-hero__glow" aria-hidden="true"></div>
         <div class="showcase-hero__inner">
           <p class="showcase-hero__eyebrow">Vanilla TypeScript · Floating UI</p>
@@ -58,10 +58,16 @@
       <div class="showcase-layout">
         <aside class="showcase-sidebar">
           <nav class="showcase-toc" aria-label="Documentation sections">
-            <h2 class="showcase-toc__title">On this page</h2>
-            <ol class="showcase-toc__list">
+            <details class="showcase-toc__disclosure" open>
+              <summary class="showcase-toc__disclosure-summary">
+                <span class="showcase-toc__disclosure-kicker">On this page</span>
+                <span class="showcase-toc__disclosure-current" data-toc-current>Quick start</span>
+              </summary>
+              <h2 class="showcase-toc__title">On this page</h2>
+              <ol class="showcase-toc__list">
               <li><a class="showcase-toc__link" href="#quick-start">Quick start</a></li>
               <li><a class="showcase-toc__link" href="#getting-started">Getting started</a></li>
+              <li><a class="showcase-toc__link" href="#instance-api">Instance API</a></li>
               <li><a class="showcase-toc__link" href="#localization">Localization</a></li>
               <li><a class="showcase-toc__link" href="#constraints">Constraining dates</a></li>
               <li><a class="showcase-toc__link" href="#time">Time selection</a></li>
@@ -70,6 +76,7 @@
               <li><a class="showcase-toc__link" href="#formatting">Formatting</a></li>
               <li><a class="showcase-toc__link" href="#theming">Theming &amp; accessibility</a></li>
             </ol>
+            </details>
           </nav>
         </aside>
 
@@ -140,7 +147,10 @@
       </section>
       <section id="getting-started" class="showcase-section">
         <h2 class="showcase-section__title">Getting started</h2>
-        <p class="showcase-section__lead">Pass a text input to the picker and react to changes.</p>
+        <p class="showcase-section__lead">
+          Pass a text input element, an id selector (<code>#my-id</code>), or a class selector
+          (<code>.my-class</code>) to attach one or more pickers.
+        </p>
         <div class="showcase__grid">
         <article class="showcase-card">
           <h3 class="showcase-card__title">Basic picker with time</h3>
@@ -153,6 +163,27 @@ const picker = createCalendarPicker(input, {
   showTime: true,
 });</code></pre>
           <div class="showcase-card__mount" data-demo="basic-time"></div>
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Id selector</h3>
+          <p class="showcase-card__desc">Pass <code>#my-id</code> instead of an element — one picker for that input.</p>
+          <pre class="showcase-card__code"><code>&lt;input type="text" id="trip-date" /&gt;
+
+createCalendarPicker("#trip-date", {
+  value: new Date(2026, 2, 20),
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="selector-id"></div>
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Class selector (multiple)</h3>
+          <p class="showcase-card__desc">Pass <code>.my-class</code> to attach a picker to every matching input. Returns an array of instances.</p>
+          <pre class="showcase-card__code"><code>&lt;input type="text" class="booking-date" /&gt;
+&lt;input type="text" class="booking-date" /&gt;
+
+const pickers = createCalendarPicker(".booking-date", {
+  value: new Date(2026, 2, 20),
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="selector-class"></div>
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Runtime setOptions</h3>
@@ -178,6 +209,223 @@ picker.setOptions({ mode: "single", value: picker.getRange().start });</code></p
         </article>
         </div>
       </section>
+      <section id="instance-api" class="showcase-section">
+        <h2 class="showcase-section__title">Instance API</h2>
+        <p class="showcase-section__lead">
+          Read live state from the picker instance — selected dates and the year(s) shown in the
+          calendar view.
+        </p>
+        <div class="showcase__grid">
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">selectedDates — single mode</h3>
+          <p class="showcase-card__desc">
+            <code>{ selectedDate: Date | null }</code>
+          </p>
+          <pre class="showcase-card__code"><code>const picker = createCalendarPicker(input, {
+  value: new Date(2026, 2, 15),
+});
+
+picker.selectedDates;
+// → { selectedDate: Date }</code></pre>
+          <div class="showcase-card__mount" data-demo="selected-dates-single"></div>
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">selectedDates — range mode</h3>
+          <p class="showcase-card__desc">
+            <code>{ start: Date | null, end: Date | null }</code>
+          </p>
+          <pre class="showcase-card__code"><code>const picker = createCalendarPicker(input, {
+  mode: "range",
+  range: {
+    start: new Date(2026, 2, 5),
+    end: new Date(2026, 2, 18),
+  },
+});
+
+picker.selectedDates;
+// → { start: Date, end: Date }</code></pre>
+          <div class="showcase-card__mount" data-demo="selected-dates-range"></div>
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">currentYear — single mode</h3>
+          <p class="showcase-card__desc">
+            <code>{ currentYear: number }</code> — updates when you change month or year.
+          </p>
+          <pre class="showcase-card__code"><code>picker.currentYear;
+// → { currentYear: 2026 }</code></pre>
+          <div class="showcase-card__mount" data-demo="current-year-single"></div>
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">currentYear — range mode</h3>
+          <p class="showcase-card__desc">
+            <code>{ startYear: number, endYear: number }</code> — one year per calendar pane.
+          </p>
+          <pre class="showcase-card__code"><code>picker.currentYear;
+// → { startYear: 2026, endYear: 2026 }</code></pre>
+          <div class="showcase-card__mount" data-demo="current-year-range"></div>
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">changeMonth() method</h3>
+          <p class="showcase-card__desc">
+            <code>picker.changeMonth(months, relative = true)</code>
+          </p>
+          <ul class="showcase-card__args">
+            <li>
+              <code>months</code> — when <code>relative</code> is <code>true</code>, offset to add
+              to the current view month (negative values go back). When <code>false</code>, absolute
+              month index in the current view year: <code>0</code> = January … <code>11</code> =
+              December.
+            </li>
+            <li>
+              <code>relative</code> — optional, default <code>true</code>. <code>true</code> shifts
+              by <code>months</code>; <code>false</code> jumps to month index <code>months</code>.
+            </li>
+          </ul>
+          <p class="showcase-card__desc">Demo starts on June (<code>5</code>). Open the calendar, then try the buttons.</p>
+          <pre class="showcase-card__code"><code>// relative: true — shift by months
+picker.changeMonth(1);   // June (5) → July (6)
+picker.changeMonth(-1);  // June (5) → May (4)
+picker.changeMonth(0);  // June (5) → June (5)
+
+// relative: false — jump to month index
+picker.changeMonth(0, false); // June (5) → January (0)</code></pre>
+          <div class="showcase-card__mount" data-demo="change-month"></div>
+          <div class="showcase-card__actions" id="change-month-actions">
+            <button type="button" data-action="month-plus">changeMonth(1)</button>
+            <button type="button" data-action="month-minus">changeMonth(-1)</button>
+            <button type="button" data-action="month-same">changeMonth(0)</button>
+            <button type="button" data-action="month-jan">changeMonth(0, false)</button>
+          </div>
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">clear() method</h3>
+          <p class="showcase-card__desc">
+            <code>picker.clear()</code> — clears the current selection. Same behavior as the header
+            reset button when <code>showResetButton</code> is enabled.
+          </p>
+          <pre class="showcase-card__code"><code>const picker = createCalendarPicker(input, {
+  value: new Date(2026, 2, 15),
+  showResetButton: true,
+});
+
+picker.clear();
+// selectedDates → { selectedDate: null }
+// input cleared, onChange(null) fired</code></pre>
+          <div class="showcase-card__mount" data-demo="clear-method"></div>
+          <div class="showcase-card__actions" id="clear-method-actions">
+            <button type="button" data-action="clear">clear()</button>
+          </div>
+        </article>
+        <article class="showcase-card showcase-card--full">
+          <h3 class="showcase-card__title">setDate() method</h3>
+          <p class="showcase-card__desc">
+            <code>picker.setDate(newDate, format?, silent?)</code> — set the selection
+            programmatically from <code>Date</code> instances or strings. Updates the calendar view
+            and value input; optionally fires <code>onChange</code> (single) or
+            <code>onRangeChange</code> (range).
+          </p>
+          <ul class="showcase-card__args">
+            <li>
+              <code>newDate</code> — array of dates to apply. Single mode uses the first entry;
+              range mode uses start (<code>newDate[0]</code>) and optional end
+              (<code>newDate[1]</code>). Pass an empty array to clear the selection. Each entry may
+              be a <code>Date</code> or a string parsed with <code>format</code>.
+            </li>
+            <li>
+              <code>format</code> — optional date-fns pattern for string entries. Defaults to the
+              calendar’s output format (<code>outputFormat</code>, or the built-in default for the
+              current time settings). Provide this when your strings use a different pattern than
+              the picker displays.
+            </li>
+            <li>
+              <code>silent</code> — optional, default <code>false</code>. When
+              <code>true</code>, updates the picker without invoking
+              <code>onChange</code> / <code>onRangeChange</code>.
+            </li>
+          </ul>
+          <p class="showcase-card__desc">
+            Two pickers below (single and range). Use the buttons — the event log records callback
+            invocations; silent calls update the selection without adding a log entry.
+          </p>
+          <pre class="showcase-card__code"><code>// Single mode — Date object
+picker.setDate([new Date(2026, 9, 20)]);
+
+// Single mode — string (matches calendar outputFormat)
+picker.setDate(["2026-10-01"]);
+
+// String in a different format — pass format as 2nd argument
+picker.setDate(["01/10/2026"], "dd/MM/yyyy");
+
+// Clear selection
+picker.setDate([]);
+
+// Update without firing onChange
+picker.setDate([new Date(2026, 11, 25)], undefined, true);
+
+// Range mode — Date objects
+picker.setDate([
+  new Date(2026, 4, 1),
+  new Date(2026, 4, 15),
+]);
+
+// Range mode — strings with custom format
+picker.setDate(["01.06.2026", "30.06.2026"], "dd.MM.yyyy");
+
+// Range — start only (end cleared)
+picker.setDate([new Date(2026, 7, 10)]);
+
+// Silent range update
+picker.setDate(
+  [new Date(2026, 0, 1), new Date(2026, 0, 7)],
+  undefined,
+  true,
+);</code></pre>
+          <div class="showcase-card__mount" data-demo="set-date-method"></div>
+          <div class="showcase-card__action-groups" id="set-date-actions">
+            <div class="showcase-card__action-group">
+              <span class="showcase-card__multi-picker-label">Single mode</span>
+              <div class="showcase-card__actions">
+                <button type="button" data-action="single-date">Date object</button>
+                <button type="button" data-action="single-string">String (yyyy-MM-dd)</button>
+                <button type="button" data-action="single-format">String + format</button>
+                <button type="button" data-action="single-clear">Clear []</button>
+                <button type="button" data-action="single-silent">Silent (silent: true)</button>
+              </div>
+            </div>
+            <div class="showcase-card__action-group">
+              <span class="showcase-card__multi-picker-label">Range mode</span>
+              <div class="showcase-card__actions">
+                <button type="button" data-action="range-dates">Date objects</button>
+                <button type="button" data-action="range-strings">Strings (yyyy-MM-dd)</button>
+                <button type="button" data-action="range-format">Strings + format</button>
+                <button type="button" data-action="range-start">Start only</button>
+                <button type="button" data-action="range-clear">Clear []</button>
+                <button type="button" data-action="range-silent">Silent (silent: true)</button>
+              </div>
+            </div>
+          </div>
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">open() and close() methods</h3>
+          <p class="showcase-card__desc">
+            <code>picker.open()</code> shows the calendar panel without focusing the input;
+            <code>picker.close()</code> hides it. Calling either when already in that state is a
+            no-op. Both work with the default popover behavior (Floating UI positioning).
+          </p>
+          <pre class="showcase-card__code"><code>const picker = createCalendarPicker(input, {
+  value: new Date(2026, 2, 15),
+});
+
+picker.open();  // show calendar
+picker.close(); // hide calendar</code></pre>
+          <div class="showcase-card__mount" data-demo="open-method"></div>
+          <div class="showcase-card__actions" id="open-method-actions">
+            <button type="button" data-action="open">open()</button>
+            <button type="button" data-action="close">close()</button>
+          </div>
+        </article>
+        </div>
+      </section>
       <section id="localization" class="showcase-section">
         <h2 class="showcase-section__title">Localization</h2>
         <p class="showcase-section__lead">Pass a full locale object or merge partial overrides. Inspired by flatpickr localization.</p>
@@ -190,7 +438,6 @@ import { de } from "@/calendar/locales";
 
 createCalendarPicker(input, {
   locale: de,
-  onChange: (date) => { /* … */ },
 });</code></pre>
           <div class="showcase-card__mount" data-demo="locale-de"></div>
 
@@ -236,14 +483,13 @@ createCalendarPicker(input, {
   value: new Date(2026, 2, 15),
   minDate: new Date(2026, 2, 10),
   maxDate: new Date(2026, 2, 25),
-  onChange: (date) => { /* … */ },
 });</code></pre>
           <div class="showcase-card__mount" data-demo="min-max"></div>
 
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Disabled dates (array)</h3>
-          <p class="showcase-card__desc">Block specific dates — useful for holidays or closures.</p>
+          <p class="showcase-card__desc">Block specific dates — useful for holidays or closures. By default disabled days are dimmed only; pass <code>disabledDatesStrikeThrough: true</code> to add a strike-through.</p>
           <pre class="showcase-card__code"><code>createCalendarPicker(input, {
   value: new Date(2026, 2, 15),
   disabledDates: [
@@ -253,6 +499,21 @@ createCalendarPicker(input, {
   ],
 });</code></pre>
           <div class="showcase-card__mount" data-demo="disabled-array"></div>
+
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Disabled dates strike-through</h3>
+          <p class="showcase-card__desc">Same blocked dates with <code>disabledDatesStrikeThrough: true</code>. Text color stays the same as the default disabled style.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  value: new Date(2026, 2, 15),
+  disabledDatesStrikeThrough: true,
+  disabledDates: [
+    new Date(2026, 2, 17),
+    new Date(2026, 2, 18),
+    new Date(2026, 2, 19),
+  ],
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="disabled-strike"></div>
 
         </article>
         <article class="showcase-card">
@@ -413,7 +674,6 @@ createCalendarPicker(input, {
     end: new Date(2026, 2, 18),
   },
   outputFormat: "yyyy-MM-dd",
-  onRangeChange: ({ start, end }) => { /* … */ },
 });</code></pre>
           <div class="showcase-card__mount" data-demo="range-basic"></div>
 
@@ -429,7 +689,6 @@ createCalendarPicker(input, {
     end: new Date(2026, 3, 14, 17, 45),
   },
   outputFormat: "yyyy-MM-dd HH:mm",
-  onRangeChange: ({ start, end }) => { /* … */ },
 });</code></pre>
           <div class="showcase-card__mount" data-demo="range-time"></div>
 

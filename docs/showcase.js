@@ -57,6 +57,454 @@ function mountFloatingCalendarDemo(opts, hooks = {}) {
   return { wrap, picker };
 }
 
+/** @param {import('../src/calendar/types/types.ts').CalendarSelectedDates} dates */
+function formatSelectedDatesPreview(dates) {
+  const fmt = (d) => (d ? format(d, "yyyy-MM-dd") : null);
+  if ("selectedDate" in dates) {
+    return JSON.stringify({ selectedDate: fmt(dates.selectedDate) }, null, 2);
+  }
+  return JSON.stringify({ start: fmt(dates.start), end: fmt(dates.end) }, null, 2);
+}
+
+/** @param {import('../src/calendar/types/types.ts').CalendarCurrentYear} years */
+function formatCurrentYearPreview(years) {
+  if ("currentYear" in years) {
+    return JSON.stringify({ currentYear: years.currentYear }, null, 2);
+  }
+  return JSON.stringify({ startYear: years.startYear, endYear: years.endYear }, null, 2);
+}
+
+/** @param {import('../src/calendar/types/types.ts').CalendarPickerInstance} picker */
+function watchCalendarView(picker, update) {
+  update();
+  const root = picker.getCalendarElement();
+  root.addEventListener("click", (e) => {
+    if (e.target.closest(".cal__nav, .cal__select, .cal__year-input, .cal__day")) {
+      queueMicrotask(update);
+    }
+  });
+  root.addEventListener("change", () => queueMicrotask(update));
+}
+
+function mountSelectedDatesDemo(mode) {
+  const wrap = document.createElement("div");
+  wrap.className = "showcase-card__selected-dates-wrap";
+
+  const trigger = document.createElement("input");
+  trigger.type = "text";
+  trigger.className = "showcase-card__input showcase-card__input--trigger";
+
+  const output = document.createElement("pre");
+  output.className = "showcase-card__selected-dates-output";
+  output.setAttribute("aria-live", "polite");
+
+  wrap.append(trigger, output);
+
+  const options =
+    mode === "range"
+      ? {
+          mode: "range",
+          range: { start: new Date(2026, 2, 5), end: new Date(2026, 2, 18) },
+        }
+      : { value: new Date(2026, 2, 15) };
+
+  const picker = createCalendarPicker(trigger, {
+    ...options,
+    onChange: () => {
+      output.textContent = formatSelectedDatesPreview(picker.selectedDates);
+    },
+    onRangeChange: () => {
+      output.textContent = formatSelectedDatesPreview(picker.selectedDates);
+    },
+  });
+
+  output.textContent = formatSelectedDatesPreview(picker.selectedDates);
+
+  return wrap;
+}
+
+function mountCurrentYearDemo(mode) {
+  const wrap = document.createElement("div");
+  wrap.className = "showcase-card__selected-dates-wrap";
+
+  const trigger = document.createElement("input");
+  trigger.type = "text";
+  trigger.className = "showcase-card__input showcase-card__input--trigger";
+  trigger.placeholder = "Open calendar and change month/year";
+
+  const output = document.createElement("pre");
+  output.className = "showcase-card__selected-dates-output";
+  output.setAttribute("aria-live", "polite");
+
+  wrap.append(trigger, output);
+
+  const options =
+    mode === "range"
+      ? {
+          mode: "range",
+          range: { start: new Date(2026, 2, 5), end: new Date(2026, 2, 18) },
+        }
+      : { value: new Date(2026, 2, 15) };
+
+  const picker = createCalendarPicker(trigger, options);
+  watchCalendarView(picker, () => {
+    output.textContent = formatCurrentYearPreview(picker.currentYear);
+  });
+
+  return wrap;
+}
+
+function readViewMonthLabel(picker) {
+  const select = picker.getCalendarElement().querySelector(".cal__select--month");
+  const month = Number.parseInt(select?.value ?? "0", 10);
+  const name = format(new Date(2026, month, 1), "MMMM");
+  return `viewMonth: ${month} (${name})`;
+}
+
+function mountChangeMonthDemo() {
+  const wrap = document.createElement("div");
+  wrap.className = "showcase-card__selected-dates-wrap";
+
+  const trigger = document.createElement("input");
+  trigger.type = "text";
+  trigger.className = "showcase-card__input showcase-card__input--trigger";
+  trigger.placeholder = "Open calendar, then use the buttons below";
+
+  const output = document.createElement("pre");
+  output.className = "showcase-card__selected-dates-output";
+  output.setAttribute("aria-live", "polite");
+
+  wrap.append(trigger, output);
+
+  const picker = createCalendarPicker(trigger, { value: new Date(2026, 5, 15) });
+
+  const update = () => {
+    output.textContent = readViewMonthLabel(picker);
+  };
+  watchCalendarView(picker, update);
+
+  const actions = document.getElementById("change-month-actions");
+  actions?.querySelector('[data-action="month-plus"]')?.addEventListener("click", () => {
+    picker.changeMonth(1);
+    update();
+  });
+  actions?.querySelector('[data-action="month-minus"]')?.addEventListener("click", () => {
+    picker.changeMonth(-1);
+    update();
+  });
+  actions?.querySelector('[data-action="month-same"]')?.addEventListener("click", () => {
+    picker.changeMonth(0);
+    update();
+  });
+  actions?.querySelector('[data-action="month-jan"]')?.addEventListener("click", () => {
+    picker.changeMonth(0, false);
+    update();
+  });
+
+  return wrap;
+}
+
+function mountClearDemo() {
+  const wrap = document.createElement("div");
+  wrap.className = "showcase-card__selected-dates-wrap";
+
+  const trigger = document.createElement("input");
+  trigger.type = "text";
+  trigger.className = "showcase-card__input showcase-card__input--trigger";
+  trigger.placeholder = "Pick a date, then clear()";
+
+  const output = document.createElement("pre");
+  output.className = "showcase-card__selected-dates-output";
+  output.setAttribute("aria-live", "polite");
+
+  wrap.append(trigger, output);
+
+  const update = (picker) => {
+    output.textContent = formatSelectedDatesPreview(picker.selectedDates);
+  };
+
+  const picker = createCalendarPicker(trigger, {
+    value: new Date(2026, 2, 15),
+    showResetButton: true,
+    resetInputLabel: "Reset",
+    onChange: () => update(picker),
+  });
+
+  update(picker);
+
+  document
+    .getElementById("clear-method-actions")
+    ?.querySelector('[data-action="clear"]')
+    ?.addEventListener("click", () => {
+      picker.clear();
+      update(picker);
+    });
+
+  return wrap;
+}
+
+function mountSetDateDemo() {
+  const wrap = document.createElement("div");
+  wrap.className = "showcase-card__selected-dates-wrap";
+
+  const singleLabel = document.createElement("span");
+  singleLabel.className = "showcase-card__multi-picker-label";
+  singleLabel.textContent = "Single mode";
+
+  const singleInput = document.createElement("input");
+  singleInput.type = "text";
+  singleInput.className = "showcase-card__input showcase-card__input--trigger";
+  singleInput.placeholder = "Single picker — use buttons below";
+
+  const rangeLabel = document.createElement("span");
+  rangeLabel.className = "showcase-card__multi-picker-label";
+  rangeLabel.textContent = "Range mode";
+
+  const rangeInput = document.createElement("input");
+  rangeInput.type = "text";
+  rangeInput.className = "showcase-card__input showcase-card__input--trigger";
+  rangeInput.placeholder = "Range picker — use buttons below";
+
+  const singleStateBlock = document.createElement("div");
+  singleStateBlock.className = "showcase-card__output-block";
+
+  const singleStateLabel = document.createElement("span");
+  singleStateLabel.className = "showcase-card__multi-picker-label";
+  singleStateLabel.textContent = "Single selectedDates:";
+
+  const singleStateOutput = document.createElement("pre");
+  singleStateOutput.className = "showcase-card__selected-dates-output";
+  singleStateOutput.setAttribute("aria-live", "polite");
+  singleStateBlock.append(singleStateLabel, singleStateOutput);
+
+  const rangeStateBlock = document.createElement("div");
+  rangeStateBlock.className = "showcase-card__output-block";
+
+  const rangeStateLabel = document.createElement("span");
+  rangeStateLabel.className = "showcase-card__multi-picker-label";
+  rangeStateLabel.textContent = "Range selectedDates:";
+
+  const rangeStateOutput = document.createElement("pre");
+  rangeStateOutput.className = "showcase-card__selected-dates-output";
+  rangeStateOutput.setAttribute("aria-live", "polite");
+  rangeStateBlock.append(rangeStateLabel, rangeStateOutput);
+
+  const eventLogBlock = document.createElement("div");
+  eventLogBlock.className = "showcase-card__output-block";
+
+  const eventLogLabel = document.createElement("span");
+  eventLogLabel.className = "showcase-card__multi-picker-label";
+  eventLogLabel.textContent = "Event log (onChange / onRangeChange):";
+
+  const eventLog = document.createElement("pre");
+  eventLog.className = "showcase-card__selected-dates-output showcase-card__set-date-log";
+  eventLog.textContent = "—";
+  eventLogBlock.append(eventLogLabel, eventLog);
+
+  wrap.append(
+    singleLabel,
+    singleInput,
+    rangeLabel,
+    rangeInput,
+    singleStateBlock,
+    rangeStateBlock,
+    eventLogBlock,
+  );
+
+  const fmt = "yyyy-MM-dd";
+  const rangeSep = " — ";
+
+  /** @type {string[]} */
+  const logLines = [];
+  const appendLog = (label, detail) => {
+    const stamp = new Date().toLocaleTimeString(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
+    logLines.unshift(`[${stamp}] ${label}\n  ${detail}`);
+    eventLog.textContent = logLines.length ? logLines.slice(0, 8).join("\n\n") : "—";
+  };
+
+  const updateState = (singlePicker, rangePicker) => {
+    singleStateOutput.textContent = formatSelectedDatesPreview(singlePicker.selectedDates);
+    rangeStateOutput.textContent = formatSelectedDatesPreview(rangePicker.selectedDates);
+  };
+
+  const singlePicker = createCalendarPicker(singleInput, {
+    value: new Date(2026, 2, 15),
+    outputFormat: fmt,
+    onChange: (d) => {
+      appendLog("onChange (single)", d ? format(d, fmt) : "null");
+      updateState(singlePicker, rangePicker);
+    },
+  });
+
+  const rangePicker = createCalendarPicker(rangeInput, {
+    mode: "range",
+    outputFormat: fmt,
+    range: { start: new Date(2026, 2, 5), end: new Date(2026, 2, 18) },
+    onRangeChange: (r) => {
+      appendLog("onRangeChange", formatRangeLine(r, fmt, rangeSep));
+      updateState(singlePicker, rangePicker);
+    },
+  });
+
+  updateState(singlePicker, rangePicker);
+
+  const actions = document.getElementById("set-date-actions");
+  const bind = (selector, handler) => {
+    actions?.querySelector(selector)?.addEventListener("click", handler);
+  };
+
+  bind('[data-action="single-date"]', () => {
+    singlePicker.setDate([new Date(2026, 9, 20)]);
+    updateState(singlePicker, rangePicker);
+  });
+  bind('[data-action="single-string"]', () => {
+    singlePicker.setDate(["2026-10-01"]);
+    updateState(singlePicker, rangePicker);
+  });
+  bind('[data-action="single-format"]', () => {
+    singlePicker.setDate(["01/10/2026"], "dd/MM/yyyy");
+    updateState(singlePicker, rangePicker);
+  });
+  bind('[data-action="single-clear"]', () => {
+    singlePicker.setDate([]);
+    updateState(singlePicker, rangePicker);
+  });
+  bind('[data-action="single-silent"]', () => {
+    singlePicker.setDate([new Date(2026, 11, 25)], undefined, true);
+    updateState(singlePicker, rangePicker);
+  });
+
+  bind('[data-action="range-dates"]', () => {
+    rangePicker.setDate([new Date(2026, 4, 1), new Date(2026, 4, 15)]);
+    updateState(singlePicker, rangePicker);
+  });
+  bind('[data-action="range-strings"]', () => {
+    rangePicker.setDate(["2026-06-01", "2026-06-30"]);
+    updateState(singlePicker, rangePicker);
+  });
+  bind('[data-action="range-format"]', () => {
+    rangePicker.setDate(["01.06.2026", "30.06.2026"], "dd.MM.yyyy");
+    updateState(singlePicker, rangePicker);
+  });
+  bind('[data-action="range-start"]', () => {
+    rangePicker.setDate([new Date(2026, 7, 10)]);
+    updateState(singlePicker, rangePicker);
+  });
+  bind('[data-action="range-clear"]', () => {
+    rangePicker.setDate([]);
+    updateState(singlePicker, rangePicker);
+  });
+  bind('[data-action="range-silent"]', () => {
+    rangePicker.setDate([new Date(2026, 0, 1), new Date(2026, 0, 7)], undefined, true);
+    updateState(singlePicker, rangePicker);
+  });
+
+  return wrap;
+}
+
+function mountOpenDemo() {
+  const wrap = document.createElement("div");
+  wrap.className = "showcase-card__selected-dates-wrap";
+
+  const trigger = document.createElement("input");
+  trigger.type = "text";
+  trigger.readOnly = true;
+  trigger.className = "showcase-card__input showcase-card__input--trigger";
+  trigger.placeholder = "Use the buttons below — no need to focus";
+
+  const output = document.createElement("pre");
+  output.className = "showcase-card__selected-dates-output";
+  output.setAttribute("aria-live", "polite");
+
+  wrap.append(trigger, output);
+
+  const picker = createCalendarPicker(trigger, {
+    value: new Date(2026, 2, 15),
+  });
+
+  const update = () => {
+    const expanded = picker.getInputElement().getAttribute("aria-expanded");
+    const hidden = picker.getCalendarElement().hidden;
+    output.textContent = `aria-expanded: ${expanded}\npanel hidden: ${hidden}`;
+  };
+
+  update();
+
+  document
+    .getElementById("open-method-actions")
+    ?.querySelector('[data-action="open"]')
+    ?.addEventListener("click", () => {
+      picker.open();
+      update();
+    });
+  document
+    .getElementById("open-method-actions")
+    ?.querySelector('[data-action="close"]')
+    ?.addEventListener("click", () => {
+      picker.close();
+      update();
+    });
+
+  return wrap;
+}
+
+function mountSelectorIdDemo() {
+  const wrap = document.createElement("div");
+  wrap.className = "showcase-card__floating-trigger-wrap";
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.id = "getting-started-id-picker";
+  input.className = "showcase-card__input showcase-card__input--trigger";
+  input.placeholder = "Pick a date";
+  wrap.append(input);
+
+  return {
+    wrap,
+    setup() {
+      createCalendarPicker("#getting-started-id-picker", {
+        value: new Date(2026, 2, 20),
+      });
+    },
+  };
+}
+
+function mountSelectorClassDemo() {
+  const wrap = document.createElement("div");
+  wrap.className = "showcase-card__multi-picker-wrap";
+
+  for (const label of ["Start", "End", "Deadline"]) {
+    const row = document.createElement("div");
+    row.className = "showcase-card__multi-picker-row";
+
+    const rowLabel = document.createElement("span");
+    rowLabel.className = "showcase-card__multi-picker-label";
+    rowLabel.textContent = label;
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className =
+      "showcase-card__input showcase-card__input--trigger getting-started-multi-picker";
+    input.placeholder = label;
+
+    row.append(rowLabel, input);
+    wrap.append(row);
+  }
+
+  return {
+    wrap,
+    setup() {
+      createCalendarPicker(".getting-started-multi-picker", {
+        value: new Date(2026, 2, 20),
+      });
+    },
+  };
+}
+
 function mountDemo(key) {
   switch (key) {
     case "basic-time":
@@ -68,6 +516,26 @@ function mountDemo(key) {
       return mountFloatingCalendarDemo({ value: new Date(2026, 5, 8) }).wrap;
     case "set-options":
       return mountSetOptionsDemo();
+    case "selector-id":
+      return mountSelectorIdDemo();
+    case "selector-class":
+      return mountSelectorClassDemo();
+    case "selected-dates-single":
+      return mountSelectedDatesDemo("single");
+    case "selected-dates-range":
+      return mountSelectedDatesDemo("range");
+    case "current-year-single":
+      return mountCurrentYearDemo("single");
+    case "current-year-range":
+      return mountCurrentYearDemo("range");
+    case "change-month":
+      return mountChangeMonthDemo();
+    case "clear-method":
+      return mountClearDemo();
+    case "set-date-method":
+      return mountSetDateDemo();
+    case "open-method":
+      return mountOpenDemo();
     case "locale-de":
       return mountFloatingCalendarDemo({ locale: de }).wrap;
     case "locale-fr":
@@ -86,6 +554,12 @@ function mountDemo(key) {
     case "disabled-array":
       return mountFloatingCalendarDemo({
         value: new Date(2026, 2, 15),
+        disabledDates: [new Date(2026, 2, 17), new Date(2026, 2, 18), new Date(2026, 2, 19)],
+      }).wrap;
+    case "disabled-strike":
+      return mountFloatingCalendarDemo({
+        value: new Date(2026, 2, 15),
+        disabledDatesStrikeThrough: true,
         disabledDates: [new Date(2026, 2, 17), new Date(2026, 2, 18), new Date(2026, 2, 19)],
       }).wrap;
     case "disabled-predicate":
@@ -300,34 +774,136 @@ function mountQuickStartDemo() {
 }
 
 function initTocSpy() {
+  const disclosure = document.querySelector(".showcase-toc__disclosure");
+  const currentLabel = document.querySelector("[data-toc-current]");
   const links = [...document.querySelectorAll(".showcase-toc__link")];
-  const sectionIds = links
-    .map((link) => link.getAttribute("href")?.slice(1))
-    .filter((id) => id);
-  const sections = sectionIds
-    .map((id) => document.getElementById(id))
-    .filter((el) => el instanceof HTMLElement);
+  const sections = links
+    .map((link) => {
+      const id = link.getAttribute("href")?.slice(1);
+      const el = id ? document.getElementById(id) : null;
+      return el instanceof HTMLElement ? { id, el, link } : null;
+    })
+    .filter(Boolean);
 
   if (!sections.length) return;
 
+  let lastActiveId = null;
+  let navigationLockUntil = 0;
+
+  const isMobileToc = () => window.matchMedia("(max-width: 959px)").matches;
+
+  const syncDisclosureMode = () => {
+    if (!(disclosure instanceof HTMLDetailsElement)) return;
+    disclosure.open = !isMobileToc();
+  };
+
   const setActive = (id) => {
-    for (const link of links) {
-      link.classList.toggle("is-active", link.getAttribute("href") === `#${id}`);
+    for (const section of sections) {
+      section.link.classList.toggle("is-active", section.id === id);
+    }
+    const activeSection = sections.find((section) => section.id === id);
+    if (currentLabel instanceof HTMLElement && activeSection) {
+      currentLabel.textContent = activeSection.link.textContent.trim();
     }
   };
 
-  const observer = new IntersectionObserver(
-    (entries) => {
-      const visible = entries
-        .filter((entry) => entry.isIntersecting)
-        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-      if (visible?.target.id) setActive(visible.target.id);
-    },
-    { rootMargin: "-25% 0px -55% 0px", threshold: [0, 0.15, 0.4] },
-  );
+  const scrollOffset = () => {
+    const header = document.querySelector(".site-header");
+    let offset = (header instanceof HTMLElement ? header.offsetHeight : 52) + 12;
+    if (isMobileToc()) {
+      const tocBar = document.querySelector(".showcase-sidebar");
+      if (tocBar instanceof HTMLElement) {
+        offset += tocBar.offsetHeight;
+      }
+    } else {
+      offset += 36;
+    }
+    return offset;
+  };
 
-  for (const section of sections) observer.observe(section);
-  setActive(sectionIds[0]);
+  const scrollToSection = (id, behavior = "smooth") => {
+    const section = sections.find((entry) => entry.id === id);
+    if (!section) return;
+
+    const top =
+      section.el.getBoundingClientRect().top + window.scrollY - scrollOffset();
+    navigationLockUntil = performance.now() + (behavior === "smooth" ? 900 : 0);
+    window.scrollTo({ top: Math.max(0, top), behavior });
+    history.replaceState(null, "", `#${id}`);
+    lastActiveId = id;
+    setActive(id);
+
+    if (disclosure instanceof HTMLDetailsElement && isMobileToc()) {
+      disclosure.open = false;
+    }
+  };
+
+  const updateActive = () => {
+    if (performance.now() < navigationLockUntil) return;
+
+    const offset = scrollOffset();
+    let activeId = sections[0].id;
+
+    for (const section of sections) {
+      if (section.el.getBoundingClientRect().top <= offset) {
+        activeId = section.id;
+      }
+    }
+
+    if (activeId !== lastActiveId) {
+      lastActiveId = activeId;
+      setActive(activeId);
+    }
+  };
+
+  let ticking = false;
+  const onScroll = () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      updateActive();
+      ticking = false;
+    });
+  };
+
+  for (const section of sections) {
+    section.link.addEventListener("click", (event) => {
+      event.preventDefault();
+      scrollToSection(section.id);
+    });
+  }
+
+  for (const anchor of document.querySelectorAll("a[href^='#']")) {
+    const href = anchor.getAttribute("href");
+    if (!href || href === "#" || href === "#top") continue;
+    const id = href.slice(1);
+    if (!sections.some((section) => section.id === id)) continue;
+    if (anchor.classList.contains("showcase-toc__link")) continue;
+    anchor.addEventListener("click", (event) => {
+      event.preventDefault();
+      scrollToSection(id);
+    });
+  }
+
+  syncDisclosureMode();
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", () => {
+    syncDisclosureMode();
+    onScroll();
+  });
+  window.addEventListener("hashchange", () => {
+    const hash = location.hash.slice(1);
+    if (sections.some((section) => section.id === hash)) {
+      scrollToSection(hash, "auto");
+    }
+  });
+
+  const initialHash = location.hash.slice(1);
+  if (sections.some((section) => section.id === initialHash)) {
+    scrollToSection(initialHash, "auto");
+  } else {
+    updateActive();
+  }
 }
 
 function initShowcase() {
@@ -337,7 +913,13 @@ function initShowcase() {
     const key = mount.dataset.demo;
     if (!key) continue;
     const demo = mountDemo(key);
-    if (demo) mount.append(demo);
+    if (!demo) continue;
+    if (demo instanceof HTMLElement) {
+      mount.append(demo);
+    } else {
+      mount.append(demo.wrap);
+      demo.setup?.();
+    }
   }
 }
 

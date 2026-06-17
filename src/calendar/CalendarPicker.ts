@@ -26,10 +26,44 @@ import {
 import type {
   CalendarMode,
   CalendarOptions,
+  CalendarPickerAnchor,
   CalendarPickerInstance,
+  CalendarSelectedDates,
+  CalendarCurrentYear,
+  CalendarSetDateInput,
   DateRangeValue,
 } from "./types";
 import "./calendar.css";
+
+const resolveCalendarInputs = (anchor: CalendarPickerAnchor): HTMLInputElement[] => {
+  if (anchor instanceof HTMLInputElement) return [anchor];
+  if (typeof anchor !== "string") {
+    throw new TypeError(
+      "createCalendarPicker expects an HTMLInputElement or a CSS selector string",
+    );
+  }
+
+  const selector = anchor.trim();
+  if (!selector.startsWith("#") && !selector.startsWith(".")) {
+    throw new TypeError("createCalendarPicker selector must start with # (id) or . (class)");
+  }
+
+  if (selector.startsWith("#")) {
+    const el = document.querySelector(selector);
+    if (!(el instanceof HTMLInputElement)) {
+      throw new TypeError(`createCalendarPicker: no input element matches ${selector}`);
+    }
+    return [el];
+  }
+
+  const inputs = [...document.querySelectorAll(selector)].filter(
+    (node): node is HTMLInputElement => node instanceof HTMLInputElement,
+  );
+  if (inputs.length === 0) {
+    throw new TypeError(`createCalendarPicker: no input elements match ${selector}`);
+  }
+  return inputs;
+};
 
 const fillSecond = (selectS: HTMLSelectElement): void => {
   selectS.replaceChildren();
@@ -38,6 +72,25 @@ const fillSecond = (selectS: HTMLSelectElement): void => {
     o.value = String(s);
     o.textContent = s < 10 ? `0${String(s)}` : String(s);
     selectS.append(o);
+  }
+};
+
+const coerceSetDateEntry = (
+  entry: Date | string | null | undefined,
+  formatStr: string,
+  ref: Date,
+): Date | null => {
+  if (entry == null) return null;
+  if (entry instanceof Date) {
+    return isValid(entry) ? new Date(entry.getTime()) : null;
+  }
+  const trimmed = entry.trim();
+  if (!trimmed) return null;
+  try {
+    const d = parse(trimmed, formatStr, ref);
+    return isValid(d) ? d : null;
+  } catch {
+    return null;
   }
 };
 
@@ -123,14 +176,10 @@ const applyHM = (
   return new Date(base.getFullYear(), base.getMonth(), base.getDate(), h, min, sec, 0);
 };
 
-export const createCalendarPicker = (
+const buildCalendarPicker = (
   input: HTMLInputElement,
   initial: CalendarOptions = {},
 ): CalendarPickerInstance => {
-  if (!(input instanceof HTMLInputElement)) {
-    throw new TypeError("createCalendarPicker expects an HTMLInputElement");
-  }
-
   let options: CalendarOptions = { ...initial };
   const valueInput = input;
   valueInput.classList.add("cal__input");
@@ -147,11 +196,20 @@ export const createCalendarPicker = (
   }
 
   let popover: CalendarPopover | null = null;
+  const showPanel = (): void => {
+    if (popover) {
+      popover.open();
+      return;
+    }
+    if (!container.hidden) return;
+    container.hidden = false;
+  };
   const hidePanel = (): void => {
     if (popover) {
       popover.close();
       return;
     }
+    if (container.hidden) return;
     container.hidden = true;
     onPanelClosed();
   };
@@ -167,6 +225,8 @@ export const createCalendarPicker = (
   /** Tentative end while choosing a range (pointer hover). */
   let rangeHoverEnd: Date | null = null;
 
+  const shouldPseudoSelectToday = (): boolean => mode() === "single" && selected === null;
+
   function onPanelClosed(): void {
     if (mode() !== "range") return;
     if (!rangeStart || rangeEnd) return;
@@ -177,7 +237,7 @@ export const createCalendarPicker = (
   }
 
   if (mode() === "single") {
-    selected = options.value ?? null;
+    selected = options.value != null ? new Date(options.value.getTime()) : null;
     if (selected && !shouldShowTimeOn(options)) {
       selected = startOfDay(selected);
     }
@@ -501,6 +561,18 @@ export const createCalendarPicker = (
       end: rangeEnd ? new Date(dateOnlyIfNeeded(options, rangeEnd).getTime()) : null,
     });
     syncInputFromState();
+  };
+
+  const clearSelection = (): void => {
+    clearRangeHover();
+    if (mode() === "single") {
+      selected = null;
+      emitSingle();
+    } else {
+      rangeStart = null;
+      rangeEnd = null;
+    }
+    render();
   };
 
   const allowInputOn = (): boolean => options.allowInput ?? false;
@@ -874,12 +946,18 @@ export const createCalendarPicker = (
         if (!selectable) {
           btn.disabled = true;
           btn.classList.add("cal__day--disabled");
+          if (options.disabledDatesStrikeThrough) {
+            btn.classList.add("cal__day--disabled-strike");
+          }
         }
 
         if (mode() === "single") {
           if (selected && isSameDay(dayDate, selected)) {
             btn.classList.add("cal__day--selected");
             btn.setAttribute("aria-selected", "true");
+          } else if (shouldPseudoSelectToday() && isSameDay(dayDate, now)) {
+            btn.classList.add("cal__day--pseudo-selected");
+            btn.setAttribute("aria-selected", "false");
           } else {
             btn.setAttribute("aria-selected", "false");
           }
@@ -1199,15 +1277,7 @@ export const createCalendarPicker = (
   });
 
   btnReset.addEventListener("click", (): void => {
-    clearRangeHover();
-    if (mode() === "single") {
-      selected = null;
-      emitSingle();
-    } else {
-      rangeStart = null;
-      rangeEnd = null;
-    }
-    render();
+    clearSelection();
   });
 
   btnApplyRange.addEventListener("click", (): void => {
@@ -1354,7 +1424,50 @@ export const createCalendarPicker = (
 
   render();
 
+  const readSelectedDates = (): CalendarSelectedDates => {
+    if (mode() === "single") {
+      return {
+        selectedDate: selected ? new Date(dateOnlyIfNeeded(options, selected).getTime()) : null,
+      };
+    }
+    return {
+      start: rangeStart ? new Date(dateOnlyIfNeeded(options, rangeStart).getTime()) : null,
+      end: rangeEnd ? new Date(dateOnlyIfNeeded(options, rangeEnd).getTime()) : null,
+    };
+  };
+
+  const readCurrentYear = (): CalendarCurrentYear => {
+    if (mode() === "single") {
+      return { currentYear: viewYear };
+    }
+    const rightView = addMonths(new Date(viewYear, viewMonth, 1), 1);
+    return {
+      startYear: viewYear,
+      endYear: rightView.getFullYear(),
+    };
+  };
+
   return {
+    get selectedDates(): CalendarSelectedDates {
+      return readSelectedDates();
+    },
+    get currentYear(): CalendarCurrentYear {
+      return readCurrentYear();
+    },
+    changeMonth(months: number, relative = true): void {
+      clearRangeHover();
+      if (relative) {
+        const next = addMonths(new Date(viewYear, viewMonth, 1), months);
+        viewYear = next.getFullYear();
+        viewMonth = next.getMonth();
+      } else {
+        viewMonth = Math.min(11, Math.max(0, Math.floor(months)));
+      }
+      render();
+    },
+    clear(): void {
+      clearSelection();
+    },
     getValue(): Date | null {
       if (mode() !== "single") return null;
       if (!selected) return null;
@@ -1371,6 +1484,46 @@ export const createCalendarPicker = (
         viewMonth = selected.getMonth();
       }
       render();
+    },
+    setDate(newDate: CalendarSetDateInput, format?: string, silent = false): void {
+      clearRangeHover();
+      const parseFormat = format ?? effectiveOutputFormat(options);
+      const ref = selected ?? rangeStart ?? new Date();
+
+      if (mode() === "single") {
+        const parsed =
+          newDate.length === 0 ? null : coerceSetDateEntry(newDate[0], parseFormat, ref);
+        selected = parsed ? new Date(parsed.getTime()) : null;
+        if (selected && !shouldShowTimeOn(options)) {
+          selected = startOfDay(selected);
+        }
+        if (selected) {
+          viewYear = selected.getFullYear();
+          viewMonth = selected.getMonth();
+        }
+        render();
+        if (!silent) emitSingle();
+        return;
+      }
+
+      const startParsed =
+        newDate.length === 0 ? null : coerceSetDateEntry(newDate[0], parseFormat, ref);
+      const endParsed =
+        newDate.length < 2 ? null : coerceSetDateEntry(newDate[1], parseFormat, ref);
+      rangeStart = startParsed ? new Date(startParsed.getTime()) : null;
+      rangeEnd = endParsed ? new Date(endParsed.getTime()) : null;
+      if (!shouldShowTimeOn(options)) {
+        if (rangeStart) rangeStart = startOfDay(rangeStart);
+        if (rangeEnd) rangeEnd = startOfDay(rangeEnd);
+      }
+      const anchor = rangeStart ?? rangeEnd;
+      if (anchor) {
+        viewYear = anchor.getFullYear();
+        viewMonth = anchor.getMonth();
+      }
+      syncCommittedRange();
+      render();
+      if (!silent) emitRange();
     },
     getRange(): DateRangeValue {
       if (mode() === "single") {
@@ -1423,10 +1576,10 @@ export const createCalendarPicker = (
           rangeEnd = null;
           committedRangeStart = null;
           committedRangeEnd = null;
-          selected =
-            options.value === undefined || options.value === null
-              ? null
-              : new Date(options.value.getTime());
+          selected = options.value != null ? new Date(options.value.getTime()) : null;
+          if (selected && !shouldShowTimeOn(options)) {
+            selected = startOfDay(selected);
+          }
           if (selected) {
             viewYear = selected.getFullYear();
             viewMonth = selected.getMonth();
@@ -1486,7 +1639,7 @@ export const createCalendarPicker = (
       return container;
     },
     open(): void {
-      popover?.open();
+      showPanel();
     },
     close(): void {
       hidePanel();
@@ -1499,3 +1652,27 @@ export const createCalendarPicker = (
     },
   };
 };
+
+export function createCalendarPicker(
+  anchor: HTMLInputElement,
+  initial?: CalendarOptions,
+): CalendarPickerInstance;
+export function createCalendarPicker(
+  selector: `#${string}`,
+  initial?: CalendarOptions,
+): CalendarPickerInstance;
+export function createCalendarPicker(
+  selector: `.${string}`,
+  initial?: CalendarOptions,
+): CalendarPickerInstance[];
+export function createCalendarPicker(
+  anchor: CalendarPickerAnchor,
+  initial: CalendarOptions = {},
+): CalendarPickerInstance | CalendarPickerInstance[] {
+  const inputs = resolveCalendarInputs(anchor);
+  const pickers = inputs.map((input) => buildCalendarPicker(input, initial));
+  if (typeof anchor === "string" && anchor.trim().startsWith(".")) {
+    return pickers;
+  }
+  return pickers[0]!;
+}

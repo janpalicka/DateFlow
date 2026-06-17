@@ -339,40 +339,62 @@
   opacity: 0.55;
 }
 
-.cal__day--today:not(.cal__day--selected) {
-  border-color: var(--cal-border);
-  background: var(--cal-surface);
+.cal:not(.cal--range) .cal__day:hover:not(:disabled):not(.cal__day--disabled) {
+  color: rgb(70, 114, 235);
 }
 
-.cal__day--selected {
-  background: var(--cal-accent);
-  color: var(--cal-accent-contrast);
+/* Today outside selection/range highlight: plain cell like any other day. */
+.cal__day--today:not(.cal__day--selected):not(.cal__day--pseudo-selected):not(
+  .cal__day--range-start
+):not(.cal__day--range-end):not(.cal__day--range-single):not(.cal__day--range-between):not(
+  .cal__day--range-preview-between
+):not(.cal__day--range-preview-start):not(.cal__day--range-preview-end) {
+  border-color: transparent;
+  background: transparent;
+  color: rgb(70, 114, 235);
+}
+
+/* Single mode: selected day is text-only (no fill, no border). */
+.cal:not(.cal--range) .cal__day--selected,
+.cal:not(.cal--range) .cal__day--pseudo-selected {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  color: rgb(70, 114, 235);
   font-weight: 600;
 }
 
-.cal__day--range-start,
-.cal__day--range-end,
-.cal__day--range-single {
+.cal:not(.cal--range) .cal__day--today.cal__day--selected,
+.cal:not(.cal--range) .cal__day--today.cal__day--pseudo-selected {
+  border-color: transparent;
+  background: transparent;
+}
+
+/* Range mode: start/end keep accent fill. */
+.cal.cal--range .cal__day--range-start,
+.cal.cal--range .cal__day--range-end,
+.cal.cal--range .cal__day--range-single {
   background: var(--cal-accent);
   color: var(--cal-accent-contrast);
   font-weight: 600;
+  border-color: transparent;
 }
 
-.cal__day--range-between {
+.cal.cal--range .cal__day--range-between {
   background: color-mix(in srgb, var(--cal-accent) 28%, transparent);
   color: var(--cal-text);
   border-radius: 0;
   border-color: transparent;
 }
 
-.cal__day--range-preview-between {
+.cal.cal--range .cal__day--range-preview-between {
   background: color-mix(in srgb, var(--cal-accent) 22%, transparent);
   color: var(--cal-text);
   border-radius: 0;
   border-color: transparent;
 }
 
-.cal__day--range-preview-start {
+.cal.cal--range .cal__day--range-preview-start {
   background: color-mix(in srgb, var(--cal-accent) 38%, transparent);
   color: var(--cal-text);
   font-weight: 600;
@@ -380,7 +402,7 @@
   border-color: transparent;
 }
 
-.cal__day--range-preview-end {
+.cal.cal--range .cal__day--range-preview-end {
   background: color-mix(in srgb, var(--cal-accent) 38%, transparent);
   color: var(--cal-text);
   font-weight: 600;
@@ -388,17 +410,17 @@
   border-color: transparent;
 }
 
-.cal__day--range-start:not(.cal__day--range-single) {
+.cal.cal--range .cal__day--range-start:not(.cal__day--range-single) {
   border-radius: 10px 0 0 10px;
   border-color: transparent;
 }
 
-.cal__day--range-end:not(.cal__day--range-single) {
+.cal.cal--range .cal__day--range-end:not(.cal__day--range-single) {
   border-radius: 0 10px 10px 0;
   border-color: transparent;
 }
 
-.cal__day--range-start:not(.cal__day--range-single)::after {
+.cal.cal--range .cal__day--range-start:not(.cal__day--range-single)::after {
   content: "";
   position: absolute;
   top: 50%;
@@ -410,7 +432,7 @@
   z-index: 2;
 }
 
-.cal__day--range-end:not(.cal__day--range-single)::before {
+.cal.cal--range .cal__day--range-end:not(.cal__day--range-single)::before {
   content: "";
   position: absolute;
   top: 50%;
@@ -431,6 +453,9 @@
 .cal__day:disabled {
   opacity: 0.35;
   cursor: not-allowed;
+}
+
+.cal__day--disabled-strike .cal__day__num {
   text-decoration: line-through;
 }
 
