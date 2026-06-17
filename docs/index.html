@@ -489,7 +489,7 @@ createCalendarPicker(input, {
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Disabled dates (array)</h3>
-          <p class="showcase-card__desc">Block specific dates — useful for holidays or closures.</p>
+          <p class="showcase-card__desc">Block specific dates — useful for holidays or closures. By default disabled days are dimmed only; pass <code>disabledDatesStrikeThrough: true</code> to add a strike-through.</p>
           <pre class="showcase-card__code"><code>createCalendarPicker(input, {
   value: new Date(2026, 2, 15),
   disabledDates: [
@@ -499,6 +499,21 @@ createCalendarPicker(input, {
   ],
 });</code></pre>
           <div class="showcase-card__mount" data-demo="disabled-array"></div>
+
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Disabled dates strike-through</h3>
+          <p class="showcase-card__desc">Same blocked dates with <code>disabledDatesStrikeThrough: true</code>. Text color stays the same as the default disabled style.</p>
+          <pre class="showcase-card__code"><code>createCalendarPicker(input, {
+  value: new Date(2026, 2, 15),
+  disabledDatesStrikeThrough: true,
+  disabledDates: [
+    new Date(2026, 2, 17),
+    new Date(2026, 2, 18),
+    new Date(2026, 2, 19),
+  ],
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="disabled-strike"></div>
 
         </article>
         <article class="showcase-card">

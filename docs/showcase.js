@@ -556,6 +556,12 @@ function mountDemo(key) {
         value: new Date(2026, 2, 15),
         disabledDates: [new Date(2026, 2, 17), new Date(2026, 2, 18), new Date(2026, 2, 19)],
       }).wrap;
+    case "disabled-strike":
+      return mountFloatingCalendarDemo({
+        value: new Date(2026, 2, 15),
+        disabledDatesStrikeThrough: true,
+        disabledDates: [new Date(2026, 2, 17), new Date(2026, 2, 18), new Date(2026, 2, 19)],
+      }).wrap;
     case "disabled-predicate":
       return mountFloatingCalendarDemo({
         disabledDates: (d) => d.getDay() === 0 || d.getDay() === 6,
