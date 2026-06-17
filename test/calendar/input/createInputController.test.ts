@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { createInputController } from "./createInputController";
-import type { CalendarMode } from "../types";
+import { createInputController } from "@/calendar/input/createInputController";
+import type { CalendarMode } from "@/calendar/types";
 
 const createDeps = () => {
   let selected: Date | null = new Date(2026, 5, 15);

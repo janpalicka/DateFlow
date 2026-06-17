@@ -1,11 +1,11 @@
-import { describe, expect, it } from "vitest";
 import {
   clampYear,
   fillMonthYearSelects,
   parseYearInput,
   restoreYearInput,
   syncYearInputs,
-} from "../render/monthYear";
+} from "@/calendar/render/monthYear";
+import { describe, expect, it } from "vitest";
 
 describe("parseYearInput", () => {
   it("parses 1-4 digit years", () => {

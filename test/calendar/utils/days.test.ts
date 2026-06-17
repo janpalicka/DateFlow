@@ -1,5 +1,5 @@
+import { compareCalendarDay, dayInInclusiveRange, parseCalendarDay } from "@/calendar/utils/days";
 import { describe, expect, it } from "vitest";
-import { compareCalendarDay, dayInInclusiveRange, parseCalendarDay } from "./days";
 
 describe("parseCalendarDay", () => {
   it("parses ISO date strings to local midnight dates", () => {

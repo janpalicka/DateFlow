@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { renderGrid, renderGridForMonth } from "../render/grid";
-import type { GridSelectionState } from "../render/grid";
+import { renderGrid, renderGridForMonth } from "@/calendar/render/grid";
+import type { GridSelectionState } from "@/calendar/render/grid";
 
 const baseSelection = (overrides: Partial<GridSelectionState> = {}): GridSelectionState => ({
   mode: "single",

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ICON_NEXT_MONTH, ICON_PREV_MONTH, ICON_RESET } from "./icons";
+import { ICON_NEXT_MONTH, ICON_PREV_MONTH, ICON_RESET } from "@/calendar/icons";
 
 describe("icons", () => {
   it("exports SVG markup for navigation and reset", () => {

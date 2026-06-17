@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_LOCALE } from "../locales";
-import { mergeLocale } from "./locale";
+import { DEFAULT_LOCALE } from "@/calendar/locales";
+import { mergeLocale } from "@/calendar/utils/locale";
 
 describe("mergeLocale", () => {
   it("returns default locale when partial is undefined", () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { matchesFilter } from "./filters";
+import { matchesFilter } from "@/calendar/utils/filters";
 
 describe("matchesFilter", () => {
   const day = new Date(2026, 5, 15);

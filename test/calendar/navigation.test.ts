@@ -1,5 +1,5 @@
+import { canGoNextMonth, canGoPrevMonth } from "@/calendar/navigation";
 import { describe, expect, it } from "vitest";
-import { canGoNextMonth, canGoPrevMonth } from "./navigation";
 
 describe("canGoPrevMonth", () => {
   it("allows navigation when no minDate is set", () => {

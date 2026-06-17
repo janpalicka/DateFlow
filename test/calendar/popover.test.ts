@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { attachCalendarPopover } from "./popover";
+import { attachCalendarPopover } from "@/calendar/popover";
 
 vi.mock("@floating-ui/dom", () => ({
   autoUpdate: vi.fn(() => vi.fn()),
