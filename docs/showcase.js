@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { createCalendarPicker } from "../src/calendar/index.ts";
+import { dateFlow } from "../src/calendar/index.ts";
 import { cs, de, fr } from "../src/calendar/locales/index.ts";
 
 /** @param {import('../src/calendar/types/types.ts').DateRangeValue} r */
@@ -34,7 +34,7 @@ function mountFloatingCalendarDemo(opts, hooks = {}) {
   trigger.classList.add("showcase-card__input", "showcase-card__input--trigger");
   wrap.append(trigger);
 
-  const picker = createCalendarPicker(trigger, {
+  const picker = dateFlow(trigger, {
     ...options,
     onChange: (d) => {
       options.onChange?.(d);
@@ -108,7 +108,7 @@ function mountSelectedDatesDemo(mode) {
         }
       : { value: new Date(2026, 2, 15) };
 
-  const picker = createCalendarPicker(trigger, {
+  const picker = dateFlow(trigger, {
     ...options,
     onChange: () => {
       output.textContent = formatSelectedDatesPreview(picker.selectedDates);
@@ -146,7 +146,7 @@ function mountCurrentYearDemo(mode) {
         }
       : { value: new Date(2026, 2, 15) };
 
-  const picker = createCalendarPicker(trigger, options);
+  const picker = dateFlow(trigger, options);
   watchCalendarView(picker, () => {
     output.textContent = formatCurrentYearPreview(picker.currentYear);
   });
@@ -176,7 +176,7 @@ function mountChangeMonthDemo() {
 
   wrap.append(trigger, output);
 
-  const picker = createCalendarPicker(trigger, { value: new Date(2026, 5, 15) });
+  const picker = dateFlow(trigger, { value: new Date(2026, 5, 15) });
 
   const update = () => {
     output.textContent = readViewMonthLabel(picker);
@@ -223,7 +223,7 @@ function mountClearDemo() {
     output.textContent = formatSelectedDatesPreview(picker.selectedDates);
   };
 
-  const picker = createCalendarPicker(trigger, {
+  const picker = dateFlow(trigger, {
     value: new Date(2026, 2, 15),
     showResetButton: true,
     resetInputLabel: "Reset",
@@ -331,7 +331,7 @@ function mountSetDateDemo() {
     rangeStateOutput.textContent = formatSelectedDatesPreview(rangePicker.selectedDates);
   };
 
-  const singlePicker = createCalendarPicker(singleInput, {
+  const singlePicker = dateFlow(singleInput, {
     value: new Date(2026, 2, 15),
     outputFormat: fmt,
     onChange: (d) => {
@@ -340,7 +340,7 @@ function mountSetDateDemo() {
     },
   });
 
-  const rangePicker = createCalendarPicker(rangeInput, {
+  const rangePicker = dateFlow(rangeInput, {
     mode: "range",
     outputFormat: fmt,
     range: { start: new Date(2026, 2, 5), end: new Date(2026, 2, 18) },
@@ -422,7 +422,7 @@ function mountOpenDemo() {
 
   wrap.append(trigger, output);
 
-  const picker = createCalendarPicker(trigger, {
+  const picker = dateFlow(trigger, {
     value: new Date(2026, 2, 15),
   });
 
@@ -466,7 +466,7 @@ function mountSelectorIdDemo() {
   return {
     wrap,
     setup() {
-      createCalendarPicker("#getting-started-id-picker", {
+      dateFlow("#getting-started-id-picker", {
         value: new Date(2026, 2, 20),
       });
     },
@@ -498,7 +498,7 @@ function mountSelectorClassDemo() {
   return {
     wrap,
     setup() {
-      createCalendarPicker(".getting-started-multi-picker", {
+      dateFlow(".getting-started-multi-picker", {
         value: new Date(2026, 2, 20),
       });
     },
@@ -767,7 +767,7 @@ function mountQuickStartDemo() {
   const input = document.getElementById("quick-start-date-field");
   if (!(input instanceof HTMLInputElement)) return;
 
-  createCalendarPicker(input, {
+  dateFlow(input, {
     value: new Date(2026, 5, 8),
     onChange: (date) => console.log("Selected:", date),
   });

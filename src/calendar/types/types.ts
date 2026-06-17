@@ -193,7 +193,7 @@ export interface CalendarPickerInstance {
   setRange(range: DateRangeValue): void;
   /** Merge options and re-render (e.g. change locale or constraints). */
   setOptions(partial: Partial<CalendarOptions>): void;
-  /** The input element passed to {@link createCalendarPicker}. */
+  /** The input element passed to {@link dateFlow}. */
   getInputElement(): HTMLInputElement;
   /** Root wrapper for the calendar panel (initially hidden). */
   getCalendarElement(): HTMLElement;
