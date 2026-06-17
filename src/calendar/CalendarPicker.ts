@@ -28,6 +28,9 @@ import type {
   CalendarOptions,
   CalendarPickerAnchor,
   CalendarPickerInstance,
+  CalendarSelectedDates,
+  CalendarCurrentYear,
+  CalendarSetDateInput,
   DateRangeValue,
 } from "./types";
 import "./calendar.css";
@@ -69,6 +72,25 @@ const fillSecond = (selectS: HTMLSelectElement): void => {
     o.value = String(s);
     o.textContent = s < 10 ? `0${String(s)}` : String(s);
     selectS.append(o);
+  }
+};
+
+const coerceSetDateEntry = (
+  entry: Date | string | null | undefined,
+  formatStr: string,
+  ref: Date,
+): Date | null => {
+  if (entry == null) return null;
+  if (entry instanceof Date) {
+    return isValid(entry) ? new Date(entry.getTime()) : null;
+  }
+  const trimmed = entry.trim();
+  if (!trimmed) return null;
+  try {
+    const d = parse(trimmed, formatStr, ref);
+    return isValid(d) ? d : null;
+  } catch {
+    return null;
   }
 };
 
@@ -174,11 +196,20 @@ const buildCalendarPicker = (
   }
 
   let popover: CalendarPopover | null = null;
+  const showPanel = (): void => {
+    if (popover) {
+      popover.open();
+      return;
+    }
+    if (!container.hidden) return;
+    container.hidden = false;
+  };
   const hidePanel = (): void => {
     if (popover) {
       popover.close();
       return;
     }
+    if (container.hidden) return;
     container.hidden = true;
     onPanelClosed();
   };
@@ -530,6 +561,18 @@ const buildCalendarPicker = (
       end: rangeEnd ? new Date(dateOnlyIfNeeded(options, rangeEnd).getTime()) : null,
     });
     syncInputFromState();
+  };
+
+  const clearSelection = (): void => {
+    clearRangeHover();
+    if (mode() === "single") {
+      selected = null;
+      emitSingle();
+    } else {
+      rangeStart = null;
+      rangeEnd = null;
+    }
+    render();
   };
 
   const allowInputOn = (): boolean => options.allowInput ?? false;
@@ -1231,15 +1274,7 @@ const buildCalendarPicker = (
   });
 
   btnReset.addEventListener("click", (): void => {
-    clearRangeHover();
-    if (mode() === "single") {
-      selected = null;
-      emitSingle();
-    } else {
-      rangeStart = null;
-      rangeEnd = null;
-    }
-    render();
+    clearSelection();
   });
 
   btnApplyRange.addEventListener("click", (): void => {
@@ -1386,7 +1421,50 @@ const buildCalendarPicker = (
 
   render();
 
+  const readSelectedDates = (): CalendarSelectedDates => {
+    if (mode() === "single") {
+      return {
+        selectedDate: selected ? new Date(dateOnlyIfNeeded(options, selected).getTime()) : null,
+      };
+    }
+    return {
+      start: rangeStart ? new Date(dateOnlyIfNeeded(options, rangeStart).getTime()) : null,
+      end: rangeEnd ? new Date(dateOnlyIfNeeded(options, rangeEnd).getTime()) : null,
+    };
+  };
+
+  const readCurrentYear = (): CalendarCurrentYear => {
+    if (mode() === "single") {
+      return { currentYear: viewYear };
+    }
+    const rightView = addMonths(new Date(viewYear, viewMonth, 1), 1);
+    return {
+      startYear: viewYear,
+      endYear: rightView.getFullYear(),
+    };
+  };
+
   return {
+    get selectedDates(): CalendarSelectedDates {
+      return readSelectedDates();
+    },
+    get currentYear(): CalendarCurrentYear {
+      return readCurrentYear();
+    },
+    changeMonth(months: number, relative = true): void {
+      clearRangeHover();
+      if (relative) {
+        const next = addMonths(new Date(viewYear, viewMonth, 1), months);
+        viewYear = next.getFullYear();
+        viewMonth = next.getMonth();
+      } else {
+        viewMonth = Math.min(11, Math.max(0, Math.floor(months)));
+      }
+      render();
+    },
+    clear(): void {
+      clearSelection();
+    },
     getValue(): Date | null {
       if (mode() !== "single") return null;
       if (!selected) return null;
@@ -1403,6 +1481,46 @@ const buildCalendarPicker = (
         viewMonth = selected.getMonth();
       }
       render();
+    },
+    setDate(newDate: CalendarSetDateInput, format?: string, silent = false): void {
+      clearRangeHover();
+      const parseFormat = format ?? effectiveOutputFormat(options);
+      const ref = selected ?? rangeStart ?? new Date();
+
+      if (mode() === "single") {
+        const parsed =
+          newDate.length === 0 ? null : coerceSetDateEntry(newDate[0], parseFormat, ref);
+        selected = parsed ? new Date(parsed.getTime()) : null;
+        if (selected && !shouldShowTimeOn(options)) {
+          selected = startOfDay(selected);
+        }
+        if (selected) {
+          viewYear = selected.getFullYear();
+          viewMonth = selected.getMonth();
+        }
+        render();
+        if (!silent) emitSingle();
+        return;
+      }
+
+      const startParsed =
+        newDate.length === 0 ? null : coerceSetDateEntry(newDate[0], parseFormat, ref);
+      const endParsed =
+        newDate.length < 2 ? null : coerceSetDateEntry(newDate[1], parseFormat, ref);
+      rangeStart = startParsed ? new Date(startParsed.getTime()) : null;
+      rangeEnd = endParsed ? new Date(endParsed.getTime()) : null;
+      if (!shouldShowTimeOn(options)) {
+        if (rangeStart) rangeStart = startOfDay(rangeStart);
+        if (rangeEnd) rangeEnd = startOfDay(rangeEnd);
+      }
+      const anchor = rangeStart ?? rangeEnd;
+      if (anchor) {
+        viewYear = anchor.getFullYear();
+        viewMonth = anchor.getMonth();
+      }
+      syncCommittedRange();
+      render();
+      if (!silent) emitRange();
     },
     getRange(): DateRangeValue {
       if (mode() === "single") {
@@ -1518,7 +1636,7 @@ const buildCalendarPicker = (
       return container;
     },
     open(): void {
-      popover?.open();
+      showPanel();
     },
     close(): void {
       hidePanel();
