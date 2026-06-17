@@ -58,15 +58,21 @@
     "check": "vp check",
     "fix": "vp check --fix",
     "fmt": "vp fmt",
-    "lint": "vp lint"
+    "lint": "vp lint",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@floating-ui/dom": "^1.7.6",
     "@tsdown/css": "^0.22.3",
     "@types/node": "^25.9.3",
+    "@vitest/coverage-v8": "^4.1.9",
     "date-fns": "^4.4.0",
+    "jsdom": "^29.1.1",
     "typescript": "~6.0.3",
-    "vite-plus": "^0.1.24"
+    "vite-plus": "^0.1.24",
+    "vitest": "^4.1.9"
   },
   "peerDependencies": {
     "@floating-ui/dom": "^1.6.0",

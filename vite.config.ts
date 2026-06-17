@@ -29,9 +29,26 @@ export default defineConfig({
     port: 5173,
     host: "0.0.0.0",
   },
+  test: {
+    root: rootDir,
+    environment: "jsdom",
+    include: ["src/**/*.test.ts"],
+    coverage: {
+      provider: "v8",
+      include: ["src/calendar/**/*.ts"],
+      exclude: [
+        "src/calendar/**/*.test.ts",
+        "src/calendar/types/**",
+        "src/vite-env.d.ts",
+        "src/calendar/time/index.ts",
+        "src/calendar/utils/index.ts",
+        "src/calendar/types/index.ts",
+      ],
+    },
+  },
   // Oxlint (ESLint-compatible `import/*` rules). Import *order* is enforced by Oxfmt `sortImports` below.
   lint: {
-    ignorePatterns: ["dist/**", "node_modules/**", ".vscode/**", "docs/**"],
+    ignorePatterns: ["dist/**", "node_modules/**", ".vscode/**", "docs/**", "coverage/**"],
     plugins: ["import"],
     options: {
       typeAware: true,
