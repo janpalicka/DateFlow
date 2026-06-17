@@ -58,8 +58,13 @@
       <div class="showcase-layout">
         <aside class="showcase-sidebar">
           <nav class="showcase-toc" aria-label="Documentation sections">
-            <h2 class="showcase-toc__title">On this page</h2>
-            <ol class="showcase-toc__list">
+            <details class="showcase-toc__disclosure" open>
+              <summary class="showcase-toc__disclosure-summary">
+                <span class="showcase-toc__disclosure-kicker">On this page</span>
+                <span class="showcase-toc__disclosure-current" data-toc-current>Quick start</span>
+              </summary>
+              <h2 class="showcase-toc__title">On this page</h2>
+              <ol class="showcase-toc__list">
               <li><a class="showcase-toc__link" href="#quick-start">Quick start</a></li>
               <li><a class="showcase-toc__link" href="#getting-started">Getting started</a></li>
               <li><a class="showcase-toc__link" href="#instance-api">Instance API</a></li>
@@ -71,6 +76,7 @@
               <li><a class="showcase-toc__link" href="#formatting">Formatting</a></li>
               <li><a class="showcase-toc__link" href="#theming">Theming &amp; accessibility</a></li>
             </ol>
+            </details>
           </nav>
         </aside>
 

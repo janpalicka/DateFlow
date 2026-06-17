@@ -768,6 +768,8 @@ function mountQuickStartDemo() {
 }
 
 function initTocSpy() {
+  const disclosure = document.querySelector(".showcase-toc__disclosure");
+  const currentLabel = document.querySelector("[data-toc-current]");
   const links = [...document.querySelectorAll(".showcase-toc__link")];
   const sections = links
     .map((link) => {
@@ -779,18 +781,60 @@ function initTocSpy() {
 
   if (!sections.length) return;
 
+  let lastActiveId = null;
+  let navigationLockUntil = 0;
+
+  const isMobileToc = () => window.matchMedia("(max-width: 959px)").matches;
+
+  const syncDisclosureMode = () => {
+    if (!(disclosure instanceof HTMLDetailsElement)) return;
+    disclosure.open = !isMobileToc();
+  };
+
   const setActive = (id) => {
     for (const section of sections) {
       section.link.classList.toggle("is-active", section.id === id);
+    }
+    const activeSection = sections.find((section) => section.id === id);
+    if (currentLabel instanceof HTMLElement && activeSection) {
+      currentLabel.textContent = activeSection.link.textContent.trim();
     }
   };
 
   const scrollOffset = () => {
     const header = document.querySelector(".site-header");
-    return (header instanceof HTMLElement ? header.offsetHeight : 64) + 48;
+    let offset = (header instanceof HTMLElement ? header.offsetHeight : 52) + 12;
+    if (isMobileToc()) {
+      const tocBar = document.querySelector(".showcase-sidebar");
+      if (tocBar instanceof HTMLElement) {
+        offset += tocBar.offsetHeight;
+      }
+    } else {
+      offset += 36;
+    }
+    return offset;
+  };
+
+  const scrollToSection = (id, behavior = "smooth") => {
+    const section = sections.find((entry) => entry.id === id);
+    if (!section) return;
+
+    const top =
+      section.el.getBoundingClientRect().top + window.scrollY - scrollOffset();
+    navigationLockUntil = performance.now() + (behavior === "smooth" ? 900 : 0);
+    window.scrollTo({ top: Math.max(0, top), behavior });
+    history.replaceState(null, "", `#${id}`);
+    lastActiveId = id;
+    setActive(id);
+
+    if (disclosure instanceof HTMLDetailsElement && isMobileToc()) {
+      disclosure.open = false;
+    }
   };
 
   const updateActive = () => {
+    if (performance.now() < navigationLockUntil) return;
+
     const offset = scrollOffset();
     let activeId = sections[0].id;
 
@@ -799,7 +843,11 @@ function initTocSpy() {
         activeId = section.id;
       }
     }
-    setActive(activeId);
+
+    if (activeId !== lastActiveId) {
+      lastActiveId = activeId;
+      setActive(activeId);
+    }
   };
 
   let ticking = false;
@@ -813,13 +861,43 @@ function initTocSpy() {
   };
 
   for (const section of sections) {
-    section.link.addEventListener("click", () => setActive(section.id));
+    section.link.addEventListener("click", (event) => {
+      event.preventDefault();
+      scrollToSection(section.id);
+    });
   }
 
+  for (const anchor of document.querySelectorAll("a[href^='#']")) {
+    const href = anchor.getAttribute("href");
+    if (!href || href === "#" || href === "#top") continue;
+    const id = href.slice(1);
+    if (!sections.some((section) => section.id === id)) continue;
+    if (anchor.classList.contains("showcase-toc__link")) continue;
+    anchor.addEventListener("click", (event) => {
+      event.preventDefault();
+      scrollToSection(id);
+    });
+  }
+
+  syncDisclosureMode();
   window.addEventListener("scroll", onScroll, { passive: true });
-  window.addEventListener("resize", onScroll, { passive: true });
-  window.addEventListener("hashchange", updateActive);
-  updateActive();
+  window.addEventListener("resize", () => {
+    syncDisclosureMode();
+    onScroll();
+  });
+  window.addEventListener("hashchange", () => {
+    const hash = location.hash.slice(1);
+    if (sections.some((section) => section.id === hash)) {
+      scrollToSection(hash, "auto");
+    }
+  });
+
+  const initialHash = location.hash.slice(1);
+  if (sections.some((section) => section.id === initialHash)) {
+    scrollToSection(initialHash, "auto");
+  } else {
+    updateActive();
+  }
 }
 
 function initShowcase() {
