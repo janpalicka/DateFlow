@@ -22,7 +22,7 @@ export const en: CalendarLocale = {
       "December",
     ],
   },
-  firstDayOfWeek: 0,
+  localeTag: "en",
   weekNumberHeader: "Wk",
   rangeDurationOne: "1 day",
   rangeDurationOther: "{n} days",

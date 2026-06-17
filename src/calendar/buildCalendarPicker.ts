@@ -88,11 +88,35 @@ export const buildCalendarPicker = (
   let rangeEnd: Date | null = null;
   let committedRangeStart: Date | null = null;
   let committedRangeEnd: Date | null = null;
+  let committedSelected: Date | null = null;
   let rangeHoverEnd: Date | null = null;
+
+  const usesApplyActions = (): boolean => shouldShowTimeOn(options);
+
+  const shouldShowApplyActions = (): boolean => {
+    if (usesApplyActions()) return true;
+    return mode() === "range" && Boolean(rangeStart || rangeEnd);
+  };
+
+  const syncCommittedSingle = (): void => {
+    committedSelected = selected ? new Date(selected.getTime()) : null;
+  };
 
   const shouldPseudoSelectToday = (): boolean => mode() === "single" && selected === null;
 
   function onPanelClosed(): void {
+    if (mode() === "single" && usesApplyActions()) {
+      selected = committedSelected ? new Date(committedSelected.getTime()) : null;
+      render();
+      return;
+    }
+    if (mode() === "range" && usesApplyActions()) {
+      clearRangeHover();
+      rangeStart = committedRangeStart ? new Date(committedRangeStart.getTime()) : null;
+      rangeEnd = committedRangeEnd ? new Date(committedRangeEnd.getTime()) : null;
+      render();
+      return;
+    }
     if (mode() !== "range") return;
     if (!rangeStart || rangeEnd) return;
     clearRangeHover();
@@ -105,6 +129,9 @@ export const buildCalendarPicker = (
     selected = options.value != null ? new Date(options.value.getTime()) : null;
     if (selected && !shouldShowTimeOn(options)) {
       selected = startOfDay(selected);
+    }
+    if (usesApplyActions()) {
+      committedSelected = selected ? new Date(selected.getTime()) : null;
     }
   } else {
     rangeStart = options.range?.start ? new Date(options.range.start.getTime()) : null;
@@ -122,8 +149,18 @@ export const buildCalendarPicker = (
   let viewYear = anchor.getFullYear();
   let viewMonth = anchor.getMonth();
 
+  const applyTheme = (theme?: string): void => {
+    if (theme) {
+      root.dataset.calTheme = theme;
+      valueInput.dataset.calTheme = theme;
+    } else {
+      delete root.dataset.calTheme;
+      delete valueInput.dataset.calTheme;
+    }
+  };
+
   root.className = ["cal", options.className].filter(Boolean).join(" ");
-  if (options.theme) root.dataset.calTheme = options.theme;
+  if (options.theme) applyTheme(options.theme);
   root.setAttribute("aria-label", options.ariaLabel ?? "Calendar");
 
   function clearRangeHover(): void {
@@ -215,6 +252,9 @@ export const buildCalendarPicker = (
   let inputController: InputController;
 
   function emitSingle(): void {
+    if (usesApplyActions()) {
+      syncCommittedSingle();
+    }
     if (!selected) {
       options.onChange?.(null);
       inputController.syncInputFromState();
@@ -285,9 +325,11 @@ export const buildCalendarPicker = (
             use12Hour(),
           )
         : dayOnly;
-      emitSingle();
-      if (options.hideOnSingleSelect ?? true) {
-        hidePanel();
+      if (!usesApplyActions()) {
+        emitSingle();
+        if (options.hideOnSingleSelect ?? true) {
+          hidePanel();
+        }
       }
     } else {
       const clicked = new Date(cellYear, cellMonth, dayNum, 0, 0, 0, 0);
@@ -487,10 +529,9 @@ export const buildCalendarPicker = (
 
   function render(): void {
     const isRange = mode() === "range";
-    const hasRangeSelection = Boolean(rangeStart || rangeEnd);
     root.classList.toggle("cal--range", isRange);
     dom.paneRight.hidden = !isRange;
-    dom.rangeActions.hidden = !isRange || !hasRangeSelection;
+    dom.rangeActions.hidden = !shouldShowApplyActions();
     layoutRangeHeaders();
     fillMonthYearSelects(dom.monthSelect, dom.monthSelectRight, viewYear, viewMonth, options);
     syncingYearInput = true;
@@ -515,6 +556,12 @@ export const buildCalendarPicker = (
     getOptions: () => options,
     getMode: mode,
     getSelected: () => selected,
+    getInputSingleValue: () => {
+      if (usesApplyActions()) {
+        return committedSelected ? new Date(committedSelected.getTime()) : null;
+      }
+      return selected ? new Date(selected.getTime()) : null;
+    },
     setSelected: (d) => {
       selected = d;
     },
@@ -603,6 +650,23 @@ export const buildCalendarPicker = (
   });
 
   dom.btnApplyRange.addEventListener("click", (): void => {
+    if (mode() === "single" && usesApplyActions()) {
+      if (!selected) return;
+      selected = applyHM(
+        selected,
+        dom.timeSingle.hour,
+        dom.timeSingle.minute,
+        dom.timeSingle.meridiem,
+        secondForSingle(),
+        use12Hour(),
+      );
+      emitSingle();
+      if (options.hideOnSingleSelect ?? true) {
+        hidePanel();
+      }
+      render();
+      return;
+    }
     if (mode() !== "range") return;
     const hoverAtApply = rangeHoverEnd ? new Date(rangeHoverEnd.getTime()) : null;
     if (rangeStart && !rangeEnd && hoverAtApply) {
@@ -644,6 +708,12 @@ export const buildCalendarPicker = (
   });
 
   dom.btnCancelRange.addEventListener("click", (): void => {
+    if (mode() === "single" && usesApplyActions()) {
+      selected = committedSelected ? new Date(committedSelected.getTime()) : null;
+      hidePanel();
+      render();
+      return;
+    }
     if (mode() !== "range") return;
     clearRangeHover();
     rangeStart = null;
@@ -704,7 +774,9 @@ export const buildCalendarPicker = (
       secondForSingle(),
       use12Hour(),
     );
-    emitSingle();
+    if (!usesApplyActions()) {
+      emitSingle();
+    }
   };
 
   const onTimeRangeStartChange = (): void => {
@@ -776,8 +848,9 @@ export const buildCalendarPicker = (
 
   const readSelectedDates = (): CalendarSelectedDates => {
     if (mode() === "single") {
+      const value = usesApplyActions() ? committedSelected : selected;
       return {
-        selectedDate: selected ? new Date(dateOnlyIfNeeded(options, selected).getTime()) : null,
+        selectedDate: value ? new Date(dateOnlyIfNeeded(options, value).getTime()) : null,
       };
     }
     return {
@@ -820,14 +893,18 @@ export const buildCalendarPicker = (
     },
     getValue(): Date | null {
       if (mode() !== "single") return null;
-      if (!selected) return null;
-      return new Date(dateOnlyIfNeeded(options, selected).getTime());
+      const value = usesApplyActions() ? committedSelected : selected;
+      if (!value) return null;
+      return new Date(dateOnlyIfNeeded(options, value).getTime());
     },
     setValue(date: Date | null): void {
       if (mode() !== "single") return;
       selected = date ? new Date(date.getTime()) : null;
       if (selected && !shouldShowTimeOn(options)) {
         selected = startOfDay(selected);
+      }
+      if (usesApplyActions()) {
+        syncCommittedSingle();
       }
       if (selected) {
         viewYear = selected.getFullYear();
@@ -846,6 +923,9 @@ export const buildCalendarPicker = (
         selected = parsed ? new Date(parsed.getTime()) : null;
         if (selected && !shouldShowTimeOn(options)) {
           selected = startOfDay(selected);
+        }
+        if (usesApplyActions()) {
+          syncCommittedSingle();
         }
         if (selected) {
           viewYear = selected.getFullYear();
@@ -930,6 +1010,9 @@ export const buildCalendarPicker = (
           if (selected && !shouldShowTimeOn(options)) {
             selected = startOfDay(selected);
           }
+          if (usesApplyActions()) {
+            syncCommittedSingle();
+          }
           if (selected) {
             viewYear = selected.getFullYear();
             viewMonth = selected.getMonth();
@@ -948,6 +1031,9 @@ export const buildCalendarPicker = (
       }
       if (partial.value !== undefined && mode() === "single") {
         selected = partial.value === null ? null : new Date(partial.value.getTime());
+        if (usesApplyActions()) {
+          syncCommittedSingle();
+        }
         if (selected) {
           viewYear = selected.getFullYear();
           viewMonth = selected.getMonth();
@@ -964,8 +1050,7 @@ export const buildCalendarPicker = (
         }
       }
       if (partial.theme !== undefined) {
-        if (partial.theme) root.dataset.calTheme = partial.theme;
-        else delete root.dataset.calTheme;
+        applyTheme(partial.theme || undefined);
       }
       if (partial.className !== undefined) {
         root.className = ["cal", options.className].filter(Boolean).join(" ");
@@ -979,6 +1064,8 @@ export const buildCalendarPicker = (
       normalizeStoredDatesIfDateOnly();
       if (mode() === "range") {
         syncCommittedRange();
+      } else if (usesApplyActions()) {
+        syncCommittedSingle();
       }
       render();
     },

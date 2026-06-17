@@ -1,5 +1,5 @@
-import { cloneRange, isSelectable, yearRange } from "@/calendar/utils/range";
 import { describe, expect, it } from "vitest";
+import { cloneRange, isSelectable, yearRange } from "@/calendar/utils/range";
 
 describe("isSelectable", () => {
   const day = new Date(2026, 5, 15);

@@ -22,7 +22,7 @@ export const cs: CalendarLocale = {
       "prosinec",
     ],
   },
-  firstDayOfWeek: 1,
+  localeTag: "cs",
   rangeDurationOne: "1 den",
   rangeDurationOther: "{n} dní",
   inputPlaceholder: "Vyberte datum",

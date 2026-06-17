@@ -5,5 +5,5 @@ export { fr } from "./fr";
 
 import { en } from "./en";
 
-/** Default English (US) locale; `firstDayOfWeek` is Sunday. */
+/** Default English locale strings; week start comes from {@link localeTag} via Intl. */
 export const DEFAULT_LOCALE = en;

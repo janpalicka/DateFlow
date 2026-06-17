@@ -1,5 +1,6 @@
-import { cs, de, en, fr } from "@/calendar/locales";
 import { describe, expect, it } from "vitest";
+import { cs, de, en, fr } from "@/calendar/locales";
+import { mergeLocale } from "@/calendar/utils/locale";
 
 describe("locales", () => {
   it("exports complete locale objects", () => {
@@ -8,13 +9,12 @@ describe("locales", () => {
       expect(locale.weekdays.longhand).toHaveLength(7);
       expect(locale.months.shorthand).toHaveLength(12);
       expect(locale.months.longhand).toHaveLength(12);
-      expect(locale.firstDayOfWeek).toBeGreaterThanOrEqual(0);
-      expect(locale.firstDayOfWeek).toBeLessThanOrEqual(6);
+      expect(locale.localeTag).toBeTruthy();
     }
   });
 
-  it("uses Monday as first day for de and cs", () => {
-    expect(de.firstDayOfWeek).toBe(1);
-    expect(cs.firstDayOfWeek).toBe(1);
+  it("resolves Monday as first day for de and cs via Intl", () => {
+    expect(mergeLocale(de).firstDayOfWeek).toBe(1);
+    expect(mergeLocale(cs).firstDayOfWeek).toBe(1);
   });
 });

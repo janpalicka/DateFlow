@@ -15,6 +15,7 @@ const createDeps = () => {
     getOptions: () => ({ allowInput, mode, rangeOutputSeparator: " — " as const }),
     getMode: () => mode,
     getSelected: () => selected,
+    getInputSingleValue: () => selected,
     setSelected: (d: Date | null) => {
       selected = d;
     },

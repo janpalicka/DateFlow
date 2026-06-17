@@ -1,6 +1,6 @@
 import { format } from "date-fns";
 import { dateFlow } from "../src/calendar/index.ts";
-import { cs, de, fr } from "../src/calendar/locales/index.ts";
+import { cs, de, en, fr } from "../src/calendar/locales/index.ts";
 
 /** @param {import('../src/calendar/types/types.ts').DateRangeValue} r */
 function formatRangeLine(r, fmt, sep) {
@@ -537,13 +537,31 @@ function mountDemo(key) {
     case "open-method":
       return mountOpenDemo();
     case "locale-de":
-      return mountFloatingCalendarDemo({ locale: de }).wrap;
-    case "locale-fr":
-      return mountFloatingCalendarDemo({ locale: fr }).wrap;
-    case "locale-partial":
       return mountFloatingCalendarDemo({
         showWeekNumbers: true,
-        locale: { ...cs, weekNumberHeader: "Tý" },
+        value: new Date(2026, 2, 15),
+        locale: de,
+      }).wrap;
+    case "locale-fr":
+      return mountFloatingCalendarDemo({ locale: fr }).wrap;
+    case "locale-week-start":
+      return mountFloatingCalendarDemo({
+        showWeekNumbers: true,
+        value: new Date(2026, 2, 15),
+        locale: {
+          ...en,
+          firstDayOfWeek: 0,
+        },
+      }).wrap;
+    case "locale-partial":
+      return mountFloatingCalendarDemo({
+        showTime: true,
+        showWeekNumbers: true,
+        value: new Date(2026, 2, 15, 12, 30),
+        locale: {
+          ...cs,
+          weekNumberHeader: "Tý",
+        },
       }).wrap;
     case "min-max":
       return mountFloatingCalendarDemo({

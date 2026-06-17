@@ -534,6 +534,7 @@
   --cal-muted: #71717a;
   --cal-bg: #ffffff;
   --cal-border: #e4e4e7;
+  --cal-accent: #2563eb;
   --cal-input-placeholder: color-mix(in srgb, var(--cal-muted) 58%, var(--cal-bg));
   display: block;
   width: 100%;
@@ -563,7 +564,9 @@
 }
 
 .cal__range-actions {
-  margin-top: 0.75rem;
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--cal-border);
   display: flex;
   gap: 0.5rem;
   justify-content: flex-end;
@@ -598,7 +601,8 @@
 }
 
 /* --- Preset themes (data-cal-theme) --- */
-.cal[data-cal-theme="dark"] {
+.cal[data-cal-theme="dark"],
+.cal__input[data-cal-theme="dark"] {
   --cal-bg: #18181b;
   --cal-surface: #27272a;
   --cal-text: #fafafa;
@@ -611,6 +615,18 @@
   --cal-shadow: 0 12px 48px rgb(0 0 0 / 0.45);
 }
 
+@media (prefers-color-scheme: dark) {
+  .cal__input:not([data-cal-theme]) {
+    --cal-bg: #18181b;
+    --cal-surface: #27272a;
+    --cal-text: #fafafa;
+    --cal-muted: #a1a1aa;
+    --cal-input-placeholder: color-mix(in srgb, var(--cal-muted) 52%, var(--cal-bg));
+    --cal-border: #3f3f46;
+    --cal-accent: #38bdf8;
+  }
+}
+
 .cal[data-cal-theme="dark"] .cal__selects > .cal__select {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
 }
@@ -619,13 +635,15 @@
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
 }
 
-.cal[data-cal-theme="forest"] {
+.cal[data-cal-theme="forest"],
+.cal__input[data-cal-theme="forest"] {
   --cal-accent: #15803d;
   --cal-accent-contrast: #ecfdf5;
   --cal-surface: #ecfdf5;
 }
 
-.cal[data-cal-theme="contrast"] {
+.cal[data-cal-theme="contrast"],
+.cal__input[data-cal-theme="contrast"] {
   --cal-bg: #000000;
   --cal-surface: #1a1a1a;
   --cal-text: #ffffff;

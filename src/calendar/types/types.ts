@@ -11,8 +11,10 @@ export interface CalendarLocale {
     shorthand: string[];
     longhand: string[];
   };
-  /** 0 = Sunday (US), 1 = Monday (ISO / much of Europe) */
-  firstDayOfWeek: number;
+  /** 0 = Sunday … 6 = Saturday. Override explicitly, or omit to use {@link localeTag} + Intl week info. */
+  firstDayOfWeek?: number;
+  /** BCP 47 tag used with `Intl.Locale.prototype.getWeekInfo()` when `firstDayOfWeek` is omitted. */
+  localeTag?: string;
   /** Column title when week numbers are shown. Default: `"Wk"`. */
   weekNumberHeader?: string;
   /** Range tooltip when start and end are the same day. Default: `"1 day"`. */
@@ -28,6 +30,11 @@ export interface CalendarLocale {
   /** Range mode apply button label. Default: `"Apply"`. */
   rangeApply?: string;
 }
+
+/** Locale after {@link mergeLocale} — `firstDayOfWeek` is always resolved. */
+export type ResolvedCalendarLocale = CalendarLocale & {
+  firstDayOfWeek: number;
+};
 
 export type DatePredicate = (date: Date) => boolean;
 export type DateFilter = readonly Date[] | DatePredicate;

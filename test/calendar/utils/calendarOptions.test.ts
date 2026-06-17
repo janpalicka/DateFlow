@@ -1,9 +1,9 @@
+import { describe, expect, it } from "vitest";
 import {
   dateOnlyIfNeeded,
   effectiveOutputFormat,
   shouldShowTimeOn,
 } from "@/calendar/utils/calendarOptions";
-import { describe, expect, it } from "vitest";
 
 describe("effectiveOutputFormat", () => {
   it("uses custom outputFormat when provided", () => {

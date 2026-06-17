@@ -35,7 +35,7 @@ export const fr: CalendarLocale = {
       "décembre",
     ],
   },
-  firstDayOfWeek: 1,
+  localeTag: "fr",
   rangeDurationOne: "1 jour",
   rangeDurationOther: "{n} jours",
   inputPlaceholder: "Choisir une date",

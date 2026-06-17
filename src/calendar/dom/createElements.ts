@@ -129,7 +129,7 @@ export const createCalendarDom = (): CalendarDomElements => {
   panes.className = "cal__panes";
   panes.append(paneLeft, paneRight);
 
-  root.append(panes, rangeActions, timeWrap);
+  root.append(panes, timeWrap, rangeActions);
   container.append(root);
 
   return {
