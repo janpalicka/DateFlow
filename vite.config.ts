@@ -3,8 +3,10 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
+const repoBase = "/DateFlow/";
 
 export default defineConfig({
+  base: process.env.GH_PAGES === "true" ? repoBase : "/",
   root: path.resolve(rootDir, "docs"),
   publicDir: path.resolve(rootDir, "assets"),
   resolve: {
