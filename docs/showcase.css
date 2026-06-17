@@ -783,6 +783,25 @@ body {
   width: 100%;
 }
 
+.showcase-card__multi-picker-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  width: 100%;
+}
+
+.showcase-card__multi-picker-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.showcase-card__multi-picker-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
 .showcase-card__input {
   width: 100%;
   min-width: 0;

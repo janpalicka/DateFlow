@@ -57,6 +57,59 @@ function mountFloatingCalendarDemo(opts, hooks = {}) {
   return { wrap, picker };
 }
 
+function mountSelectorIdDemo() {
+  const wrap = document.createElement("div");
+  wrap.className = "showcase-card__floating-trigger-wrap";
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.id = "getting-started-id-picker";
+  input.className = "showcase-card__input showcase-card__input--trigger";
+  input.placeholder = "Pick a date";
+  wrap.append(input);
+
+  return {
+    wrap,
+    setup() {
+      createCalendarPicker("#getting-started-id-picker", {
+        value: new Date(2026, 2, 20),
+      });
+    },
+  };
+}
+
+function mountSelectorClassDemo() {
+  const wrap = document.createElement("div");
+  wrap.className = "showcase-card__multi-picker-wrap";
+
+  for (const label of ["Start", "End", "Deadline"]) {
+    const row = document.createElement("div");
+    row.className = "showcase-card__multi-picker-row";
+
+    const rowLabel = document.createElement("span");
+    rowLabel.className = "showcase-card__multi-picker-label";
+    rowLabel.textContent = label;
+
+    const input = document.createElement("input");
+    input.type = "text";
+    input.className =
+      "showcase-card__input showcase-card__input--trigger getting-started-multi-picker";
+    input.placeholder = label;
+
+    row.append(rowLabel, input);
+    wrap.append(row);
+  }
+
+  return {
+    wrap,
+    setup() {
+      createCalendarPicker(".getting-started-multi-picker", {
+        value: new Date(2026, 2, 20),
+      });
+    },
+  };
+}
+
 function mountDemo(key) {
   switch (key) {
     case "basic-time":
@@ -68,6 +121,10 @@ function mountDemo(key) {
       return mountFloatingCalendarDemo({ value: new Date(2026, 5, 8) }).wrap;
     case "set-options":
       return mountSetOptionsDemo();
+    case "selector-id":
+      return mountSelectorIdDemo();
+    case "selector-class":
+      return mountSelectorClassDemo();
     case "locale-de":
       return mountFloatingCalendarDemo({ locale: de }).wrap;
     case "locale-fr":
@@ -337,7 +394,13 @@ function initShowcase() {
     const key = mount.dataset.demo;
     if (!key) continue;
     const demo = mountDemo(key);
-    if (demo) mount.append(demo);
+    if (!demo) continue;
+    if (demo instanceof HTMLElement) {
+      mount.append(demo);
+    } else {
+      mount.append(demo.wrap);
+      demo.setup?.();
+    }
   }
 }
 

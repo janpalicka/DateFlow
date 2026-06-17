@@ -140,7 +140,10 @@
       </section>
       <section id="getting-started" class="showcase-section">
         <h2 class="showcase-section__title">Getting started</h2>
-        <p class="showcase-section__lead">Pass a text input to the picker and react to changes.</p>
+        <p class="showcase-section__lead">
+          Pass a text input element, an id selector (<code>#my-id</code>), or a class selector
+          (<code>.my-class</code>) to attach one or more pickers.
+        </p>
         <div class="showcase__grid">
         <article class="showcase-card">
           <h3 class="showcase-card__title">Basic picker with time</h3>
@@ -153,6 +156,27 @@ const picker = createCalendarPicker(input, {
   showTime: true,
 });</code></pre>
           <div class="showcase-card__mount" data-demo="basic-time"></div>
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Id selector</h3>
+          <p class="showcase-card__desc">Pass <code>#my-id</code> instead of an element — one picker for that input.</p>
+          <pre class="showcase-card__code"><code>&lt;input type="text" id="trip-date" /&gt;
+
+createCalendarPicker("#trip-date", {
+  value: new Date(2026, 2, 20),
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="selector-id"></div>
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Class selector (multiple)</h3>
+          <p class="showcase-card__desc">Pass <code>.my-class</code> to attach a picker to every matching input. Returns an array of instances.</p>
+          <pre class="showcase-card__code"><code>&lt;input type="text" class="booking-date" /&gt;
+&lt;input type="text" class="booking-date" /&gt;
+
+const pickers = createCalendarPicker(".booking-date", {
+  value: new Date(2026, 2, 20),
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="selector-class"></div>
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Runtime setOptions</h3>

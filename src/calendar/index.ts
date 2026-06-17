@@ -3,6 +3,7 @@ export type {
   CalendarLocale,
   CalendarMode,
   CalendarOptions,
+  CalendarPickerAnchor,
   CalendarPickerInstance,
   DateFilter,
   DatePredicate,

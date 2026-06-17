@@ -39,6 +39,8 @@ export interface DateRangeValue {
   end: Date | null;
 }
 
+export type CalendarPickerAnchor = HTMLInputElement | `#${string}` | `.${string}`;
+
 export interface CalendarOptions {
   /** Partial locale merges over {@link DEFAULT_LOCALE} */
   locale?: Partial<CalendarLocale>;

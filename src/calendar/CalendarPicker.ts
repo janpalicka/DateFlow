@@ -26,10 +26,41 @@ import {
 import type {
   CalendarMode,
   CalendarOptions,
+  CalendarPickerAnchor,
   CalendarPickerInstance,
   DateRangeValue,
 } from "./types";
 import "./calendar.css";
+
+const resolveCalendarInputs = (anchor: CalendarPickerAnchor): HTMLInputElement[] => {
+  if (anchor instanceof HTMLInputElement) return [anchor];
+  if (typeof anchor !== "string") {
+    throw new TypeError(
+      "createCalendarPicker expects an HTMLInputElement or a CSS selector string",
+    );
+  }
+
+  const selector = anchor.trim();
+  if (!selector.startsWith("#") && !selector.startsWith(".")) {
+    throw new TypeError("createCalendarPicker selector must start with # (id) or . (class)");
+  }
+
+  if (selector.startsWith("#")) {
+    const el = document.querySelector(selector);
+    if (!(el instanceof HTMLInputElement)) {
+      throw new TypeError(`createCalendarPicker: no input element matches ${selector}`);
+    }
+    return [el];
+  }
+
+  const inputs = [...document.querySelectorAll(selector)].filter(
+    (node): node is HTMLInputElement => node instanceof HTMLInputElement,
+  );
+  if (inputs.length === 0) {
+    throw new TypeError(`createCalendarPicker: no input elements match ${selector}`);
+  }
+  return inputs;
+};
 
 const fillSecond = (selectS: HTMLSelectElement): void => {
   selectS.replaceChildren();
@@ -123,14 +154,10 @@ const applyHM = (
   return new Date(base.getFullYear(), base.getMonth(), base.getDate(), h, min, sec, 0);
 };
 
-export const createCalendarPicker = (
+const buildCalendarPicker = (
   input: HTMLInputElement,
   initial: CalendarOptions = {},
 ): CalendarPickerInstance => {
-  if (!(input instanceof HTMLInputElement)) {
-    throw new TypeError("createCalendarPicker expects an HTMLInputElement");
-  }
-
   let options: CalendarOptions = { ...initial };
   const valueInput = input;
   valueInput.classList.add("cal__input");
@@ -1504,3 +1531,27 @@ export const createCalendarPicker = (
     },
   };
 };
+
+export function createCalendarPicker(
+  anchor: HTMLInputElement,
+  initial?: CalendarOptions,
+): CalendarPickerInstance;
+export function createCalendarPicker(
+  selector: `#${string}`,
+  initial?: CalendarOptions,
+): CalendarPickerInstance;
+export function createCalendarPicker(
+  selector: `.${string}`,
+  initial?: CalendarOptions,
+): CalendarPickerInstance[];
+export function createCalendarPicker(
+  anchor: CalendarPickerAnchor,
+  initial: CalendarOptions = {},
+): CalendarPickerInstance | CalendarPickerInstance[] {
+  const inputs = resolveCalendarInputs(anchor);
+  const pickers = inputs.map((input) => buildCalendarPicker(input, initial));
+  if (typeof anchor === "string" && anchor.trim().startsWith(".")) {
+    return pickers;
+  }
+  return pickers[0]!;
+}
