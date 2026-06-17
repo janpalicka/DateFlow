@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { createInput } from "./helpers";
 import { dateFlow } from "@/calendar/dateFlow";
+import { createInput } from "./helpers";
 
 describe("dateFlow", () => {
   afterEach(() => {

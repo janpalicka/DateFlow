@@ -12,6 +12,7 @@ export interface InputControllerDeps {
   getOptions: () => CalendarOptions;
   getMode: () => CalendarMode;
   getSelected: () => Date | null;
+  getInputSingleValue: () => Date | null;
   setSelected: (d: Date | null) => void;
   getRangeStart: () => Date | null;
   setRangeStart: (d: Date | null) => void;
@@ -77,7 +78,9 @@ export const createInputController = (
   const syncInputFromState = (): void => {
     syncingInput = true;
     valueInput.value =
-      deps.getMode() === "range" ? formatRangeForInput() : formatSingleForInput(deps.getSelected());
+      deps.getMode() === "range"
+        ? formatRangeForInput()
+        : formatSingleForInput(deps.getInputSingleValue());
     syncInputPlaceholder();
     syncingInput = false;
   };

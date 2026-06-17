@@ -1,10 +1,42 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { DEFAULT_LOCALE } from "@/calendar/locales";
-import { mergeLocale } from "@/calendar/utils/locale";
+import { mergeLocale, resolveFirstDayOfWeek } from "@/calendar/utils/locale";
+
+describe("resolveFirstDayOfWeek", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("uses an explicit override", () => {
+    expect(resolveFirstDayOfWeek(3)).toBe(3);
+    expect(resolveFirstDayOfWeek(0)).toBe(0);
+  });
+
+  it("falls back to Monday when Intl week info is unavailable", () => {
+    vi.stubGlobal("Intl", { Locale: undefined });
+    expect(resolveFirstDayOfWeek(undefined, "de-DE")).toBe(1);
+  });
+
+  it("maps Intl week info to calendar weekday indices", () => {
+    class MockLocale {
+      constructor(private readonly tag: string) {}
+      getWeekInfo() {
+        return { firstDay: this.tag.startsWith("en") ? 7 : 1 };
+      }
+    }
+    vi.stubGlobal("Intl", { Locale: MockLocale });
+
+    expect(resolveFirstDayOfWeek(undefined, "en-US")).toBe(0);
+    expect(resolveFirstDayOfWeek(undefined, "de-DE")).toBe(1);
+  });
+});
 
 describe("mergeLocale", () => {
-  it("returns default locale when partial is undefined", () => {
-    expect(mergeLocale(undefined)).toBe(DEFAULT_LOCALE);
+  it("returns default strings with resolved first day of week", () => {
+    const merged = mergeLocale(undefined);
+    expect(merged.weekdays).toEqual(DEFAULT_LOCALE.weekdays);
+    expect(merged.months).toEqual(DEFAULT_LOCALE.months);
+    expect(merged.firstDayOfWeek).toBe(resolveFirstDayOfWeek());
   });
 
   it("merges partial weekday and month overrides", () => {

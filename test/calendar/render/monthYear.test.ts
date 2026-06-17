@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import {
   clampYear,
   fillMonthYearSelects,
@@ -5,7 +6,6 @@ import {
   restoreYearInput,
   syncYearInputs,
 } from "@/calendar/render/monthYear";
-import { describe, expect, it } from "vitest";
 
 describe("parseYearInput", () => {
   it("parses 1-4 digit years", () => {

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { createInput } from "./helpers";
 import { resolveCalendarInputs } from "@/calendar/resolveInputs";
+import { createInput } from "./helpers";
 
 describe("resolveCalendarInputs", () => {
   afterEach(() => {

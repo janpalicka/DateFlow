@@ -22,7 +22,7 @@ export const de: CalendarLocale = {
       "Dezember",
     ],
   },
-  firstDayOfWeek: 1,
+  localeTag: "de",
   rangeDurationOne: "1 Tag",
   rangeDurationOther: "{n} Tage",
   inputPlaceholder: "Datum wählen",

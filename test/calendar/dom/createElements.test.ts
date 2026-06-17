@@ -13,5 +13,11 @@ describe("createCalendarDom", () => {
     expect(dom.timeRangeEnd.hour.getAttribute("aria-label")).toBe("End hour");
     expect(dom.btnApplyRange.textContent).toBe("Apply");
     expect(dom.btnCancelRange.textContent).toBe("Cancel");
+    const rootChildren = [...dom.root.children];
+    expect(rootChildren.map((el) => el.className)).toEqual([
+      "cal__panes",
+      "cal__time-wrap",
+      "cal__range-actions",
+    ]);
   });
 });

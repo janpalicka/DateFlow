@@ -429,15 +429,16 @@ picker.close(); // hide calendar</code></pre>
       </section>
       <section id="localization" class="showcase-section">
         <h2 class="showcase-section__title">Localization</h2>
-        <p class="showcase-section__lead">Pass a full locale object or merge partial overrides. Inspired by flatpickr localization.</p>
+        <p class="showcase-section__lead">Pass a full locale object or merge partial overrides. When <code>firstDayOfWeek</code> is omitted, week start is resolved from <code>Intl.Locale.prototype.getWeekInfo()</code> using the locale tag (or the browser), with Monday as fallback.</p>
         <div class="showcase__grid">
         <article class="showcase-card">
           <h3 class="showcase-card__title">German locale</h3>
-          <p class="showcase-card__desc">German month names and Monday as the first day of the week.</p>
+          <p class="showcase-card__desc">German month and weekday labels. Week start follows Intl for <code>localeTag: "de"</code> (typically Monday).</p>
           <pre class="showcase-card__code"><code>import { dateFlow } from "@/calendar";
 import { de } from "@/calendar/locales";
 
 dateFlow(input, {
+  showWeekNumbers: true,
   locale: de,
 });</code></pre>
           <div class="showcase-card__mount" data-demo="locale-de"></div>
@@ -445,7 +446,7 @@ dateFlow(input, {
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">French locale</h3>
-          <p class="showcase-card__desc">Another full locale with Monday as the first weekday.</p>
+          <p class="showcase-card__desc">French labels with week start resolved from Intl for <code>fr</code>.</p>
           <pre class="showcase-card__code"><code>import { dateFlow } from "@/calendar";
 import { fr } from "@/calendar/locales";
 
@@ -457,18 +458,37 @@ dateFlow(input, {
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Partial locale override</h3>
-          <p class="showcase-card__desc">Merge over defaults — here Czech labels with a custom week-number header.</p>
+          <p class="showcase-card__desc">Merge over defaults — Czech labels, custom week-number header, and localized Apply/Cancel with time selection.</p>
           <pre class="showcase-card__code"><code>import { dateFlow } from "@/calendar";
 import { cs } from "@/calendar/locales";
 
 dateFlow(input, {
+  showTime: true,
   showWeekNumbers: true,
   locale: {
     ...cs,
     weekNumberHeader: "Tý",
+    rangeApply: "Potvrdit",
+    rangeCancel: "Zpět",
   },
 });</code></pre>
           <div class="showcase-card__mount" data-demo="locale-partial"></div>
+
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">First day of week override</h3>
+          <p class="showcase-card__desc">Override Intl week info with <code>firstDayOfWeek</code> — here English labels with a Sunday-first grid (<code>0</code>).</p>
+          <pre class="showcase-card__code"><code>import { dateFlow } from "@/calendar";
+import { en } from "@/calendar/locales";
+
+dateFlow(input, {
+  showWeekNumbers: true,
+  locale: {
+    ...en,
+    firstDayOfWeek: 0,
+  },
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="locale-week-start"></div>
 
         </article>
         </div>

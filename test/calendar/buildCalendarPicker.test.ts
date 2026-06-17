@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { clickDay, createInput } from "./helpers";
 import { dateFlow } from "@/calendar/dateFlow";
+import { clickDay, createInput } from "./helpers";
 
 vi.mock("@/calendar/popover", () => ({
   attachCalendarPopover: vi.fn((_input, panel) => ({
@@ -60,6 +60,31 @@ describe("buildCalendarPicker integration", () => {
     picker.setDate(["2026-06-11"]);
     expect(picker.getValue()?.getDate()).toBe(11);
     expect(onChange).toHaveBeenCalled();
+    picker.destroy();
+  });
+
+  it("defers single-date commits until Apply when showTime is enabled", () => {
+    const input = createInput();
+    const onChange = vi.fn();
+    const picker = dateFlow(input, {
+      inline: true,
+      popover: false,
+      showTime: true,
+      hideOnSingleSelect: false,
+      onChange,
+    });
+    const root = picker.getCalendarElement();
+
+    clickDay(root, new Date(2026, 5, 20));
+    expect(onChange).not.toHaveBeenCalled();
+    expect(input.value).toBe("");
+
+    const apply = root.querySelector(".cal__action-btn--primary") as HTMLButtonElement;
+    apply.click();
+
+    expect(picker.getValue()?.getDate()).toBe(20);
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(input.value).toContain("2026-06-20");
     picker.destroy();
   });
 

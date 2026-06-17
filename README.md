@@ -76,31 +76,31 @@ Built-in locales: `en`, `de`, `cs`, `fr`. Pass a partial `CalendarLocale` object
 
 ## Options
 
-| Option | Description |
-| --- | --- |
-| `mode` | `"single"` (default) or `"range"` |
-| `value` | Selected `Date` in single mode |
-| `range` | `{ start, end }` in range mode |
-| `onChange` / `onRangeChange` | Called when the value is committed |
-| `minDate` / `maxDate` | Selectable bounds |
-| `disabledDates` / `enabledDatesOnly` | Block or allow specific dates (array or predicate) |
-| `disabledDatesStrikeThrough` | Strike through disabled day numbers |
-| `showTime` | Enable hour/minute (and optional second) selectors |
-| `use12HourTime` | 12-hour clock with AM/PM when `showTime` is on |
-| `showSeconds` | Show seconds selector |
-| `minuteStep` | Minute dropdown step (default `5`) |
-| `outputFormat` | [date-fns `format`](https://date-fns.org/docs/format) pattern for the visible value |
-| `rangeOutputSeparator` | Between start and end in range output (default `"—"`) |
-| `showWeekNumbers` | ISO week numbers in the first column |
-| `allowInput` | Type dates directly into the value field |
-| `hideOnSingleSelect` | Close popover after picking a day in single mode (default `true`) |
-| `inline` | Render calendar in-page instead of a popover |
-| `popover` | Open on focus, position with Floating UI, close on outside click / Escape (default `true`) |
-| `appendTo` | Popover mount target (default `document.body`) |
-| `className` / `theme` | Extra class / `data-cal-theme` on the calendar root |
-| `showResetButton` / `resetInputLabel` | Header reset control |
-| `ariaLabel` | Accessible name for the calendar region |
-| `locale` | Locale from `dateflow/locales` or a custom partial object |
+| Option                                | Description                                                                                |
+| ------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `mode`                                | `"single"` (default) or `"range"`                                                          |
+| `value`                               | Selected `Date` in single mode                                                             |
+| `range`                               | `{ start, end }` in range mode                                                             |
+| `onChange` / `onRangeChange`          | Called when the value is committed                                                         |
+| `minDate` / `maxDate`                 | Selectable bounds                                                                          |
+| `disabledDates` / `enabledDatesOnly`  | Block or allow specific dates (array or predicate)                                         |
+| `disabledDatesStrikeThrough`          | Strike through disabled day numbers                                                        |
+| `showTime`                            | Enable hour/minute (and optional second) selectors                                         |
+| `use12HourTime`                       | 12-hour clock with AM/PM when `showTime` is on                                             |
+| `showSeconds`                         | Show seconds selector                                                                      |
+| `minuteStep`                          | Minute dropdown step (default `5`)                                                         |
+| `outputFormat`                        | [date-fns `format`](https://date-fns.org/docs/format) pattern for the visible value        |
+| `rangeOutputSeparator`                | Between start and end in range output (default `"—"`)                                      |
+| `showWeekNumbers`                     | ISO week numbers in the first column                                                       |
+| `allowInput`                          | Type dates directly into the value field                                                   |
+| `hideOnSingleSelect`                  | Close popover after picking a day in single mode (default `true`)                          |
+| `inline`                              | Render calendar in-page instead of a popover                                               |
+| `popover`                             | Open on focus, position with Floating UI, close on outside click / Escape (default `true`) |
+| `appendTo`                            | Popover mount target (default `document.body`)                                             |
+| `className` / `theme`                 | Extra class / `data-cal-theme` on the calendar root                                        |
+| `showResetButton` / `resetInputLabel` | Header reset control                                                                       |
+| `ariaLabel`                           | Accessible name for the calendar region                                                    |
+| `locale`                              | Locale from `dateflow/locales` or a custom partial object                                  |
 
 See the [documentation](https://janpalicka.github.io/DateFlow/) for full examples: constraints, time selection, theming, and more.
 
@@ -108,18 +108,18 @@ See the [documentation](https://janpalicka.github.io/DateFlow/) for full example
 
 Each call to `dateFlow` returns a `CalendarPickerInstance`:
 
-| Method / property | Description |
-| --- | --- |
-| `selectedDates` / `currentYear` | Read-only view state |
-| `getValue()` / `setValue(date)` | Single-mode value |
-| `getRange()` / `setRange(range)` | Range-mode value |
-| `setDate(dates, format?, silent?)` | Set one or more dates (strings use date-fns parsing) |
-| `changeMonth(months, relative?)` | Navigate the visible month |
-| `clear()` | Clear selection (same as reset) |
-| `setOptions(partial)` | Merge options and re-render |
-| `open()` / `close()` | Show or hide the panel |
-| `getInputElement()` / `getCalendarElement()` | DOM references |
-| `destroy()` | Tear down listeners and popover |
+| Method / property                            | Description                                          |
+| -------------------------------------------- | ---------------------------------------------------- |
+| `selectedDates` / `currentYear`              | Read-only view state                                 |
+| `getValue()` / `setValue(date)`              | Single-mode value                                    |
+| `getRange()` / `setRange(range)`             | Range-mode value                                     |
+| `setDate(dates, format?, silent?)`           | Set one or more dates (strings use date-fns parsing) |
+| `changeMonth(months, relative?)`             | Navigate the visible month                           |
+| `clear()`                                    | Clear selection (same as reset)                      |
+| `setOptions(partial)`                        | Merge options and re-render                          |
+| `open()` / `close()`                         | Show or hide the panel                               |
+| `getInputElement()` / `getCalendarElement()` | DOM references                                       |
+| `destroy()`                                  | Tear down listeners and popover                      |
 
 ## Development
 
