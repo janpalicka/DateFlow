@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { coerceSetDateEntry } from "./setDate";
+import { coerceSetDateEntry } from "@/calendar/setDate";
 
 describe("coerceSetDateEntry", () => {
   const ref = new Date(2026, 5, 15);

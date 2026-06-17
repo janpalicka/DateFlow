@@ -1,6 +1,6 @@
-import path from "node:path";
-import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite-plus";
+import { fileURLToPath } from "node:url";
+import path from "node:path";
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 
@@ -32,12 +32,12 @@ export default defineConfig({
   test: {
     root: rootDir,
     environment: "jsdom",
-    include: ["src/**/*.test.ts"],
+    include: ["test/**/*.test.ts"],
     coverage: {
       provider: "v8",
       include: ["src/calendar/**/*.ts"],
       exclude: [
-        "src/calendar/**/*.test.ts",
+        "test/**",
         "src/calendar/types/**",
         "src/vite-env.d.ts",
         "src/calendar/time/index.ts",
@@ -65,16 +65,15 @@ export default defineConfig({
           css: "always",
         },
       ],
-      "import/order": [
+      "eslint/sort-imports": [
         "error",
         {
-          alphabetize: {
-            caseInsensitive: true,
-            order: "asc",
-          },
+          ignoreCase: true,
+          ignoreDeclarationSort: true,
+          ignoreMemberSort: true,
+          memberSyntaxSortOrder: ["all", "multiple", "single", "none"],
         },
       ],
-      "sort-exports": "error",
     },
   },
   fmt: {

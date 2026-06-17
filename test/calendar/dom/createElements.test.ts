@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createCalendarDom } from "../dom/createElements";
+import { createCalendarDom } from "@/calendar/dom/createElements";
 
 describe("createCalendarDom", () => {
   it("creates the full calendar DOM tree", () => {

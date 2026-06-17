@@ -1,8 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { dateFlow } from "./dateFlow";
-import { clickDay, createInput } from "./test/helpers";
+import { clickDay, createInput } from "./helpers";
+import { dateFlow } from "@/calendar/dateFlow";
 
-vi.mock("../popover", () => ({
+vi.mock("@/calendar/popover", () => ({
   attachCalendarPopover: vi.fn((_input, panel) => ({
     open: () => {
       panel.hidden = false;

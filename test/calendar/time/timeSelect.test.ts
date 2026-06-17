@@ -1,4 +1,3 @@
-import { describe, expect, it } from "vitest";
 import {
   applyHM,
   createTimeRow,
@@ -7,7 +6,8 @@ import {
   normalizeMinuteStep,
   setHM,
   snapMinuteToStep,
-} from "../time/timeSelect";
+} from "@/calendar/time/timeSelect";
+import { describe, expect, it } from "vitest";
 
 describe("normalizeMinuteStep", () => {
   it("defaults to 5", () => {

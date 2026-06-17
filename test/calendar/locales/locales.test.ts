@@ -1,5 +1,5 @@
+import { cs, de, en, fr } from "@/calendar/locales";
 import { describe, expect, it } from "vitest";
-import { cs, de, en, fr } from "./index";
 
 describe("locales", () => {
   it("exports complete locale objects", () => {

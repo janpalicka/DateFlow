@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { renderWeekdaysRow } from "../render/weekdays";
+import { renderWeekdaysRow } from "@/calendar/render/weekdays";
 
 describe("renderWeekdaysRow", () => {
   it("renders seven weekday cells", () => {

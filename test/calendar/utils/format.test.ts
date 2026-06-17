@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { en } from "../locales/en";
-import { formatRangeDurationLabel } from "./format";
+import { en } from "@/calendar/locales/en";
+import { formatRangeDurationLabel } from "@/calendar/utils/format";
 
 describe("formatRangeDurationLabel", () => {
   it("uses singular label for one day", () => {
