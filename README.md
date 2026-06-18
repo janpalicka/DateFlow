@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="./assets/logo.png" alt="DateFlow — pick, select, flow" width="320" />
+  <picture>
+    <source srcset="./assets/logo-dark.png" media="(prefers-color-scheme: dark)" />
+    <img src="./assets/logo-light.png" alt="DateFlow — pick, select, flow" width="320" />
+  </picture>
 </p>
 
 # DateFlow

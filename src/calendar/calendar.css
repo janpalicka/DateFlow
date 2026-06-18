@@ -100,22 +100,110 @@
   max-width: 100%;
 }
 
-.cal__selects > .cal__select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
+.cal__month-select {
+  position: relative;
+  flex: 1.35 1 0;
+  min-width: 150px;
+}
+
+.cal__month-select__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 2.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
+  border: 1px solid var(--cal-header-select-border);
+  background: var(--cal-bg);
+  color: var(--cal-text);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 500;
   cursor: pointer;
   text-align: left;
-  min-height: 2.35rem;
-  font-size: 0.8125rem;
-  padding: 0.35rem 1.85rem 0.35rem 0.55rem;
-  border-radius: 8px;
+}
+
+.cal__month-select__label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cal__month-select__chevron {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--cal-muted);
+  transition: transform 0.15s ease;
+}
+
+.cal__month-select--open .cal__month-select__chevron {
+  transform: rotate(180deg);
+}
+
+.cal__month-select__trigger:focus-visible {
+  outline: 2px solid var(--cal-accent);
+  outline-offset: 2px;
+}
+
+.cal__month-select__list {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 0.35rem 0;
+  list-style: none;
+  border-radius: 12px;
   border: 1px solid var(--cal-header-select-border);
-  background-color: var(--cal-bg);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.5rem center;
-  background-size: 0.6rem;
+  background: var(--cal-bg);
+  box-shadow: 0 10px 28px rgb(15 23 42 / 0.12);
+  max-height: 14.5rem;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--cal-muted) 70%, transparent) transparent;
+}
+
+.cal__month-select__list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.cal__month-select__list::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--cal-muted) 70%, transparent);
+  border-radius: 999px;
+}
+
+.cal__month-select__option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.55rem 0.85rem;
+  cursor: pointer;
+  font-size: 0.9375rem;
+  color: var(--cal-text);
+}
+
+.cal__month-select__option:hover {
+  background: var(--cal-surface);
+}
+
+.cal__month-select__check {
+  display: inline-flex;
+  flex-shrink: 0;
+  color: var(--cal-accent);
+}
+
+.cal__month-select__check[hidden] {
+  display: none !important;
+}
+
+.cal__month-select__check-icon {
+  display: block;
 }
 
 .cal__time .cal__select {
@@ -134,16 +222,12 @@
   padding: 0.35rem 1.85rem 0.35rem 0.55rem;
 }
 
-.cal__select--month {
-  flex: 1.35 1 0;
-}
-
 .cal__year-input {
   flex: 0.85 1 0;
   max-width: 5.75rem;
-  min-height: 2.35rem;
-  padding: 0.35rem 0.55rem;
-  border-radius: 8px;
+  min-height: 2.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
   border: 1px solid var(--cal-header-select-border);
   background: var(--cal-bg);
   color: var(--cal-text);
@@ -151,6 +235,7 @@
   font-size: 0.8125rem;
   text-align: center;
   font-variant-numeric: tabular-nums;
+  font-weight: 500;
 }
 
 .cal__year-input:focus-visible {
@@ -625,10 +710,6 @@
     --cal-border: #3f3f46;
     --cal-accent: #38bdf8;
   }
-}
-
-.cal[data-cal-theme="dark"] .cal__selects > .cal__select {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2.25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
 }
 
 .cal[data-cal-theme="dark"] .cal__time .cal__select {

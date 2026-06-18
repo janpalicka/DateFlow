@@ -1,3 +1,4 @@
+import type { MonthSelectControl } from "./monthSelect";
 import type { TimeRowElements } from "../time";
 
 export interface CalendarDomElements {
@@ -10,8 +11,8 @@ export interface CalendarDomElements {
   btnPrev: HTMLButtonElement;
   btnNext: HTMLButtonElement;
   btnReset: HTMLButtonElement;
-  monthSelect: HTMLSelectElement;
-  monthSelectRight: HTMLSelectElement;
+  monthSelect: MonthSelectControl;
+  monthSelectRight: MonthSelectControl;
   yearInput: HTMLInputElement;
   yearInputRight: HTMLInputElement;
   weekdaysRow: HTMLDivElement;

@@ -1,5 +1,6 @@
 import { ICON_NEXT_MONTH, ICON_PREV_MONTH, ICON_RESET } from "../icons";
 import { createTimeRow } from "../time";
+import { createMonthSelect } from "./monthSelect";
 import type { CalendarDomElements } from "./types";
 
 export const createCalendarDom = (): CalendarDomElements => {
@@ -33,9 +34,7 @@ export const createCalendarDom = (): CalendarDomElements => {
   const selectsWrap = document.createElement("div");
   selectsWrap.className = "cal__selects";
 
-  const monthSelect = document.createElement("select");
-  monthSelect.className = "cal__select cal__select--month";
-  monthSelect.setAttribute("aria-label", "Month");
+  const monthSelect = createMonthSelect("Month");
 
   const yearInput = document.createElement("input");
   yearInput.type = "text";
@@ -45,16 +44,14 @@ export const createCalendarDom = (): CalendarDomElements => {
   yearInput.maxLength = 4;
   yearInput.spellcheck = false;
 
-  selectsWrap.append(monthSelect, yearInput);
+  selectsWrap.append(monthSelect.root, yearInput);
   header.append(btnPrev, selectsWrap, btnNext, btnReset);
 
   const headerRight = document.createElement("div");
   headerRight.className = "cal__header cal__header--sub";
   const selectsWrapRight = document.createElement("div");
   selectsWrapRight.className = "cal__selects";
-  const monthSelectRight = document.createElement("select");
-  monthSelectRight.className = "cal__select cal__select--month";
-  monthSelectRight.setAttribute("aria-label", "Month");
+  const monthSelectRight = createMonthSelect("Month");
   const yearInputRight = document.createElement("input");
   yearInputRight.type = "text";
   yearInputRight.inputMode = "numeric";
@@ -62,7 +59,7 @@ export const createCalendarDom = (): CalendarDomElements => {
   yearInputRight.setAttribute("aria-label", "Year");
   yearInputRight.maxLength = 4;
   yearInputRight.spellcheck = false;
-  selectsWrapRight.append(monthSelectRight, yearInputRight);
+  selectsWrapRight.append(monthSelectRight.root, yearInputRight);
   headerRight.append(selectsWrapRight);
 
   const weekdaysRow = document.createElement("div");
