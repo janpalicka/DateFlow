@@ -40,3 +40,8 @@ jobs:
 
       - name: Publish to npm
         run: pnpm publish --no-git-checks --access public
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          generate_release_notes: true

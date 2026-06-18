@@ -18,7 +18,7 @@
   --radius-lg: 18px;
   --radius-md: 12px;
   --sidebar-width: 15.5rem;
-  --site-header-height: 3.25rem;
+  --site-header-height: 6rem;
   --docs-sticky-offset: calc(var(--site-header-height) + 1rem);
   --docs-mobile-toc-height: 3.35rem;
   --font-sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -92,8 +92,13 @@ body {
 
 .site-header__logo {
   display: block;
-  width: clamp(4.25rem, 18vw, 5.5rem);
-  height: auto;
+  height: clamp(3.5rem, 12vw, 5rem);
+  width: auto;
+}
+
+.site-header__brand picture {
+  display: flex;
+  align-items: center;
 }
 
 .site-header__nav {

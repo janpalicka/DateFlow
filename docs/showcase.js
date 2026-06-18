@@ -106,7 +106,7 @@ function mountSelectedDatesDemo(mode) {
           mode: "range",
           range: { start: new Date(2026, 2, 5), end: new Date(2026, 2, 18) },
         }
-      : { value: new Date(2026, 2, 15) };
+      : { value: new Date(2026, 3, 14) };
 
   const picker = dateFlow(trigger, {
     ...options,
@@ -144,7 +144,7 @@ function mountCurrentYearDemo(mode) {
           mode: "range",
           range: { start: new Date(2026, 2, 5), end: new Date(2026, 2, 18) },
         }
-      : { value: new Date(2026, 2, 15) };
+      : { value: new Date(2026, 3, 14) };
 
   const picker = dateFlow(trigger, options);
   watchCalendarView(picker, () => {
@@ -224,7 +224,7 @@ function mountClearDemo() {
   };
 
   const picker = dateFlow(trigger, {
-    value: new Date(2026, 2, 15),
+    value: new Date(2026, 3, 14),
     showResetButton: true,
     resetInputLabel: "Reset",
     onChange: () => update(picker),
@@ -332,7 +332,7 @@ function mountSetDateDemo() {
   };
 
   const singlePicker = dateFlow(singleInput, {
-    value: new Date(2026, 2, 15),
+    value: new Date(2026, 3, 14),
     outputFormat: fmt,
     onChange: (d) => {
       appendLog("onChange (single)", d ? format(d, fmt) : "null");
@@ -423,7 +423,7 @@ function mountOpenDemo() {
   wrap.append(trigger, output);
 
   const picker = dateFlow(trigger, {
-    value: new Date(2026, 2, 15),
+    value: new Date(2026, 3, 14),
   });
 
   const update = () => {
@@ -539,7 +539,7 @@ function mountDemo(key) {
     case "locale-de":
       return mountFloatingCalendarDemo({
         showWeekNumbers: true,
-        value: new Date(2026, 2, 15),
+        value: new Date(2026, 3, 14),
         locale: de,
       }).wrap;
     case "locale-fr":
@@ -547,7 +547,7 @@ function mountDemo(key) {
     case "locale-week-start":
       return mountFloatingCalendarDemo({
         showWeekNumbers: true,
-        value: new Date(2026, 2, 15),
+        value: new Date(2026, 3, 14),
         locale: {
           ...en,
           firstDayOfWeek: 0,
@@ -557,7 +557,7 @@ function mountDemo(key) {
       return mountFloatingCalendarDemo({
         showTime: true,
         showWeekNumbers: true,
-        value: new Date(2026, 2, 15, 12, 30),
+        value: new Date(2026, 5, 18, 12, 30),
         locale: {
           ...cs,
           weekNumberHeader: "Tý",
@@ -565,18 +565,18 @@ function mountDemo(key) {
       }).wrap;
     case "min-max":
       return mountFloatingCalendarDemo({
-        value: new Date(2026, 2, 15),
+        value: new Date(2026, 3, 14),
         minDate: new Date(2026, 2, 10),
         maxDate: new Date(2026, 2, 25),
       }).wrap;
     case "disabled-array":
       return mountFloatingCalendarDemo({
-        value: new Date(2026, 2, 15),
+        value: new Date(2026, 3, 14),
         disabledDates: [new Date(2026, 2, 17), new Date(2026, 2, 18), new Date(2026, 2, 19)],
       }).wrap;
     case "disabled-strike":
       return mountFloatingCalendarDemo({
-        value: new Date(2026, 2, 15),
+        value: new Date(2026, 3, 14),
         disabledDatesStrikeThrough: true,
         disabledDates: [new Date(2026, 2, 17), new Date(2026, 2, 18), new Date(2026, 2, 19)],
       }).wrap;
@@ -620,7 +620,7 @@ function mountDemo(key) {
       }).wrap;
     case "allow-input-date":
       return mountFloatingCalendarDemo({
-        value: new Date(2026, 2, 15),
+        value: new Date(2026, 3, 14),
         outputFormat: "yyyy-MM-dd",
         allowInput: true,
       }).wrap;
