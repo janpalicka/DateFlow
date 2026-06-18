@@ -7,9 +7,12 @@
       name="description"
       content="DateFlow — lightweight date and range calendar picker for the web. Interactive API reference and live examples."
     />
-    <meta name="theme-color" content="#1e3a5f" />
+    <meta name="theme-color" content="#eef2f7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0a0f1a" media="(prefers-color-scheme: dark)" />
     <title>DateFlow — documentation</title>
-    <link rel="icon" href="%BASE_URL%logo.png" type="image/png" />
+    <link rel="icon" href="%BASE_URL%favicon-light.png" type="image/png" media="(prefers-color-scheme: light)" />
+    <link rel="icon" href="%BASE_URL%favicon-dark.png" type="image/png" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="%BASE_URL%favicon-light.png" type="image/png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -22,7 +25,10 @@
     <div class="showcase-shell" id="top">
       <header class="site-header">
         <a class="site-header__brand" href="#top" aria-label="DateFlow home">
-          <img class="site-header__logo" src="%BASE_URL%logo.png" alt="" width="88" />
+          <picture>
+            <source srcset="%BASE_URL%logo-dark.png" media="(prefers-color-scheme: dark)" />
+            <img class="site-header__logo" src="%BASE_URL%logo-light.png" alt="" height="80" />
+          </picture>
         </a>
         <nav class="site-header__nav" aria-label="External links">
           <a
@@ -223,7 +229,7 @@ picker.setOptions({ mode: "single", value: picker.getRange().start });</code></p
             <code>{ selectedDate: Date | null }</code>
           </p>
           <pre class="showcase-card__code"><code>const picker = dateFlow(input, {
-  value: new Date(2026, 2, 15),
+  value: new Date(2026, 3, 14),
 });
 
 picker.selectedDates;
@@ -305,7 +311,7 @@ picker.changeMonth(0, false); // June (5) → January (0)</code></pre>
             reset button when <code>showResetButton</code> is enabled.
           </p>
           <pre class="showcase-card__code"><code>const picker = dateFlow(input, {
-  value: new Date(2026, 2, 15),
+  value: new Date(2026, 3, 14),
   showResetButton: true,
 });
 
@@ -414,7 +420,7 @@ picker.setDate(
             no-op. Both work with the default popover behavior (Floating UI positioning).
           </p>
           <pre class="showcase-card__code"><code>const picker = dateFlow(input, {
-  value: new Date(2026, 2, 15),
+  value: new Date(2026, 3, 14),
 });
 
 picker.open();  // show calendar
@@ -501,7 +507,7 @@ dateFlow(input, {
           <h3 class="showcase-card__title">Min and max date</h3>
           <p class="showcase-card__desc">Only days within the inclusive range are selectable.</p>
           <pre class="showcase-card__code"><code>dateFlow(input, {
-  value: new Date(2026, 2, 15),
+  value: new Date(2026, 3, 14),
   minDate: new Date(2026, 2, 10),
   maxDate: new Date(2026, 2, 25),
 });</code></pre>
@@ -512,7 +518,7 @@ dateFlow(input, {
           <h3 class="showcase-card__title">Disabled dates (array)</h3>
           <p class="showcase-card__desc">Block specific dates — useful for holidays or closures. By default disabled days are dimmed only; pass <code>disabledDatesStrikeThrough: true</code> to add a strike-through.</p>
           <pre class="showcase-card__code"><code>dateFlow(input, {
-  value: new Date(2026, 2, 15),
+  value: new Date(2026, 3, 14),
   disabledDates: [
     new Date(2026, 2, 17),
     new Date(2026, 2, 18),
@@ -526,7 +532,7 @@ dateFlow(input, {
           <h3 class="showcase-card__title">Disabled dates strike-through</h3>
           <p class="showcase-card__desc">Same blocked dates with <code>disabledDatesStrikeThrough: true</code>. Text color stays the same as the default disabled style.</p>
           <pre class="showcase-card__code"><code>dateFlow(input, {
-  value: new Date(2026, 2, 15),
+  value: new Date(2026, 3, 14),
   disabledDatesStrikeThrough: true,
   disabledDates: [
     new Date(2026, 2, 17),
@@ -637,7 +643,7 @@ dateFlow(input, {
           <pre class="showcase-card__code"><code>dateFlow(input, {
   allowInput: true,
   outputFormat: "yyyy-MM-dd",
-  value: new Date(2026, 2, 15),
+  value: new Date(2026, 3, 14),
 });</code></pre>
           <div class="showcase-card__mount" data-demo="allow-input-date"></div>
 
