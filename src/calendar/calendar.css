@@ -835,6 +835,18 @@
   }
 }
 
+@media (max-width: 899px) {
+  .cal.cal--range-compact .cal__panes {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cal.cal--range-compact .cal__time-wrap--pane + .cal__time-wrap--pane {
+    margin-top: 0.35rem;
+    padding-top: 0.35rem;
+    border-top: 1px solid var(--cal-border);
+  }
+}
+
 @media (min-width: 900px) {
   .cal.cal--range {
     width: min(100%, 48rem);

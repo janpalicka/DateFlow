@@ -22,6 +22,11 @@ describe("canGoNextMonth", () => {
     expect(canGoNextMonth(2026, 3, new Date(2026, 5, 30), "range")).toBe(true);
   });
 
+  it("uses one-month shift in compact range mode", () => {
+    expect(canGoNextMonth(2026, 4, new Date(2026, 5, 30), "range", true)).toBe(true);
+    expect(canGoNextMonth(2026, 5, new Date(2026, 5, 30), "range", true)).toBe(false);
+  });
+
   it("blocks when next visible month exceeds maxDate month", () => {
     expect(canGoNextMonth(2026, 5, new Date(2026, 5, 30), "single")).toBe(false);
     expect(canGoNextMonth(2026, 4, new Date(2026, 5, 30), "single")).toBe(true);
