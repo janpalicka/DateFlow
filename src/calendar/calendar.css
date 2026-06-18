@@ -110,8 +110,13 @@
 }
 
 .cal__list-select--time {
-  flex: 0 0 auto;
-  min-width: 80px;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 4.25rem;
+}
+
+.cal__list-select--time.cal__list-select--meridiem {
+  max-width: 4.5rem;
 }
 
 .cal__list-select__trigger {
@@ -133,11 +138,72 @@
   text-align: left;
 }
 
+.cal__list-select--month .cal__list-select__trigger {
+  cursor: pointer;
+}
+
 .cal__list-select--time .cal__list-select__trigger {
   min-height: 2.35rem;
-  padding: 0.4rem 0.5rem;
+  padding: 0;
+  gap: 0;
+  cursor: default;
+}
+
+.cal__list-select__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0.4rem 0.15rem 0.4rem 0.5rem;
+  border: 0;
+  border-radius: 12px 0 0 12px;
+  background: transparent;
+  color: var(--cal-text);
+  font: inherit;
   font-size: 0.8125rem;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.cal__list-select__input:read-only {
+  cursor: pointer;
+}
+
+.cal__list-select__input:focus-visible {
+  outline: none;
+}
+
+.cal__list-select--editing .cal__list-select__trigger {
+  outline: 2px solid var(--cal-accent);
+  outline-offset: 2px;
+}
+
+.cal__list-select__chevron-btn {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0.35rem 0.4rem 0.35rem 0.15rem;
+  border: 0;
+  border-radius: 0 12px 12px 0;
+  background: transparent;
+  color: var(--cal-muted);
+  cursor: pointer;
+}
+
+.cal__list-select__chevron-btn:focus-visible {
+  outline: 2px solid var(--cal-accent);
+  outline-offset: 2px;
+}
+
+.cal__list-select--open .cal__list-select__chevron-btn .cal__list-select__chevron-icon {
+  transform: rotate(180deg);
+}
+
+.cal__list-select__chevron-btn .cal__list-select__chevron-icon {
+  transition: transform 0.15s ease;
 }
 
 .cal__list-select__label {
@@ -729,6 +795,33 @@
   --cal-accent: #ffff00;
   --cal-accent-contrast: #000000;
   --cal-shadow: none;
+}
+
+@media (max-width: 479px) {
+  .cal {
+    padding: 0.65rem;
+  }
+
+  .cal__time {
+    gap: 0.125rem;
+  }
+
+  .cal__list-select--time {
+    max-width: none;
+  }
+
+  .cal__list-select__input {
+    padding-left: 0.4rem;
+    font-size: 0.75rem;
+  }
+
+  .cal__list-select__chevron-btn {
+    padding-inline: 0.2rem 0.3rem;
+  }
+
+  .cal__time-sep {
+    font-size: 0.75rem;
+  }
 }
 
 @media (min-width: 480px) {

@@ -128,6 +128,7 @@ export const createTimeRow = (
 
   const second = createCustomSelect(labels.second, "time");
   const meridiem = createCustomSelect(labels.meridiem, "time");
+  meridiem.root.classList.add("cal__list-select--meridiem");
 
   row.append(
     label,
