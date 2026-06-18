@@ -1,4 +1,5 @@
 import { addMonths } from "date-fns";
+import type { CustomSelectControl } from "../dom/customSelect";
 import { mergeLocale } from "../utils";
 import type { CalendarOptions } from "../types";
 
@@ -32,26 +33,20 @@ export const restoreYearInput = (
 };
 
 export const fillMonthYearSelects = (
-  monthSelect: HTMLSelectElement,
-  monthSelectRight: HTMLSelectElement,
+  monthSelect: CustomSelectControl,
+  monthSelectRight: CustomSelectControl,
   viewYear: number,
   viewMonth: number,
   options: CalendarOptions,
 ): void => {
   const locale = mergeLocale(options.locale);
-  monthSelect.replaceChildren();
-  monthSelectRight.replaceChildren();
-  for (let m = 0; m < 12; m += 1) {
-    const o = document.createElement("option");
-    o.value = String(m);
-    o.textContent = locale.months.longhand[m] ?? String(m);
-    monthSelect.append(o);
-    const r = document.createElement("option");
-    r.value = String(m);
-    r.textContent = locale.months.longhand[m] ?? String(m);
-    monthSelectRight.append(r);
-  }
+  const monthOptions = Array.from({ length: 12 }, (_, monthIndex) => ({
+    value: String(monthIndex),
+    label: locale.months.longhand[monthIndex] ?? String(monthIndex),
+  }));
+  monthSelect.setOptions(monthOptions);
   monthSelect.value = String(viewMonth);
+  monthSelectRight.setOptions(monthOptions);
   const rightView = addMonths(new Date(viewYear, viewMonth, 1), 1);
   monthSelectRight.value = String(rightView.getMonth());
 };

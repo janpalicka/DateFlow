@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { createMonthSelect } from "@/calendar/dom/customSelect";
 import {
   clampYear,
   fillMonthYearSelects,
@@ -49,11 +50,11 @@ describe("restoreYearInput", () => {
 
 describe("fillMonthYearSelects", () => {
   it("fills month options and syncs values", () => {
-    const left = document.createElement("select");
-    const right = document.createElement("select");
+    const left = createMonthSelect("Month");
+    const right = createMonthSelect("Month");
     fillMonthYearSelects(left, right, 2026, 5, {});
-    expect(left.options).toHaveLength(12);
-    expect(right.options).toHaveLength(12);
+    expect(left.root.querySelectorAll(".cal__list-select__option")).toHaveLength(12);
+    expect(right.root.querySelectorAll(".cal__list-select__option")).toHaveLength(12);
     expect(left.value).toBe("5");
     expect(right.value).toBe("6");
   });

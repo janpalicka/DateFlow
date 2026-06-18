@@ -1,5 +1,6 @@
 import { addMonths, compareAsc, isSameDay, startOfDay } from "date-fns";
 import { createCalendarDom } from "./dom/createElements";
+import type { CustomSelectControl } from "./dom/customSelect";
 import { createInputController, type InputController } from "./input/createInputController";
 import { canGoNextMonth, canGoPrevMonth } from "./navigation";
 import { attachCalendarPopover, type CalendarPopover } from "./popover";
@@ -215,11 +216,11 @@ export const buildCalendarPicker = (
   const minuteStepOn = (): number => normalizeMinuteStep(options.minuteStep);
   const use12Hour = (): boolean => options.use12HourTime ?? false;
   const showSecondsOn = (): boolean => options.showSeconds ?? false;
-  const secondForSingle = (): HTMLSelectElement | null =>
+  const secondForSingle = (): CustomSelectControl | null =>
     showSecondsOn() ? dom.timeSingle.second : null;
-  const secondForStart = (): HTMLSelectElement | null =>
+  const secondForStart = (): CustomSelectControl | null =>
     showSecondsOn() ? dom.timeRangeStart.second : null;
-  const secondForEnd = (): HTMLSelectElement | null =>
+  const secondForEnd = (): CustomSelectControl | null =>
     showSecondsOn() ? dom.timeRangeEnd.second : null;
 
   fillHourMinute(
@@ -483,14 +484,14 @@ export const buildCalendarPicker = (
     dom.timeSingle.row.hidden = !st || rng;
     dom.timeRangeStart.row.hidden = !st || !rng;
     dom.timeRangeEnd.row.hidden = !st || !rng;
-    dom.timeSingle.meridiem.hidden = !st || !use12 || rng;
-    dom.timeRangeStart.meridiem.hidden = !st || !use12 || !rng;
-    dom.timeRangeEnd.meridiem.hidden = !st || !use12 || !rng;
-    dom.timeSingle.second.hidden = !st || !secs || rng;
+    dom.timeSingle.meridiem.root.hidden = !st || !use12 || rng;
+    dom.timeRangeStart.meridiem.root.hidden = !st || !use12 || !rng;
+    dom.timeRangeEnd.meridiem.root.hidden = !st || !use12 || !rng;
+    dom.timeSingle.second.root.hidden = !st || !secs || rng;
     dom.timeSingle.sepSecond.hidden = !st || !secs || rng;
-    dom.timeRangeStart.second.hidden = !st || !secs || !rng;
+    dom.timeRangeStart.second.root.hidden = !st || !secs || !rng;
     dom.timeRangeStart.sepSecond.hidden = !st || !secs || !rng;
-    dom.timeRangeEnd.second.hidden = !st || !secs || !rng;
+    dom.timeRangeEnd.second.root.hidden = !st || !secs || !rng;
     dom.timeRangeEnd.sepSecond.hidden = !st || !secs || !rng;
   }
 
