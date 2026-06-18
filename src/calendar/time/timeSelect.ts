@@ -1,16 +1,7 @@
 import { createCustomSelect, type CustomSelectControl } from "../dom/customSelect";
+import { snapMinuteToStep } from "./numericField";
 
-export const normalizeMinuteStep = (step?: number): number => {
-  if (step === undefined) return 5;
-  if (!Number.isFinite(step) || step < 1) return 5;
-  return Math.min(60, Math.max(1, Math.floor(step)));
-};
-
-export const snapMinuteToStep = (minute: number, step: number): number => {
-  const max = 60 - (60 % step || step);
-  const snapped = Math.round(minute / step) * step;
-  return Math.min(max, Math.max(0, snapped));
-};
+export { normalizeMinuteStep, snapMinuteToStep } from "./numericField";
 
 const formatTimeOption = (value: number): string =>
   value < 10 ? `0${String(value)}` : String(value);
@@ -116,17 +107,17 @@ export const createTimeRow = (
   const label = document.createElement("span");
   label.className = "cal__time-label";
 
-  const hour = createCustomSelect(labels.hour, "time");
+  const hour = createCustomSelect(labels.hour, "time", { numericField: "hour" });
   const sep = document.createElement("span");
   sep.className = "cal__time-sep";
   sep.textContent = ":";
 
-  const minute = createCustomSelect(labels.minute, "time");
+  const minute = createCustomSelect(labels.minute, "time", { numericField: "minute" });
   const sepSecond = document.createElement("span");
   sepSecond.className = "cal__time-sep cal__time-sep--second";
   sepSecond.textContent = ":";
 
-  const second = createCustomSelect(labels.second, "time");
+  const second = createCustomSelect(labels.second, "time", { numericField: "second" });
   const meridiem = createCustomSelect(labels.meridiem, "time");
 
   row.append(

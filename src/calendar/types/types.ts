@@ -116,6 +116,11 @@ export interface CalendarOptions {
    */
   minuteStep?: number;
   /**
+   * When `showTime` is enabled, allow typing hour, minute, and second values directly
+   * into the time selectors. Default: `true`.
+   */
+  allowTimeInput?: boolean;
+  /**
    * [date-fns `format`](https://date-fns.org/docs/format) for the visible &lt;output&gt; text.
    * Default: `"yyyy-MM-dd"` without time, `"yyyy-MM-dd HH:mm"` with 24h time,
    * `"yyyy-MM-dd hh:mm a"` with 12h time, with `:ss` when `showSeconds` is enabled.
