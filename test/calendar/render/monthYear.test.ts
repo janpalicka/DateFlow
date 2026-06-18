@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createMonthSelect } from "@/calendar/dom/monthSelect";
+import { createMonthSelect } from "@/calendar/dom/customSelect";
 import {
   clampYear,
   fillMonthYearSelects,
@@ -53,8 +53,8 @@ describe("fillMonthYearSelects", () => {
     const left = createMonthSelect("Month");
     const right = createMonthSelect("Month");
     fillMonthYearSelects(left, right, 2026, 5, {});
-    expect(left.root.querySelectorAll(".cal__month-select__option")).toHaveLength(12);
-    expect(right.root.querySelectorAll(".cal__month-select__option")).toHaveLength(12);
+    expect(left.root.querySelectorAll(".cal__list-select__option")).toHaveLength(12);
+    expect(right.root.querySelectorAll(".cal__list-select__option")).toHaveLength(12);
     expect(left.value).toBe("5");
     expect(right.value).toBe("6");
   });

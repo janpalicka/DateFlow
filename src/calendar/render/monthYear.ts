@@ -1,5 +1,5 @@
 import { addMonths } from "date-fns";
-import type { MonthSelectControl } from "../dom/monthSelect";
+import type { CustomSelectControl } from "../dom/customSelect";
 import { mergeLocale } from "../utils";
 import type { CalendarOptions } from "../types";
 
@@ -33,20 +33,20 @@ export const restoreYearInput = (
 };
 
 export const fillMonthYearSelects = (
-  monthSelect: MonthSelectControl,
-  monthSelectRight: MonthSelectControl,
+  monthSelect: CustomSelectControl,
+  monthSelectRight: CustomSelectControl,
   viewYear: number,
   viewMonth: number,
   options: CalendarOptions,
 ): void => {
   const locale = mergeLocale(options.locale);
-  const labels = Array.from(
-    { length: 12 },
-    (_, monthIndex) => locale.months.longhand[monthIndex] ?? String(monthIndex),
-  );
-  monthSelect.setMonths(labels);
+  const monthOptions = Array.from({ length: 12 }, (_, monthIndex) => ({
+    value: String(monthIndex),
+    label: locale.months.longhand[monthIndex] ?? String(monthIndex),
+  }));
+  monthSelect.setOptions(monthOptions);
   monthSelect.value = String(viewMonth);
-  monthSelectRight.setMonths(labels);
+  monthSelectRight.setOptions(monthOptions);
   const rightView = addMonths(new Date(viewYear, viewMonth, 1), 1);
   monthSelectRight.value = String(rightView.getMonth());
 };

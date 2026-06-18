@@ -1,6 +1,6 @@
 import { ICON_NEXT_MONTH, ICON_PREV_MONTH, ICON_RESET } from "../icons";
 import { createTimeRow } from "../time";
-import { createMonthSelect } from "./monthSelect";
+import { createMonthSelect } from "./customSelect";
 import type { CalendarDomElements } from "./types";
 
 export const createCalendarDom = (): CalendarDomElements => {

@@ -1,3 +1,5 @@
+import { createCustomSelect, type CustomSelectControl } from "../dom/customSelect";
+
 export const normalizeMinuteStep = (step?: number): number => {
   if (step === undefined) return 5;
   if (!Number.isFinite(step) || step < 1) return 5;
@@ -10,53 +12,56 @@ export const snapMinuteToStep = (minute: number, step: number): number => {
   return Math.min(max, Math.max(0, snapped));
 };
 
-export const fillSecond = (selectS: HTMLSelectElement): void => {
-  selectS.replaceChildren();
-  for (let s = 0; s < 60; s += 1) {
-    const o = document.createElement("option");
-    o.value = String(s);
-    o.textContent = s < 10 ? `0${String(s)}` : String(s);
-    selectS.append(o);
-  }
+const formatTimeOption = (value: number): string =>
+  value < 10 ? `0${String(value)}` : String(value);
+
+export const fillSecond = (selectS: CustomSelectControl): void => {
+  selectS.setOptions(
+    Array.from({ length: 60 }, (_, second) => ({
+      value: String(second),
+      label: formatTimeOption(second),
+    })),
+  );
 };
 
 export const fillHourMinute = (
-  selectH: HTMLSelectElement,
-  selectM: HTMLSelectElement,
-  selectMeridiem: HTMLSelectElement,
+  selectH: CustomSelectControl,
+  selectM: CustomSelectControl,
+  selectMeridiem: CustomSelectControl,
   use12HourTime: boolean,
   minuteStep: number,
 ): void => {
-  selectH.replaceChildren();
-  selectM.replaceChildren();
-  selectMeridiem.replaceChildren();
   const hourFrom = use12HourTime ? 1 : 0;
   const hourTo = use12HourTime ? 12 : 23;
-  for (let h = hourFrom; h <= hourTo; h += 1) {
-    const o = document.createElement("option");
-    o.value = String(h);
-    o.textContent = h < 10 ? `0${String(h)}` : String(h);
-    selectH.append(o);
-  }
-  for (let m = 0; m < 60; m += minuteStep) {
-    const o = document.createElement("option");
-    o.value = String(m);
-    o.textContent = m < 10 ? `0${String(m)}` : String(m);
-    selectM.append(o);
-  }
-  for (const value of ["AM", "PM"]) {
-    const o = document.createElement("option");
-    o.value = value;
-    o.textContent = value;
-    selectMeridiem.append(o);
-  }
+  selectH.setOptions(
+    Array.from({ length: hourTo - hourFrom + 1 }, (_, index) => {
+      const hour = hourFrom + index;
+      return {
+        value: String(hour),
+        label: formatTimeOption(hour),
+      };
+    }),
+  );
+  selectM.setOptions(
+    Array.from({ length: Math.ceil(60 / minuteStep) }, (_, index) => {
+      const minute = index * minuteStep;
+      return {
+        value: String(minute),
+        label: formatTimeOption(minute),
+      };
+    }),
+  );
+  selectMeridiem.setOptions([
+    { value: "AM", label: "AM" },
+    { value: "PM", label: "PM" },
+  ]);
 };
 
 export const setHM = (
-  selectH: HTMLSelectElement,
-  selectM: HTMLSelectElement,
-  selectMeridiem: HTMLSelectElement,
-  selectS: HTMLSelectElement | null,
+  selectH: CustomSelectControl,
+  selectM: CustomSelectControl,
+  selectMeridiem: CustomSelectControl,
+  selectS: CustomSelectControl | null,
   d: Date,
   use12HourTime: boolean,
   minuteStep: number,
@@ -77,10 +82,10 @@ export const setHM = (
 
 export const applyHM = (
   base: Date,
-  selectH: HTMLSelectElement,
-  selectM: HTMLSelectElement,
-  selectMeridiem: HTMLSelectElement,
-  selectS: HTMLSelectElement | null,
+  selectH: CustomSelectControl,
+  selectM: CustomSelectControl,
+  selectMeridiem: CustomSelectControl,
+  selectS: CustomSelectControl | null,
   use12HourTime: boolean,
 ): Date => {
   const rawHour = Number.parseInt(selectH.value, 10);
@@ -93,12 +98,12 @@ export const applyHM = (
 export interface TimeRowElements {
   row: HTMLDivElement;
   label: HTMLSpanElement;
-  hour: HTMLSelectElement;
+  hour: CustomSelectControl;
   sep: HTMLSpanElement;
-  minute: HTMLSelectElement;
+  minute: CustomSelectControl;
   sepSecond: HTMLSpanElement;
-  second: HTMLSelectElement;
-  meridiem: HTMLSelectElement;
+  second: CustomSelectControl;
+  meridiem: CustomSelectControl;
 }
 
 export const createTimeRow = (
@@ -111,31 +116,28 @@ export const createTimeRow = (
   const label = document.createElement("span");
   label.className = "cal__time-label";
 
-  const hour = document.createElement("select");
-  hour.className = "cal__select cal__select--hour";
-  hour.setAttribute("aria-label", labels.hour);
-
+  const hour = createCustomSelect(labels.hour, "time");
   const sep = document.createElement("span");
   sep.className = "cal__time-sep";
   sep.textContent = ":";
 
-  const minute = document.createElement("select");
-  minute.className = "cal__select cal__select--minute";
-  minute.setAttribute("aria-label", labels.minute);
-
+  const minute = createCustomSelect(labels.minute, "time");
   const sepSecond = document.createElement("span");
   sepSecond.className = "cal__time-sep cal__time-sep--second";
   sepSecond.textContent = ":";
 
-  const second = document.createElement("select");
-  second.className = "cal__select cal__select--second";
-  second.setAttribute("aria-label", labels.second);
+  const second = createCustomSelect(labels.second, "time");
+  const meridiem = createCustomSelect(labels.meridiem, "time");
 
-  const meridiem = document.createElement("select");
-  meridiem.className = "cal__select cal__select--meridiem";
-  meridiem.setAttribute("aria-label", labels.meridiem);
-
-  row.append(label, hour, sep, minute, sepSecond, second, meridiem);
+  row.append(
+    label,
+    hour.root,
+    sep,
+    minute.root,
+    sepSecond,
+    second.root,
+    meridiem.root,
+  );
 
   return { row, label, hour, sep, minute, sepSecond, second, meridiem };
 };

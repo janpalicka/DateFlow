@@ -1,46 +1,56 @@
 import { ICON_SELECT_CHECK, ICON_SELECT_CHEVRON } from "../icons";
 
-export interface MonthSelectControl {
+export interface CustomSelectOption {
+  value: string;
+  label: string;
+}
+
+export interface CustomSelectControl {
   readonly root: HTMLDivElement;
   get value(): string;
-  set value(monthIndex: string);
-  setMonths(labels: readonly string[]): void;
+  set value(next: string);
+  setOptions(options: readonly CustomSelectOption[]): void;
   addEventListener(type: "change", listener: () => void): void;
   close(): void;
 }
 
-let openMonthSelect: (() => void) | null = null;
+export type CustomSelectVariant = "month" | "time";
 
-export const createMonthSelect = (ariaLabel: string): MonthSelectControl => {
+let openCustomSelect: (() => void) | null = null;
+
+export const createCustomSelect = (
+  ariaLabel: string,
+  variant: CustomSelectVariant = "time",
+): CustomSelectControl => {
   const root = document.createElement("div");
-  root.className = "cal__month-select";
+  root.className = `cal__list-select cal__list-select--${variant}`;
 
   const trigger = document.createElement("button");
   trigger.type = "button";
-  trigger.className = "cal__month-select__trigger";
+  trigger.className = "cal__list-select__trigger";
   trigger.setAttribute("aria-label", ariaLabel);
   trigger.setAttribute("aria-haspopup", "listbox");
   trigger.setAttribute("aria-expanded", "false");
 
   const label = document.createElement("span");
-  label.className = "cal__month-select__label";
+  label.className = "cal__list-select__label";
 
   const chevron = document.createElement("span");
-  chevron.className = "cal__month-select__chevron";
+  chevron.className = "cal__list-select__chevron";
   chevron.innerHTML = ICON_SELECT_CHEVRON;
 
   trigger.append(label, chevron);
 
   const list = document.createElement("ul");
-  list.className = "cal__month-select__list";
+  list.className = "cal__list-select__list";
   list.setAttribute("role", "listbox");
   list.setAttribute("aria-label", ariaLabel);
   list.hidden = true;
 
   root.append(trigger, list);
 
-  let monthLabels: string[] = [];
-  let selected = 0;
+  let options: CustomSelectOption[] = [];
+  let selectedValue = "";
   const changeListeners: Array<() => void> = [];
   let docPointerListener: ((event: PointerEvent) => void) | null = null;
 
@@ -50,43 +60,48 @@ export const createMonthSelect = (ariaLabel: string): MonthSelectControl => {
     docPointerListener = null;
   };
 
+  const syncTriggerLabel = (): void => {
+    const current = options.find((option) => option.value === selectedValue);
+    label.textContent = current?.label ?? "";
+  };
+
   const close = (): void => {
     list.hidden = true;
     trigger.setAttribute("aria-expanded", "false");
-    root.classList.remove("cal__month-select--open");
+    root.classList.remove("cal__list-select--open");
     removeDocPointerListener();
-    if (openMonthSelect === close) openMonthSelect = null;
+    if (openCustomSelect === close) openCustomSelect = null;
   };
 
   const renderList = (): void => {
     list.replaceChildren();
-    monthLabels.forEach((name, monthIndex) => {
+    options.forEach((option) => {
       const item = document.createElement("li");
-      item.className = "cal__month-select__option";
+      item.className = "cal__list-select__option";
       item.setAttribute("role", "option");
-      const isSelected = monthIndex === selected;
+      const isSelected = option.value === selectedValue;
       item.setAttribute("aria-selected", isSelected ? "true" : "false");
-      if (isSelected) item.classList.add("cal__month-select__option--selected");
+      if (isSelected) item.classList.add("cal__list-select__option--selected");
 
       const optionLabel = document.createElement("span");
-      optionLabel.className = "cal__month-select__option-label";
-      optionLabel.textContent = name;
+      optionLabel.className = "cal__list-select__option-label";
+      optionLabel.textContent = option.label;
 
       item.append(optionLabel);
       if (isSelected) {
         const check = document.createElement("span");
-        check.className = "cal__month-select__check";
+        check.className = "cal__list-select__check";
         check.innerHTML = ICON_SELECT_CHECK;
         item.append(check);
       }
       item.addEventListener("click", (event) => {
         event.stopPropagation();
-        if (selected === monthIndex) {
+        if (selectedValue === option.value) {
           close();
           return;
         }
-        selected = monthIndex;
-        label.textContent = name;
+        selectedValue = option.value;
+        syncTriggerLabel();
         renderList();
         close();
         changeListeners.forEach((listener) => listener());
@@ -96,12 +111,12 @@ export const createMonthSelect = (ariaLabel: string): MonthSelectControl => {
   };
 
   const open = (): void => {
-    openMonthSelect?.();
-    openMonthSelect = close;
+    openCustomSelect?.();
+    openCustomSelect = close;
     list.hidden = false;
     trigger.setAttribute("aria-expanded", "true");
-    root.classList.add("cal__month-select--open");
-    const selectedItem = list.querySelector(".cal__month-select__option--selected");
+    root.classList.add("cal__list-select--open");
+    const selectedItem = list.querySelector(".cal__list-select__option--selected");
     selectedItem?.scrollIntoView({ block: "nearest" });
     docPointerListener = (event: PointerEvent): void => {
       if (!root.contains(event.target as Node)) close();
@@ -121,18 +136,23 @@ export const createMonthSelect = (ariaLabel: string): MonthSelectControl => {
   return {
     root,
     get value() {
-      return String(selected);
+      return selectedValue;
     },
-    set value(monthIndex) {
-      const next = Number.parseInt(monthIndex, 10);
-      if (!Number.isFinite(next) || next < 0 || next > 11) return;
-      selected = next;
-      label.textContent = monthLabels[selected] ?? monthIndex;
+    set value(next) {
+      if (!options.some((option) => option.value === next)) return;
+      selectedValue = next;
+      syncTriggerLabel();
       renderList();
     },
-    setMonths(labels) {
-      monthLabels = [...labels];
-      label.textContent = monthLabels[selected] ?? "";
+    setOptions(nextOptions) {
+      const previous = selectedValue;
+      options = [...nextOptions];
+      if (!options.some((option) => option.value === selectedValue)) {
+        selectedValue = options[0]?.value ?? "";
+      } else {
+        selectedValue = previous;
+      }
+      syncTriggerLabel();
       renderList();
     },
     addEventListener(type, listener) {
@@ -141,3 +161,6 @@ export const createMonthSelect = (ariaLabel: string): MonthSelectControl => {
     close,
   };
 };
+
+export const createMonthSelect = (ariaLabel: string): CustomSelectControl =>
+  createCustomSelect(ariaLabel, "month");

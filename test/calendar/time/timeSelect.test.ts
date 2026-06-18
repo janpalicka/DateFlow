@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { createCustomSelect } from "@/calendar/dom/customSelect";
 import {
   applyHM,
   createTimeRow,
@@ -36,42 +37,45 @@ describe("snapMinuteToStep", () => {
 
 describe("fillSecond", () => {
   it("creates 60 second options", () => {
-    const select = document.createElement("select");
+    const select = createCustomSelect("Second", "time");
     fillSecond(select);
-    expect(select.options).toHaveLength(60);
-    expect(select.options[0]?.textContent).toBe("00");
-    expect(select.options[59]?.value).toBe("59");
+    expect(select.root.querySelectorAll(".cal__list-select__option")).toHaveLength(60);
+    expect(select.value).toBe("0");
+    select.value = "59";
+    expect(select.value).toBe("59");
   });
 });
 
 describe("fillHourMinute", () => {
   it("fills 24-hour options", () => {
-    const hour = document.createElement("select");
-    const minute = document.createElement("select");
-    const meridiem = document.createElement("select");
+    const hour = createCustomSelect("Hour", "time");
+    const minute = createCustomSelect("Minute", "time");
+    const meridiem = createCustomSelect("AM/PM", "time");
     fillHourMinute(hour, minute, meridiem, false, 15);
-    expect(hour.options).toHaveLength(24);
-    expect(minute.options).toHaveLength(4);
-    expect(meridiem.options).toHaveLength(2);
+    expect(hour.root.querySelectorAll(".cal__list-select__option")).toHaveLength(24);
+    expect(minute.root.querySelectorAll(".cal__list-select__option")).toHaveLength(4);
+    expect(meridiem.root.querySelectorAll(".cal__list-select__option")).toHaveLength(2);
   });
 
   it("fills 12-hour options", () => {
-    const hour = document.createElement("select");
-    const minute = document.createElement("select");
-    const meridiem = document.createElement("select");
+    const hour = createCustomSelect("Hour", "time");
+    const minute = createCustomSelect("Minute", "time");
+    const meridiem = createCustomSelect("AM/PM", "time");
     fillHourMinute(hour, minute, meridiem, true, 5);
-    expect(hour.options).toHaveLength(12);
-    expect(hour.options[0]?.value).toBe("1");
-    expect(hour.options[11]?.value).toBe("12");
+    expect(hour.root.querySelectorAll(".cal__list-select__option")).toHaveLength(12);
+    hour.value = "1";
+    expect(hour.value).toBe("1");
+    hour.value = "12";
+    expect(hour.value).toBe("12");
   });
 });
 
 describe("setHM and applyHM", () => {
   it("round-trips 24-hour time", () => {
-    const hour = document.createElement("select");
-    const minute = document.createElement("select");
-    const meridiem = document.createElement("select");
-    const second = document.createElement("select");
+    const hour = createCustomSelect("Hour", "time");
+    const minute = createCustomSelect("Minute", "time");
+    const meridiem = createCustomSelect("AM/PM", "time");
+    const second = createCustomSelect("Second", "time");
     fillHourMinute(hour, minute, meridiem, false, 5);
     fillSecond(second);
 
@@ -84,9 +88,9 @@ describe("setHM and applyHM", () => {
   });
 
   it("round-trips 12-hour PM time", () => {
-    const hour = document.createElement("select");
-    const minute = document.createElement("select");
-    const meridiem = document.createElement("select");
+    const hour = createCustomSelect("Hour", "time");
+    const minute = createCustomSelect("Minute", "time");
+    const meridiem = createCustomSelect("AM/PM", "time");
     fillHourMinute(hour, minute, meridiem, true, 5);
 
     const source = new Date(2026, 5, 15, 15, 10);
@@ -106,7 +110,7 @@ describe("createTimeRow", () => {
       meridiem: "AM/PM",
     });
     expect(row.row.className).toBe("cal__time");
-    expect(row.hour.getAttribute("aria-label")).toBe("Hour");
-    expect(row.row.contains(row.minute)).toBe(true);
+    expect(row.hour.root.querySelector("button")?.getAttribute("aria-label")).toBe("Hour");
+    expect(row.row.contains(row.minute.root)).toBe(true);
   });
 });
