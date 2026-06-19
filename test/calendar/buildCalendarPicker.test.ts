@@ -134,7 +134,8 @@ describe("buildCalendarPicker integration", () => {
     const cal = root.querySelector(".cal") as HTMLElement;
 
     expect(cal.classList.contains("cal--range-compact")).toBe(true);
-    expect(root.querySelector(".cal__pane:nth-child(2)")?.hidden).toBe(true);
+    const rightPane = root.querySelector(".cal__pane:nth-child(2)") as HTMLElement;
+    expect(rightPane.hidden).toBe(true);
     expect(root.querySelectorAll("button.cal__day")).toHaveLength(30);
 
     clickDay(root, new Date(2026, 5, 8));

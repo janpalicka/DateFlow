@@ -1,6 +1,5 @@
 import { addMonths, compareAsc, isSameDay, startOfDay } from "date-fns";
 import { createCalendarDom } from "./dom/createElements";
-import type { CustomSelectControl } from "./dom/customSelect";
 import { createInputController, type InputController } from "./input/createInputController";
 import { canGoNextMonth, canGoPrevMonth } from "./navigation";
 import { attachCalendarPopover, type CalendarPopover } from "./popover";
@@ -33,6 +32,7 @@ import {
   shouldShowTimeOn,
 } from "./utils";
 import { COMPACT_RANGE_MEDIA_QUERY, matchesCompactRangeLayout } from "./utils/viewport";
+import type { CustomSelectControl } from "./dom/customSelect";
 import type {
   CalendarMode,
   CalendarOptions,
@@ -217,8 +217,7 @@ export const buildCalendarPicker = (
   };
   compactRangeMediaQuery?.addEventListener("change", onCompactRangeLayoutChange);
 
-  const isCompactRangeLayout = (): boolean =>
-    mode() === "range" && matchesCompactRangeLayout();
+  const isCompactRangeLayout = (): boolean => mode() === "range" && matchesCompactRangeLayout();
 
   function layoutCompactRangePanes(): void {
     const compact = isCompactRangeLayout();
@@ -571,15 +570,30 @@ export const buildCalendarPicker = (
     syncingYearInput = false;
     renderWeekdaysRow(dom.weekdaysRow, options);
     renderWeekdaysRow(dom.weekdaysRowRight, options);
-    renderGrid(dom.grid, dom.gridRight, viewYear, viewMonth, options, getGridSelection(), {
-      onDayClick,
-    }, compactRange);
+    renderGrid(
+      dom.grid,
+      dom.gridRight,
+      viewYear,
+      viewMonth,
+      options,
+      getGridSelection(),
+      {
+        onDayClick,
+      },
+      compactRange,
+    );
     syncTimeSelectsFromValue();
     updateTimeVisibility();
     updateResetVisibility();
     syncRangeActionLabels();
     dom.btnPrev.disabled = !canGoPrevMonth(viewYear, viewMonth, options.minDate);
-    dom.btnNext.disabled = !canGoNextMonth(viewYear, viewMonth, options.maxDate, mode(), compactRange);
+    dom.btnNext.disabled = !canGoNextMonth(
+      viewYear,
+      viewMonth,
+      options.maxDate,
+      mode(),
+      compactRange,
+    );
     inputController.applyInputMode();
     inputController.syncInputFromState();
   }

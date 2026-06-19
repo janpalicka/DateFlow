@@ -118,7 +118,13 @@ describe("createTimeRow", () => {
 describe("editable time select", () => {
   it("commits typed numeric values", () => {
     const hour = createCustomSelect("Hour", "time");
-    fillHourMinute(hour, createCustomSelect("Minute", "time"), createCustomSelect("AM/PM", "time"), false, 5);
+    fillHourMinute(
+      hour,
+      createCustomSelect("Minute", "time"),
+      createCustomSelect("AM/PM", "time"),
+      false,
+      5,
+    );
     hour.value = "14";
 
     const input = hour.root.querySelector("input");
@@ -141,7 +147,13 @@ describe("editable time select", () => {
 
   it("reverts invalid typed values", () => {
     const meridiem = createCustomSelect("AM/PM", "time");
-    fillHourMinute(createCustomSelect("Hour", "time"), createCustomSelect("Minute", "time"), meridiem, true, 5);
+    fillHourMinute(
+      createCustomSelect("Hour", "time"),
+      createCustomSelect("Minute", "time"),
+      meridiem,
+      true,
+      5,
+    );
     meridiem.value = "PM";
 
     const input = meridiem.root.querySelector("input");

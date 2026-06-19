@@ -130,15 +130,7 @@ export const createTimeRow = (
   const meridiem = createCustomSelect(labels.meridiem, "time");
   meridiem.root.classList.add("cal__list-select--meridiem");
 
-  row.append(
-    label,
-    hour.root,
-    sep,
-    minute.root,
-    sepSecond,
-    second.root,
-    meridiem.root,
-  );
+  row.append(label, hour.root, sep, minute.root, sepSecond, second.root, meridiem.root);
 
   return { row, label, hour, sep, minute, sepSecond, second, meridiem };
 };
