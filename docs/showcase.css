@@ -19,7 +19,9 @@
   --radius-md: 12px;
   --sidebar-width: 15.5rem;
   --site-header-height: 6rem;
-  --docs-sticky-offset: calc(var(--site-header-height) + 1rem);
+  --docs-sidebar-sticky-gap: 1rem;
+  --docs-sidebar-sticky-top: calc(var(--site-header-height) + var(--docs-sidebar-sticky-gap));
+  --docs-sticky-offset: var(--docs-sidebar-sticky-top);
   --docs-mobile-toc-height: 3.35rem;
   --font-sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -298,6 +300,9 @@ body {
 @media (min-width: 960px) {
   .showcase-sidebar {
     display: block;
+    position: sticky;
+    top: var(--docs-sidebar-sticky-top);
+    align-self: start;
   }
 }
 
@@ -315,8 +320,6 @@ body {
 /* ── Sidebar TOC ── */
 
 .showcase-toc {
-  position: sticky;
-  top: 5rem;
   padding: 1rem 0.85rem;
   border: 1px solid var(--card-border);
   border-radius: var(--radius-md);
