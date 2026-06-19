@@ -979,7 +979,20 @@ function initTocSpy() {
   }
 }
 
+function initDocsMeta() {
+  const versionEl = document.querySelector("[data-docs-version]");
+  if (versionEl instanceof HTMLElement) {
+    versionEl.textContent = `v${__DOCS_VERSION__}`;
+  }
+
+  const previewBanner = document.querySelector("[data-docs-preview-banner]");
+  if (previewBanner instanceof HTMLElement && __DOCS_CHANNEL__ === "preview") {
+    previewBanner.hidden = false;
+  }
+}
+
 function initShowcase() {
+  initDocsMeta();
   syncDocsLayoutMetrics();
   window.addEventListener("resize", syncDocsLayoutMetrics, { passive: true });
   mountQuickStartDemo();

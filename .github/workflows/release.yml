@@ -8,10 +8,14 @@ on:
 permissions:
   contents: write
   id-token: write
+  actions: write
 
 jobs:
   publish:
     runs-on: ubuntu-latest
+
+    outputs:
+      channel: ${{ steps.release.outputs.channel }}
 
     steps:
       - name: Checkout
@@ -32,6 +36,19 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Resolve release channel
+        id: release
+        run: |
+          if [[ "${{ github.ref_name }}" == *-* ]]; then
+            echo "channel=preview" >> "$GITHUB_OUTPUT"
+            echo "npm_tag=beta" >> "$GITHUB_OUTPUT"
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "channel=production" >> "$GITHUB_OUTPUT"
+            echo "npm_tag=latest" >> "$GITHUB_OUTPUT"
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Verify tag matches package version
         run: |
           TAG="${GITHUB_REF#refs/tags/v}"
@@ -48,18 +65,23 @@ jobs:
         run: pnpm build
 
       - name: Publish to npm
-        run: pnpm publish --no-git-checks --access public
+        run: pnpm publish --no-git-checks --access public --tag ${{ steps.release.outputs.npm_tag }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
           generate_release_notes: true
+          prerelease: ${{ steps.release.outputs.prerelease == 'true' }}
 
   deploy-docs:
     name: Deploy docs
     needs: publish
-    uses: ./.github/workflows/pages.yml
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger docs deploy
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh workflow run pages.yml --ref main \
+            -f tag="${{ github.ref_name }}" \
+            -f channel="${{ needs.publish.outputs.channel }}"
