@@ -1,6 +1,15 @@
 import { describe, expect, it, vi } from "vitest";
 import { createCustomSelect } from "@/calendar/dom/customSelect";
 
+function getSelectList(root: HTMLElement, ariaLabel: string): HTMLUListElement | null {
+  return (
+    root.querySelector<HTMLUListElement>(".cal__list-select__list") ??
+    document.querySelector<HTMLUListElement>(
+      `.cal__list-select__list--floating[aria-label="${ariaLabel}"]`,
+    )
+  );
+}
+
 describe("createCustomSelect editable time fields", () => {
   it("commits clamped typed minute values", () => {
     const select = createCustomSelect("Minute", "time", { numericField: "minute" });
@@ -43,7 +52,7 @@ describe("createCustomSelect editable time fields", () => {
     const chevron = select.root.querySelector<HTMLButtonElement>(".cal__list-select__chevron-btn");
     chevron?.click();
 
-    const list = select.root.querySelector<HTMLUListElement>(".cal__list-select__list");
+    const list = getSelectList(select.root, "Hour");
     expect(list?.hidden).toBe(false);
   });
 
@@ -55,7 +64,7 @@ describe("createCustomSelect editable time fields", () => {
     const input = select.root.querySelector<HTMLInputElement>(".cal__list-select__input");
     input?.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
 
-    const list = select.root.querySelector<HTMLUListElement>(".cal__list-select__list");
+    const list = getSelectList(select.root, "Second");
     expect(list?.hidden).toBe(false);
     expect(input?.readOnly).toBe(true);
   });
