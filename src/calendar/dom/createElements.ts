@@ -126,12 +126,27 @@ export const createCalendarDom = (): CalendarDomElements => {
   panes.className = "cal__panes";
   panes.append(paneLeft, paneRight);
 
-  root.append(panes, timeWrap, rangeActions);
+  const main = document.createElement("div");
+  main.className = "cal__main";
+
+  const rangePresets = document.createElement("nav");
+  rangePresets.className = "cal__range-presets";
+  rangePresets.setAttribute("aria-label", "Range presets");
+  rangePresets.hidden = true;
+
+  const body = document.createElement("div");
+  body.className = "cal__body";
+  main.append(panes, timeWrap, rangeActions);
+  body.append(rangePresets, main);
+  root.append(body);
   container.append(root);
 
   return {
     container,
     root,
+    body,
+    main,
+    rangePresets,
     paneLeft,
     paneRight,
     header,

@@ -4,6 +4,13 @@ import { createInputController, type InputController } from "./input/createInput
 import { canGoNextMonth, canGoPrevMonth } from "./navigation";
 import { attachCalendarPopover, type CalendarPopover } from "./popover";
 import { renderGrid, type GridSelectionState } from "./render/grid";
+import { renderRangePresetsPanel } from "./render/rangePresetsPanel";
+import {
+  DESKTOP_RANGE_PRESETS_MEDIA_QUERY,
+  findMatchingPresetIndex,
+  normalizePresetRange,
+  shouldShowRangePresetsPanel,
+} from "./range/rangePresets";
 import {
   clampYear,
   fillMonthYearSelects,
@@ -206,6 +213,29 @@ export const buildCalendarPicker = (
   dom.grid.addEventListener("mouseleave", onGridMouseLeave);
   dom.gridRight.addEventListener("mousemove", updateRangeHoverFromPointer);
   dom.gridRight.addEventListener("mouseleave", onGridMouseLeave);
+
+  const rangePresetsMediaQuery =
+    typeof window !== "undefined" && typeof window.matchMedia === "function"
+      ? window.matchMedia(DESKTOP_RANGE_PRESETS_MEDIA_QUERY)
+      : null;
+  const onRangePresetsLayoutChange = (): void => {
+    render();
+  };
+  rangePresetsMediaQuery?.addEventListener("change", onRangePresetsLayoutChange);
+
+  const applyRangePreset = (index: number): void => {
+    const config = options.rangePresets;
+    const preset = config?.presets[index];
+    if (!preset || mode() !== "range") return;
+
+    clearRangeHover();
+    const { start, end } = normalizePresetRange(preset, shouldShowTimeOn(options));
+    rangeStart = start;
+    rangeEnd = end;
+    viewYear = start.getFullYear();
+    viewMonth = start.getMonth();
+    render();
+  };
 
   const compactRangeMediaQuery =
     typeof window !== "undefined" && typeof window.matchMedia === "function"
@@ -555,6 +585,28 @@ export const buildCalendarPicker = (
     dom.btnApplyRange.textContent = locale.rangeApply ?? "Apply";
   }
 
+  function syncRangePresetsPanel(): void {
+    const config = options.rangePresets;
+    const visible = shouldShowRangePresetsPanel(mode() === "range", config?.presets);
+    dom.rangePresets.hidden = !visible;
+    root.classList.toggle("cal--range-presets", visible);
+    root.classList.toggle(
+      "cal--range-presets-right",
+      visible && config?.position === "right",
+    );
+    if (!visible || !config) {
+      dom.rangePresets.replaceChildren();
+      return;
+    }
+    const activeIndex = findMatchingPresetIndex(
+      config.presets,
+      rangeStart,
+      rangeEnd,
+      shouldShowTimeOn(options),
+    );
+    renderRangePresetsPanel(dom.rangePresets, config, activeIndex, applyRangePreset);
+  }
+
   function render(): void {
     const isRange = mode() === "range";
     const compactRange = isCompactRangeLayout();
@@ -586,6 +638,7 @@ export const buildCalendarPicker = (
     updateTimeVisibility();
     updateResetVisibility();
     syncRangeActionLabels();
+    syncRangePresetsPanel();
     dom.btnPrev.disabled = !canGoPrevMonth(viewYear, viewMonth, options.minDate);
     dom.btnNext.disabled = !canGoNextMonth(
       viewYear,
@@ -1128,6 +1181,7 @@ export const buildCalendarPicker = (
       hidePanel();
     },
     destroy(): void {
+      rangePresetsMediaQuery?.removeEventListener("change", onRangePresetsLayoutChange);
       compactRangeMediaQuery?.removeEventListener("change", onCompactRangeLayoutChange);
       popover?.destroy();
       valueInput.removeEventListener("blur", inputController.onInputBlur);
