@@ -20,10 +20,7 @@ describe("createCalendarDom", () => {
     expect(dom.btnApplyRange.textContent).toBe("Apply");
     expect(dom.btnCancelRange.textContent).toBe("Cancel");
     const rootChildren = [...dom.root.children];
-    expect(rootChildren.map((el) => el.className)).toEqual([
-      "cal__panes",
-      "cal__time-wrap",
-      "cal__range-actions",
-    ]);
+    expect(rootChildren.map((el) => el.className)).toEqual(["cal__body", "cal__range-actions"]);
+    expect(dom.rangePresets.getAttribute("aria-label")).toBe("Range presets");
   });
 });

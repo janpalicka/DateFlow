@@ -111,6 +111,75 @@ describe("buildCalendarPicker integration", () => {
     picker.destroy();
   });
 
+  it("applies a range preset without committing until Apply", () => {
+    const input = createInput();
+    const onRangeChange = vi.fn();
+    const picker = dateFlow(input, {
+      mode: "range",
+      inline: true,
+      popover: false,
+      onRangeChange,
+      rangePresets: {
+        presets: [
+          {
+            caption: "Next 7 Days",
+            start: new Date(2026, 5, 17),
+            end: new Date(2026, 5, 23),
+          },
+        ],
+      },
+    });
+    const root = picker.getCalendarElement();
+    const preset = root.querySelector(".cal__range-preset") as HTMLButtonElement;
+    preset.click();
+
+    expect(onRangeChange).not.toHaveBeenCalled();
+    expect(picker.selectedDates).toEqual({
+      start: new Date(2026, 5, 17),
+      end: new Date(2026, 5, 23),
+    });
+    expect(root.querySelector(".cal__range-preset--active")?.textContent).toBe("Next 7 Days");
+
+    const apply = root.querySelector(".cal__action-btn--primary") as HTMLButtonElement;
+    apply.click();
+    expect(picker.getRange().start?.getDate()).toBe(17);
+    expect(picker.getRange().end?.getDate()).toBe(23);
+    expect(onRangeChange).toHaveBeenCalledTimes(1);
+    picker.destroy();
+  });
+
+  it("hides range presets on mobile viewports", () => {
+    Object.defineProperty(window, "matchMedia", {
+      configurable: true,
+      writable: true,
+      value: vi.fn().mockImplementation((query: string) => ({
+        matches: !query.includes("min-width: 900px"),
+        media: query,
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      })),
+    });
+
+    const input = createInput();
+    const picker = dateFlow(input, {
+      mode: "range",
+      inline: true,
+      popover: false,
+      rangePresets: {
+        presets: [
+          {
+            caption: "Today",
+            start: new Date(2026, 5, 17),
+            end: new Date(2026, 5, 17),
+          },
+        ],
+      },
+    });
+    const presetsNav = picker.getCalendarElement().querySelector(".cal__range-presets") as HTMLElement;
+    expect(presetsNav.hidden).toBe(true);
+    picker.destroy();
+  });
+
   it("supports setRange and getRange", () => {
     const input = createInput();
     const picker = dateFlow(input, { mode: "range", inline: true, popover: false });

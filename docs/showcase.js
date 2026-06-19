@@ -9,6 +9,37 @@ function formatRangeLine(r, fmt, sep) {
   return `${format(r.start, fmt)}${sep}${format(r.end, fmt)}`;
 }
 
+function startOfLocalDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function addLocalDays(date, amount) {
+  const next = new Date(date);
+  next.setDate(next.getDate() + amount);
+  return next;
+}
+
+function addLocalMonths(date, amount) {
+  return new Date(date.getFullYear(), date.getMonth() + amount, date.getDate());
+}
+
+function buildDemoRangePresets(now = new Date()) {
+  const today = startOfLocalDay(now);
+  return {
+    position: "left",
+    presets: [
+      { caption: "Today", start: today, end: today },
+      { caption: "Last 7 Days", start: addLocalDays(today, -6), end: today },
+      { caption: "Last Month", start: addLocalMonths(today, -1), end: today },
+      { caption: "Last 6 Months", start: addLocalMonths(today, -6), end: today },
+      { caption: "Last 12 Months", start: addLocalMonths(today, -12), end: today },
+      { caption: "Next 7 Days", start: today, end: addLocalDays(today, 6) },
+      { caption: "Next Month", start: today, end: addLocalMonths(today, 1) },
+      { caption: "Next 6 Months", start: today, end: addLocalMonths(today, 6) },
+    ],
+  };
+}
+
 function mountFloatingCalendarDemo(opts, hooks = {}) {
   const options = opts ?? {};
   const wrap = document.createElement("div");
@@ -649,6 +680,20 @@ function mountDemo(key) {
         mode: "range",
         range: { start: new Date(2026, 2, 5), end: new Date(2026, 2, 18) },
         outputFormat: "yyyy-MM-dd",
+      }).wrap;
+    case "range-presets":
+      return mountFloatingCalendarDemo({
+        mode: "range",
+        showTime: true,
+        rangePresets: buildDemoRangePresets(),
+      }).wrap;
+    case "range-presets-right":
+      return mountFloatingCalendarDemo({
+        mode: "range",
+        rangePresets: {
+          position: "right",
+          presets: buildDemoRangePresets().presets,
+        },
       }).wrap;
     case "range-time":
       return mountFloatingCalendarDemo({

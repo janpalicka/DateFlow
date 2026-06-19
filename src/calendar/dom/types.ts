@@ -4,6 +4,9 @@ import type { TimeRowElements } from "../time";
 export interface CalendarDomElements {
   container: HTMLDivElement;
   root: HTMLDivElement;
+  body: HTMLDivElement;
+  main: HTMLDivElement;
+  rangePresets: HTMLElement;
   paneLeft: HTMLDivElement;
   paneRight: HTMLDivElement;
   header: HTMLDivElement;

@@ -64,6 +64,71 @@
   gap: 1rem;
 }
 
+.cal__body {
+  display: flex;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.cal__main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.cal__range-presets {
+  flex: 0 0 auto;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 8.75rem;
+  max-width: 10rem;
+  padding: 0 0.85rem 0 0;
+  margin-right: 0.85rem;
+  border-right: 1px solid var(--cal-border);
+}
+
+.cal__range-presets[hidden] {
+  display: none !important;
+}
+
+.cal--range-presets-right .cal__range-presets {
+  order: 2;
+  padding: 0 0 0 0.85rem;
+  margin-right: 0;
+  margin-left: 0.85rem;
+  border-right: 0;
+  border-left: 1px solid var(--cal-border);
+}
+
+.cal__range-preset {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin: 0;
+  padding: 0.45rem 0.2rem;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--cal-text);
+  font: inherit;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  text-align: center;
+  cursor: pointer;
+}
+
+.cal__range-preset:hover {
+  color: var(--cal-accent);
+}
+
+.cal__range-preset--active {
+  color: var(--cal-accent);
+  font-weight: 600;
+}
+
 .cal__pane[hidden] {
   display: none !important;
 }
@@ -745,6 +810,10 @@
 @media (min-width: 900px) {
   .cal.cal--range {
     width: min(100%, 48rem);
+  }
+
+  .cal.cal--range-presets {
+    width: min(100%, 56rem);
   }
 
   .cal.cal--range .cal__panes {
