@@ -842,6 +842,16 @@ function mountQuickStartDemo() {
   });
 }
 
+function syncDocsLayoutMetrics() {
+  const header = document.querySelector(".site-header");
+  if (header instanceof HTMLElement) {
+    document.documentElement.style.setProperty(
+      "--site-header-height",
+      `${header.offsetHeight}px`,
+    );
+  }
+}
+
 function initTocSpy() {
   const disclosure = document.querySelector(".showcase-toc__disclosure");
   const currentLabel = document.querySelector("[data-toc-current]");
@@ -975,7 +985,22 @@ function initTocSpy() {
   }
 }
 
+function initDocsMeta() {
+  const versionEl = document.querySelector("[data-docs-version]");
+  if (versionEl instanceof HTMLElement) {
+    versionEl.textContent = `v${__DOCS_VERSION__}`;
+  }
+
+  const previewBanner = document.querySelector("[data-docs-preview-banner]");
+  if (previewBanner instanceof HTMLElement && __DOCS_CHANNEL__ === "preview") {
+    previewBanner.hidden = false;
+  }
+}
+
 function initShowcase() {
+  initDocsMeta();
+  syncDocsLayoutMetrics();
+  window.addEventListener("resize", syncDocsLayoutMetrics, { passive: true });
   mountQuickStartDemo();
   initTocSpy();
   for (const mount of document.querySelectorAll("[data-demo]")) {

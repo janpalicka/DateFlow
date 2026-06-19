@@ -1,18 +1,29 @@
 name: Deploy docs
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Git tag to build and deploy (e.g. v1.2.3 or v1.2.3-beta.1)
+        required: true
+        type: string
+      channel:
+        description: Docs destination (production or preview)
+        required: true
+        type: choice
+        options:
+          - production
+          - preview
+        default: production
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -24,7 +35,9 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag }}
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6
@@ -40,15 +53,76 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify tag matches package version
+        run: |
+          TAG="${{ inputs.tag }}"
+          TAG="${TAG#v}"
+          VERSION="$(jq -r .version package.json)"
+          if [ "$TAG" != "$VERSION" ]; then
+            echo "Tag v$TAG does not match package.json version $VERSION"
+            exit 1
+          fi
+
       - name: Build docs
         run: pnpm build:docs
         env:
           GH_PAGES: "true"
+          GH_PAGES_CHANNEL: ${{ inputs.channel }}
+
+      - name: Merge into site tree
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          CHANNEL="${{ inputs.channel }}"
+          REPO="${{ github.repository }}"
+          SITE="$(mktemp -d)"
+
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if git clone "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.git" \
+            --branch gh-pages --depth 1 "$SITE"; then
+            :
+          else
+            git init "$SITE"
+            git -C "$SITE" checkout -b gh-pages
+          fi
+
+          if [ "$CHANNEL" = "preview" ]; then
+            rm -rf "$SITE/preview"
+            mkdir -p "$SITE/preview"
+            cp -R dist-docs/. "$SITE/preview/"
+          else
+            PREVIEW_BACKUP=""
+            if [ -d "$SITE/preview" ]; then
+              PREVIEW_BACKUP="$(mktemp -d)"
+              cp -R "$SITE/preview/." "$PREVIEW_BACKUP/"
+            fi
+            find "$SITE" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+            cp -R dist-docs/. "$SITE/"
+            if [ -n "$PREVIEW_BACKUP" ]; then
+              mkdir -p "$SITE/preview"
+              cp -R "$PREVIEW_BACKUP/." "$SITE/preview/"
+              rm -rf "$PREVIEW_BACKUP"
+            fi
+          fi
+
+          echo "SITE_DIR=$SITE" >> "$GITHUB_ENV"
+
+          cd "$SITE"
+          git add -A
+          if git diff --staged --quiet; then
+            echo "No site tree changes to commit"
+          else
+            git commit -m "docs(${CHANNEL}): deploy ${{ inputs.tag }}"
+            git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.git" HEAD:gh-pages
+          fi
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: dist-docs
+          path: ${{ env.SITE_DIR }}
 
       - name: Deploy to GitHub Pages
         id: deployment
