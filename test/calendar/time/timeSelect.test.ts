@@ -110,7 +110,59 @@ describe("createTimeRow", () => {
       meridiem: "AM/PM",
     });
     expect(row.row.className).toBe("cal__time");
-    expect(row.hour.root.querySelector("button")?.getAttribute("aria-label")).toBe("Hour");
+    expect(row.hour.root.querySelector("input")?.getAttribute("aria-label")).toBe("Hour");
     expect(row.row.contains(row.minute.root)).toBe(true);
+  });
+});
+
+describe("editable time select", () => {
+  it("commits typed numeric values", () => {
+    const hour = createCustomSelect("Hour", "time");
+    fillHourMinute(
+      hour,
+      createCustomSelect("Minute", "time"),
+      createCustomSelect("AM/PM", "time"),
+      false,
+      5,
+    );
+    hour.value = "14";
+
+    const input = hour.root.querySelector("input");
+    expect(input).toBeTruthy();
+
+    let changed = false;
+    hour.addEventListener("change", () => {
+      changed = true;
+    });
+
+    input!.readOnly = false;
+    hour.root.classList.add("cal__list-select--editing");
+    input!.value = "9";
+    input!.dispatchEvent(new Event("blur"));
+
+    expect(hour.value).toBe("9");
+    expect(changed).toBe(true);
+    expect(input!.readOnly).toBe(true);
+  });
+
+  it("reverts invalid typed values", () => {
+    const meridiem = createCustomSelect("AM/PM", "time");
+    fillHourMinute(
+      createCustomSelect("Hour", "time"),
+      createCustomSelect("Minute", "time"),
+      meridiem,
+      true,
+      5,
+    );
+    meridiem.value = "PM";
+
+    const input = meridiem.root.querySelector("input");
+    input!.readOnly = false;
+    meridiem.root.classList.add("cal__list-select--editing");
+    input!.value = "XX";
+    input!.dispatchEvent(new Event("blur"));
+
+    expect(meridiem.value).toBe("PM");
+    expect(input!.value).toBe("PM");
   });
 });

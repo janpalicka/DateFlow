@@ -18,9 +18,10 @@ export const canGoNextMonth = (
   viewMonth: number,
   maxDate: Date | null | undefined,
   mode: CalendarMode,
+  compactRange = false,
 ): boolean => {
   if (!maxDate) return true;
-  const nextShift = mode === "range" ? 2 : 1;
+  const nextShift = mode === "range" && !compactRange ? 2 : 1;
   const next = new Date(viewYear, viewMonth + nextShift, 1);
   const maxM = startOfDay(maxDate);
   return compareCalendarDay(next, new Date(maxM.getFullYear(), maxM.getMonth(), 1)) <= 0;

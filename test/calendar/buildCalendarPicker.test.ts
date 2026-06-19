@@ -180,6 +180,44 @@ describe("buildCalendarPicker integration", () => {
     picker.destroy();
   });
 
+  it("uses a single calendar for compact range selection", () => {
+    const matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: query.includes("max-width"),
+      media: query,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    }));
+    Object.defineProperty(window, "matchMedia", {
+      configurable: true,
+      writable: true,
+      value: matchMedia,
+    });
+
+    const input = createInput();
+    const picker = dateFlow(input, {
+      mode: "range",
+      inline: true,
+      popover: false,
+    });
+    const root = picker.getCalendarElement();
+    const cal = root.querySelector(".cal") as HTMLElement;
+
+    expect(cal.classList.contains("cal--range-compact")).toBe(true);
+    const rightPane = root.querySelector(".cal__pane:nth-child(2)") as HTMLElement;
+    expect(rightPane.hidden).toBe(true);
+    expect(root.querySelectorAll("button.cal__day")).toHaveLength(30);
+
+    clickDay(root, new Date(2026, 5, 8));
+    clickDay(root, new Date(2026, 5, 12));
+    const apply = root.querySelector(".cal__action-btn--primary") as HTMLButtonElement;
+    apply.click();
+
+    const range = picker.getRange();
+    expect(range.start?.getDate()).toBe(8);
+    expect(range.end?.getDate()).toBe(12);
+    picker.destroy();
+  });
+
   it("supports setRange and getRange", () => {
     const input = createInput();
     const picker = dateFlow(input, { mode: "range", inline: true, popover: false });

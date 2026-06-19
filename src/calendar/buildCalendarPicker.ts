@@ -1,6 +1,5 @@
 import { addMonths, compareAsc, isSameDay, startOfDay } from "date-fns";
 import { createCalendarDom } from "./dom/createElements";
-import type { CustomSelectControl } from "./dom/customSelect";
 import { createInputController, type InputController } from "./input/createInputController";
 import { canGoNextMonth, canGoPrevMonth } from "./navigation";
 import { attachCalendarPopover, type CalendarPopover } from "./popover";
@@ -39,6 +38,8 @@ import {
   parseCalendarDay,
   shouldShowTimeOn,
 } from "./utils";
+import { COMPACT_RANGE_MEDIA_QUERY, matchesCompactRangeLayout } from "./utils/viewport";
+import type { CustomSelectControl } from "./dom/customSelect";
 import type {
   CalendarMode,
   CalendarOptions,
@@ -235,6 +236,31 @@ export const buildCalendarPicker = (
     viewMonth = start.getMonth();
     render();
   };
+
+  const compactRangeMediaQuery =
+    typeof window !== "undefined" && typeof window.matchMedia === "function"
+      ? window.matchMedia(COMPACT_RANGE_MEDIA_QUERY)
+      : null;
+  const onCompactRangeLayoutChange = (): void => {
+    layoutCompactRangePanes();
+    render();
+  };
+  compactRangeMediaQuery?.addEventListener("change", onCompactRangeLayoutChange);
+
+  const isCompactRangeLayout = (): boolean => mode() === "range" && matchesCompactRangeLayout();
+
+  function layoutCompactRangePanes(): void {
+    const compact = isCompactRangeLayout();
+    if (compact) {
+      if (!dom.paneLeft.contains(dom.timeWrapRangeEnd)) {
+        dom.paneLeft.append(dom.timeWrapRangeEnd);
+      }
+      return;
+    }
+    if (mode() === "range" && !dom.paneRight.contains(dom.timeWrapRangeEnd)) {
+      dom.paneRight.append(dom.timeWrapRangeEnd);
+    }
+  }
 
   if (options.popover ?? true) {
     popover = attachCalendarPopover(valueInput, container, {
@@ -537,7 +563,8 @@ export const buildCalendarPicker = (
 
   function layoutRangeHeaders(): void {
     const isRange = mode() === "range";
-    if (isRange) {
+    const compact = isCompactRangeLayout();
+    if (isRange && !compact) {
       if (dom.btnNext.parentElement !== dom.headerRight) {
         dom.headerRight.append(dom.btnNext);
       }
@@ -582,8 +609,11 @@ export const buildCalendarPicker = (
 
   function render(): void {
     const isRange = mode() === "range";
+    const compactRange = isCompactRangeLayout();
     root.classList.toggle("cal--range", isRange);
-    dom.paneRight.hidden = !isRange;
+    root.classList.toggle("cal--range-compact", compactRange);
+    dom.paneRight.hidden = !isRange || compactRange;
+    layoutCompactRangePanes();
     dom.rangeActions.hidden = !shouldShowApplyActions();
     layoutRangeHeaders();
     fillMonthYearSelects(dom.monthSelect, dom.monthSelectRight, viewYear, viewMonth, options);
@@ -592,16 +622,31 @@ export const buildCalendarPicker = (
     syncingYearInput = false;
     renderWeekdaysRow(dom.weekdaysRow, options);
     renderWeekdaysRow(dom.weekdaysRowRight, options);
-    renderGrid(dom.grid, dom.gridRight, viewYear, viewMonth, options, getGridSelection(), {
-      onDayClick,
-    });
+    renderGrid(
+      dom.grid,
+      dom.gridRight,
+      viewYear,
+      viewMonth,
+      options,
+      getGridSelection(),
+      {
+        onDayClick,
+      },
+      compactRange,
+    );
     syncTimeSelectsFromValue();
     updateTimeVisibility();
     updateResetVisibility();
     syncRangeActionLabels();
     syncRangePresetsPanel();
     dom.btnPrev.disabled = !canGoPrevMonth(viewYear, viewMonth, options.minDate);
-    dom.btnNext.disabled = !canGoNextMonth(viewYear, viewMonth, options.maxDate, mode());
+    dom.btnNext.disabled = !canGoNextMonth(
+      viewYear,
+      viewMonth,
+      options.maxDate,
+      mode(),
+      compactRange,
+    );
     inputController.applyInputMode();
     inputController.syncInputFromState();
   }
@@ -920,7 +965,7 @@ export const buildCalendarPicker = (
     const rightView = addMonths(new Date(viewYear, viewMonth, 1), 1);
     return {
       startYear: viewYear,
-      endYear: rightView.getFullYear(),
+      endYear: isCompactRangeLayout() ? viewYear : rightView.getFullYear(),
     };
   };
 
@@ -1137,6 +1182,7 @@ export const buildCalendarPicker = (
     },
     destroy(): void {
       rangePresetsMediaQuery?.removeEventListener("change", onRangePresetsLayoutChange);
+      compactRangeMediaQuery?.removeEventListener("change", onCompactRangeLayoutChange);
       popover?.destroy();
       valueInput.removeEventListener("blur", inputController.onInputBlur);
       valueInput.removeEventListener("keydown", onInputKeydown);

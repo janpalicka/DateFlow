@@ -227,8 +227,13 @@ export const renderGrid = (
   options: CalendarOptions,
   selection: GridSelectionState,
   callbacks: GridRenderCallbacks,
+  compactRange = false,
 ): void => {
   renderGridForMonth(grid, viewYear, viewMonth, options, selection, callbacks);
+  if (compactRange) {
+    gridRight.replaceChildren();
+    return;
+  }
   const rightView = addMonths(new Date(viewYear, viewMonth, 1), 1);
   renderGridForMonth(
     gridRight,
