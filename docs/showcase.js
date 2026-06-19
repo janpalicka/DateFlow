@@ -40,6 +40,22 @@ function buildDemoRangePresets(now = new Date()) {
   };
 }
 
+function applyCustomThemeVars(panel) {
+  panel.style.setProperty("--cal-bg", "#fff7ed");
+  panel.style.setProperty("--cal-surface", "#ffedd5");
+  panel.style.setProperty("--cal-text", "#431407");
+  panel.style.setProperty("--cal-muted", "#9a3412");
+  panel.style.setProperty("--cal-input-placeholder", "#b45309");
+  panel.style.setProperty("--cal-border", "#fdba74");
+  panel.style.setProperty("--cal-header-select-border", "#fb923c");
+  panel.style.setProperty("--cal-accent", "#c2410c");
+  panel.style.setProperty("--cal-accent-contrast", "#fff7ed");
+  panel.style.setProperty("--cal-radius", "14px");
+  panel.style.setProperty("--cal-shadow", "0 12px 40px rgb(194 65 12 / 0.12)");
+  panel.style.setProperty("--cal-day-size", "38px");
+  panel.style.setProperty("--cal-font", "system-ui, sans-serif");
+}
+
 function mountFloatingCalendarDemo(opts, hooks = {}) {
   const options = opts ?? {};
   const wrap = document.createElement("div");
@@ -135,7 +151,7 @@ function mountSelectedDatesDemo(mode) {
     mode === "range"
       ? {
           mode: "range",
-          range: { start: new Date(2026, 2, 5), end: new Date(2026, 2, 18) },
+          range: { start: new Date(2026, 3, 5), end: new Date(2026, 3, 18) },
         }
       : { value: new Date(2026, 3, 14) };
 
@@ -173,7 +189,7 @@ function mountCurrentYearDemo(mode) {
     mode === "range"
       ? {
           mode: "range",
-          range: { start: new Date(2026, 2, 5), end: new Date(2026, 2, 18) },
+          range: { start: new Date(2026, 3, 5), end: new Date(2026, 3, 18) },
         }
       : { value: new Date(2026, 3, 14) };
 
@@ -374,7 +390,7 @@ function mountSetDateDemo() {
   const rangePicker = dateFlow(rangeInput, {
     mode: "range",
     outputFormat: fmt,
-    range: { start: new Date(2026, 2, 5), end: new Date(2026, 2, 18) },
+    range: { start: new Date(2026, 3, 5), end: new Date(2026, 3, 18) },
     onRangeChange: (r) => {
       appendLog("onRangeChange", formatRangeLine(r, fmt, rangeSep));
       updateState(singlePicker, rangePicker);
@@ -498,7 +514,7 @@ function mountSelectorIdDemo() {
     wrap,
     setup() {
       dateFlow("#getting-started-id-picker", {
-        value: new Date(2026, 2, 20),
+        value: new Date(2026, 3, 14),
       });
     },
   };
@@ -530,7 +546,7 @@ function mountSelectorClassDemo() {
     wrap,
     setup() {
       dateFlow(".getting-started-multi-picker", {
-        value: new Date(2026, 2, 20),
+        value: new Date(2026, 3, 14),
       });
     },
   };
@@ -540,7 +556,7 @@ function mountDemo(key) {
   switch (key) {
     case "basic-time":
       return mountFloatingCalendarDemo({
-        value: new Date(2026, 2, 15, 12, 30),
+        value: new Date(2026, 3, 14, 12, 30),
         showTime: true,
       }).wrap;
     case "date-only":
@@ -597,19 +613,19 @@ function mountDemo(key) {
     case "min-max":
       return mountFloatingCalendarDemo({
         value: new Date(2026, 3, 14),
-        minDate: new Date(2026, 2, 10),
-        maxDate: new Date(2026, 2, 25),
+        minDate: new Date(2026, 3, 10),
+        maxDate: new Date(2026, 3, 25),
       }).wrap;
     case "disabled-array":
       return mountFloatingCalendarDemo({
         value: new Date(2026, 3, 14),
-        disabledDates: [new Date(2026, 2, 17), new Date(2026, 2, 18), new Date(2026, 2, 19)],
+        disabledDates: [new Date(2026, 3, 17), new Date(2026, 3, 18), new Date(2026, 3, 19)],
       }).wrap;
     case "disabled-strike":
       return mountFloatingCalendarDemo({
         value: new Date(2026, 3, 14),
         disabledDatesStrikeThrough: true,
-        disabledDates: [new Date(2026, 2, 17), new Date(2026, 2, 18), new Date(2026, 2, 19)],
+        disabledDates: [new Date(2026, 3, 17), new Date(2026, 3, 18), new Date(2026, 3, 19)],
       }).wrap;
     case "disabled-predicate":
       return mountFloatingCalendarDemo({
@@ -617,8 +633,8 @@ function mountDemo(key) {
       }).wrap;
     case "enabled-array":
       return mountFloatingCalendarDemo({
-        value: new Date(2026, 2, 12),
-        enabledDatesOnly: [5, 12, 19, 26].map((day) => new Date(2026, 2, day)),
+        value: new Date(2026, 3, 12),
+        enabledDatesOnly: [5, 12, 19, 26].map((day) => new Date(2026, 3, day)),
       }).wrap;
     case "enabled-predicate":
       return mountFloatingCalendarDemo({
@@ -627,7 +643,7 @@ function mountDemo(key) {
     case "time-24h":
       return mountFloatingCalendarDemo({
         showTime: true,
-        value: new Date(2026, 2, 20, 14, 45),
+        value: new Date(2026, 3, 20, 14, 45),
         minuteStep: 1,
       }).wrap;
     case "time-12h":
@@ -638,13 +654,13 @@ function mountDemo(key) {
       }).wrap;
     case "time-seconds-24h":
       return mountFloatingCalendarDemo({
-        value: new Date(2026, 2, 15, 14, 30, 45),
+        value: new Date(2026, 3, 15, 14, 30, 45),
         showTime: true,
         showSeconds: true,
       }).wrap;
     case "time-seconds-12h":
       return mountFloatingCalendarDemo({
-        value: new Date(2026, 2, 15, 15, 30, 45),
+        value: new Date(2026, 3, 15, 15, 30, 45),
         showTime: true,
         showSeconds: true,
         use12HourTime: true,
@@ -663,20 +679,20 @@ function mountDemo(key) {
       }).wrap;
     case "allow-input-time-24h":
       return mountFloatingCalendarDemo({
-        value: new Date(2026, 2, 15, 14, 30),
+        value: new Date(2026, 3, 15, 14, 30),
         showTime: true,
         allowInput: true,
       }).wrap;
     case "allow-input-time-12h":
       return mountFloatingCalendarDemo({
-        value: new Date(2026, 2, 15, 15, 30),
+        value: new Date(2026, 3, 15, 15, 30),
         showTime: true,
         use12HourTime: true,
         allowInput: true,
       }).wrap;
     case "allow-input-keep-open":
       return mountFloatingCalendarDemo({
-        value: new Date(2026, 2, 15, 14, 30),
+        value: new Date(2026, 3, 15, 14, 30),
         showTime: true,
         allowInput: true,
         keepOpenOnAllowInputEnter: true,
@@ -684,7 +700,7 @@ function mountDemo(key) {
     case "range-basic":
       return mountFloatingCalendarDemo({
         mode: "range",
-        range: { start: new Date(2026, 2, 5), end: new Date(2026, 2, 18) },
+        range: { start: new Date(2026, 3, 5), end: new Date(2026, 3, 18) },
         outputFormat: "yyyy-MM-dd",
       }).wrap;
     case "range-presets":
@@ -748,41 +764,43 @@ function mountDemo(key) {
     case "theme-contrast":
       return mountFloatingCalendarDemo({ theme: "contrast" }).wrap;
     case "theme-custom-vars":
+      return mountFloatingCalendarDemo({}, { setupFloating: applyCustomThemeVars }).wrap;
+    case "theme-custom-vars-range":
       return mountFloatingCalendarDemo(
-        {},
+        {
+          mode: "range",
+          range: { start: new Date(2026, 4, 12), end: new Date(2026, 4, 26) },
+        },
+        { setupFloating: applyCustomThemeVars },
+      ).wrap;
+    case "theme-custom-accent":
+      return mountFloatingCalendarDemo(
+        {
+          mode: "range",
+          showTime: true,
+          range: {
+            start: new Date(2026, 5, 1, 9, 30),
+            end: new Date(2026, 5, 15, 17, 45),
+          },
+        },
         {
           setupFloating: (panel) => {
-            panel.style.setProperty("--cal-bg", "#fff7ed");
-            panel.style.setProperty("--cal-surface", "#ffedd5");
-            panel.style.setProperty("--cal-text", "#431407");
-            panel.style.setProperty("--cal-muted", "#9a3412");
-            panel.style.setProperty("--cal-border", "#fdba74");
-            panel.style.setProperty("--cal-accent", "#c2410c");
-            panel.style.setProperty("--cal-accent-contrast", "#fff7ed");
+            panel.style.setProperty("--cal-accent", "#7c3aed");
           },
         },
       ).wrap;
-    case "theme-forest-combined":
-      return mountFloatingCalendarDemo({
-        theme: "forest",
-        locale: de,
-        minDate: new Date(2026, 2, 1),
-        maxDate: new Date(2026, 3, 30),
-        disabledDates: (d) => d.getDay() === 3,
-        showTime: true,
-      }).wrap;
     case "aria-label":
       return mountFloatingCalendarDemo({ ariaLabel: "Delivery date" }).wrap;
     case "reset-button":
       return mountFloatingCalendarDemo({
-        value: new Date(2026, 2, 13, 14, 15),
+        value: new Date(2026, 3, 13, 14, 15),
         showTime: true,
         showResetButton: true,
         resetInputLabel: "Reset",
       }).wrap;
     case "year-radius":
       return mountFloatingCalendarDemo({
-        minDate: new Date(2026, 2, 1),
+        minDate: new Date(2026, 3, 1),
         maxDate: new Date(2026, 8, 30),
         value: new Date(2026, 5, 1),
       }).wrap;

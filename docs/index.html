@@ -88,7 +88,8 @@
               <li><a class="showcase-toc__link" href="#allow-input">Direct text input</a></li>
               <li><a class="showcase-toc__link" href="#ranges">Date ranges</a></li>
               <li><a class="showcase-toc__link" href="#formatting">Formatting</a></li>
-              <li><a class="showcase-toc__link" href="#theming">Theming &amp; accessibility</a></li>
+              <li><a class="showcase-toc__link" href="#theming">Theming</a></li>
+              <li><a class="showcase-toc__link" href="#accessibility">Accessibility</a></li>
             </ol>
             </details>
           </nav>
@@ -170,11 +171,11 @@
         <article class="showcase-card">
           <h3 class="showcase-card__title">Basic picker with time</h3>
           <p class="showcase-card__desc">Pass your text input to dateFlow. Focus it to open the calendar panel.</p>
-          <pre class="showcase-card__code"><code>import { dateFlow } from "@/calendar";
+          <pre class="showcase-card__code"><code>import { dateFlow } from "dateflow";
 
 const input = document.getElementById("date-field");
 const picker = dateFlow(input, {
-  value: new Date(2026, 2, 15, 12, 30),
+  value: new Date(2026, 3, 14, 12, 30),
   showTime: true,
 });</code></pre>
           <div class="showcase-card__mount" data-demo="basic-time"></div>
@@ -185,7 +186,7 @@ const picker = dateFlow(input, {
           <pre class="showcase-card__code"><code>&lt;input type="text" id="trip-date" /&gt;
 
 dateFlow("#trip-date", {
-  value: new Date(2026, 2, 20),
+  value: new Date(2026, 3, 14),
 });</code></pre>
           <div class="showcase-card__mount" data-demo="selector-id"></div>
         </article>
@@ -196,24 +197,33 @@ dateFlow("#trip-date", {
 &lt;input type="text" class="booking-date" /&gt;
 
 const pickers = dateFlow(".booking-date", {
-  value: new Date(2026, 2, 20),
+  value: new Date(2026, 3, 14),
 });</code></pre>
           <div class="showcase-card__mount" data-demo="selector-class"></div>
         </article>
         <article class="showcase-card">
           <h3 class="showcase-card__title">Runtime setOptions</h3>
           <p class="showcase-card__desc">Update locale, time, or mode without destroying the picker.</p>
-          <pre class="showcase-card__code"><code>const picker = dateFlow(input, { onChange });
+          <pre class="showcase-card__code"><code>const picker = dateFlow(input, {
+  onChange,
+});
 
-picker.setOptions({ locale: de });
-picker.setOptions({ showTime: true });
+picker.setOptions({
+  locale: de,
+});
+picker.setOptions({
+  showTime: true,
+});
 
 picker.setOptions({
   mode: "range",
   range: { start: picker.getValue(), end: null },
 });
 
-picker.setOptions({ mode: "single", value: picker.getRange().start });</code></pre>
+picker.setOptions({
+  mode: "single",
+  value: picker.getRange().start,
+});</code></pre>
           <div class="showcase-card__mount" data-demo="set-options"></div>
                     <div class="showcase-card__actions" id="set-options-actions">
             <button type="button" data-action="locale-de">Locale → German</button>
@@ -221,6 +231,18 @@ picker.setOptions({ mode: "single", value: picker.getRange().start });</code></p
             <button type="button" data-action="toggle-time">Toggle time</button>
             <button type="button" data-action="toggle-range">Toggle range mode</button>
           </div>
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Reset button</h3>
+          <p class="showcase-card__desc">showResetButton adds a header icon that clears the selection.</p>
+          <pre class="showcase-card__code"><code>dateFlow(input, {
+  showResetButton: true,
+  resetInputLabel: "Reset",
+  value: new Date(2026, 3, 13, 14, 15),
+  showTime: true,
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="reset-button"></div>
+
         </article>
         </div>
       </section>
@@ -252,8 +274,8 @@ picker.selectedDates;
           <pre class="showcase-card__code"><code>const picker = dateFlow(input, {
   mode: "range",
   range: {
-    start: new Date(2026, 2, 5),
-    end: new Date(2026, 2, 18),
+    start: new Date(2026, 3, 5),
+    end: new Date(2026, 3, 18),
   },
 });
 
@@ -448,8 +470,8 @@ picker.close(); // hide calendar</code></pre>
         <article class="showcase-card">
           <h3 class="showcase-card__title">German locale</h3>
           <p class="showcase-card__desc">German month and weekday labels. Week start follows Intl for <code>localeTag: "de"</code> (typically Monday).</p>
-          <pre class="showcase-card__code"><code>import { dateFlow } from "@/calendar";
-import { de } from "@/calendar/locales";
+          <pre class="showcase-card__code"><code>import { dateFlow } from "dateflow";
+import { de } from "dateflow/locales";
 
 dateFlow(input, {
   showWeekNumbers: true,
@@ -461,8 +483,8 @@ dateFlow(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">French locale</h3>
           <p class="showcase-card__desc">French labels with week start resolved from Intl for <code>fr</code>.</p>
-          <pre class="showcase-card__code"><code>import { dateFlow } from "@/calendar";
-import { fr } from "@/calendar/locales";
+          <pre class="showcase-card__code"><code>import { dateFlow } from "dateflow";
+import { fr } from "dateflow/locales";
 
 dateFlow(input, {
   locale: fr,
@@ -473,8 +495,8 @@ dateFlow(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">Partial locale override</h3>
           <p class="showcase-card__desc">Merge over defaults — Czech labels, custom week-number header, and localized Apply/Cancel with time selection.</p>
-          <pre class="showcase-card__code"><code>import { dateFlow } from "@/calendar";
-import { cs } from "@/calendar/locales";
+          <pre class="showcase-card__code"><code>import { dateFlow } from "dateflow";
+import { cs } from "dateflow/locales";
 
 dateFlow(input, {
   showTime: true,
@@ -492,8 +514,8 @@ dateFlow(input, {
         <article class="showcase-card">
           <h3 class="showcase-card__title">First day of week override</h3>
           <p class="showcase-card__desc">Override Intl week info with <code>firstDayOfWeek</code> — here English labels with a Sunday-first grid (<code>0</code>).</p>
-          <pre class="showcase-card__code"><code>import { dateFlow } from "@/calendar";
-import { en } from "@/calendar/locales";
+          <pre class="showcase-card__code"><code>import { dateFlow } from "dateflow";
+import { en } from "dateflow/locales";
 
 dateFlow(input, {
   showWeekNumbers: true,
@@ -516,8 +538,8 @@ dateFlow(input, {
           <p class="showcase-card__desc">Only days within the inclusive range are selectable.</p>
           <pre class="showcase-card__code"><code>dateFlow(input, {
   value: new Date(2026, 3, 14),
-  minDate: new Date(2026, 2, 10),
-  maxDate: new Date(2026, 2, 25),
+  minDate: new Date(2026, 3, 10),
+  maxDate: new Date(2026, 3, 25),
 });</code></pre>
           <div class="showcase-card__mount" data-demo="min-max"></div>
 
@@ -528,9 +550,9 @@ dateFlow(input, {
           <pre class="showcase-card__code"><code>dateFlow(input, {
   value: new Date(2026, 3, 14),
   disabledDates: [
-    new Date(2026, 2, 17),
-    new Date(2026, 2, 18),
-    new Date(2026, 2, 19),
+    new Date(2026, 3, 17),
+    new Date(2026, 3, 18),
+    new Date(2026, 3, 19),
   ],
 });</code></pre>
           <div class="showcase-card__mount" data-demo="disabled-array"></div>
@@ -543,9 +565,9 @@ dateFlow(input, {
   value: new Date(2026, 3, 14),
   disabledDatesStrikeThrough: true,
   disabledDates: [
-    new Date(2026, 2, 17),
-    new Date(2026, 2, 18),
-    new Date(2026, 2, 19),
+    new Date(2026, 3, 17),
+    new Date(2026, 3, 18),
+    new Date(2026, 3, 19),
   ],
 });</code></pre>
           <div class="showcase-card__mount" data-demo="disabled-strike"></div>
@@ -567,11 +589,11 @@ dateFlow(input, {
           <h3 class="showcase-card__title">Allowed dates only (array)</h3>
           <p class="showcase-card__desc">Whitelist mode — only listed dates are selectable.</p>
           <pre class="showcase-card__code"><code>const allowed = [5, 12, 19, 26].map(
-  (day) => new Date(2026, 2, day),
+  (day) => new Date(2026, 3, day),
 );
 
 dateFlow(input, {
-  value: new Date(2026, 2, 12),
+  value: new Date(2026, 3, 12),
   enabledDatesOnly: allowed,
 });</code></pre>
           <div class="showcase-card__mount" data-demo="enabled-array"></div>
@@ -598,7 +620,7 @@ dateFlow(input, {
           <pre class="showcase-card__code"><code>dateFlow(input, {
   showTime: true,
   minuteStep: 1,
-  value: new Date(2026, 2, 20, 14, 45),
+  value: new Date(2026, 3, 20, 14, 45),
   // default outputFormat: "yyyy-MM-dd HH:mm"
 });</code></pre>
           <div class="showcase-card__mount" data-demo="time-24h"></div>
@@ -622,7 +644,7 @@ dateFlow(input, {
           <pre class="showcase-card__code"><code>dateFlow(input, {
   showTime: true,
   showSeconds: true,
-  value: new Date(2026, 2, 15, 14, 30, 45),
+  value: new Date(2026, 3, 15, 14, 30, 45),
 });</code></pre>
           <div class="showcase-card__mount" data-demo="time-seconds-24h"></div>
 
@@ -634,7 +656,7 @@ dateFlow(input, {
   showTime: true,
   showSeconds: true,
   use12HourTime: true,
-  value: new Date(2026, 2, 15, 15, 30, 45),
+  value: new Date(2026, 3, 15, 15, 30, 45),
 });</code></pre>
           <div class="showcase-card__mount" data-demo="time-seconds-12h"></div>
 
@@ -654,7 +676,7 @@ dateFlow(input, {
       </section>
       <section id="allow-input" class="showcase-section">
         <h2 class="showcase-section__title">Direct text input</h2>
-        <p class="showcase-section__lead">allowInput lets users type values into the picker input. By default the input is read-only.</p>
+        <p class="showcase-section__lead">Typed input on the value field (<code>allowInput</code>) and in the calendar year control. By default the picker input is read-only.</p>
         <div class="showcase__grid">
         <article class="showcase-card">
           <h3 class="showcase-card__title">allowInput — date</h3>
@@ -673,7 +695,7 @@ dateFlow(input, {
           <pre class="showcase-card__code"><code>dateFlow(input, {
   allowInput: true,
   showTime: true,
-  value: new Date(2026, 2, 15, 14, 30),
+  value: new Date(2026, 3, 15, 14, 30),
   // outputFormat: "yyyy-MM-dd HH:mm"
 });</code></pre>
           <div class="showcase-card__mount" data-demo="allow-input-time-24h"></div>
@@ -686,7 +708,7 @@ dateFlow(input, {
   allowInput: true,
   showTime: true,
   use12HourTime: true,
-  value: new Date(2026, 2, 15, 15, 30),
+  value: new Date(2026, 3, 15, 15, 30),
   // outputFormat: "yyyy-MM-dd hh:mm a"
 });</code></pre>
           <div class="showcase-card__mount" data-demo="allow-input-time-12h"></div>
@@ -699,9 +721,20 @@ dateFlow(input, {
   allowInput: true,
   keepOpenOnAllowInputEnter: true,
   showTime: true,
-  value: new Date(2026, 2, 15, 14, 30),
+  value: new Date(2026, 3, 15, 14, 30),
 });</code></pre>
           <div class="showcase-card__mount" data-demo="allow-input-keep-open"></div>
+
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Year text input</h3>
+          <p class="showcase-card__desc">Type a year directly; values are clamped to minDate and maxDate when set.</p>
+          <pre class="showcase-card__code"><code>dateFlow(input, {
+  minDate: new Date(2026, 3, 1),
+  maxDate: new Date(2026, 8, 30),
+  value: new Date(2026, 5, 1),
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="year-radius"></div>
 
         </article>
         </div>
@@ -716,8 +749,8 @@ dateFlow(input, {
           <pre class="showcase-card__code"><code>dateFlow(input, {
   mode: "range",
   range: {
-    start: new Date(2026, 2, 5),
-    end: new Date(2026, 2, 18),
+    start: new Date(2026, 3, 5),
+    end: new Date(2026, 3, 18),
   },
   outputFormat: "yyyy-MM-dd",
 });</code></pre>
@@ -842,8 +875,8 @@ dateFlow(input, {
         </div>
       </section>
       <section id="theming" class="showcase-section">
-        <h2 class="showcase-section__title">Theming &amp; accessibility</h2>
-        <p class="showcase-section__lead">Built-in theme presets, CSS variables, and accessibility options.</p>
+        <h2 class="showcase-section__title">Theming</h2>
+        <p class="showcase-section__lead">Built-in theme presets and CSS custom properties for colors, typography, and layout.</p>
         <div class="showcase__grid">
         <article class="showcase-card">
           <h3 class="showcase-card__title">Dark theme preset</h3>
@@ -864,62 +897,140 @@ dateFlow(input, {
           <div class="showcase-card__mount" data-demo="theme-contrast"></div>
 
         </article>
-        <article class="showcase-card">
+        <article class="showcase-card showcase-card--full">
           <h3 class="showcase-card__title">Custom CSS variables</h3>
-          <p class="showcase-card__desc">Override --cal-* variables on the panel wrapper (<code>getCalendarElement()</code>) — no theme name required.</p>
-          <pre class="showcase-card__code"><code>const picker = dateFlow(input, { /* … */ });
+          <p class="showcase-card__desc">
+            Override <code>--cal-*</code> tokens on the panel wrapper returned by
+            <code>getCalendarElement()</code> — no named theme required. The input field reads a
+            subset of the same variables when attached.
+          </p>
+          <ul class="showcase-card__args">
+            <li>
+              <code>--cal-bg</code> — panel and input background.
+              <code>panel.style.setProperty("--cal-bg", "#fff7ed")</code>
+            </li>
+            <li>
+              <code>--cal-surface</code> — secondary surfaces (select menus, reset hover).
+              <code>panel.style.setProperty("--cal-surface", "#ffedd5")</code>
+            </li>
+            <li>
+              <code>--cal-text</code> — primary text color.
+              <code>panel.style.setProperty("--cal-text", "#431407")</code>
+            </li>
+            <li>
+              <code>--cal-muted</code> — secondary text (weekday headers, muted days).
+              <code>panel.style.setProperty("--cal-muted", "#9a3412")</code>
+            </li>
+            <li>
+              <code>--cal-input-placeholder</code> — input placeholder text color.
+              <code>panel.style.setProperty("--cal-input-placeholder", "#b45309")</code>
+            </li>
+            <li>
+              <code>--cal-border</code> — panel borders and dividers.
+              <code>panel.style.setProperty("--cal-border", "#fdba74")</code>
+            </li>
+            <li>
+              <code>--cal-header-select-border</code> — month, year, and time control borders.
+              <code>panel.style.setProperty("--cal-header-select-border", "#fb923c")</code>
+            </li>
+            <li>
+              <code>--cal-accent</code> — selected day, today, hover, links, and focus rings.
+              <code>panel.style.setProperty("--cal-accent", "#c2410c")</code>
+            </li>
+            <li>
+              <code>--cal-accent-contrast</code> — text on accent-filled cells and buttons.
+              <code>panel.style.setProperty("--cal-accent-contrast", "#fff7ed")</code>
+            </li>
+            <li>
+              <code>--cal-radius</code> — calendar panel corner radius.
+              <code>panel.style.setProperty("--cal-radius", "14px")</code>
+            </li>
+            <li>
+              <code>--cal-shadow</code> — panel drop shadow.
+              <code>panel.style.setProperty("--cal-shadow", "0 12px 40px rgb(194 65 12 / 0.12)")</code>
+            </li>
+            <li>
+              <code>--cal-day-size</code> — day cell width and height.
+              <code>panel.style.setProperty("--cal-day-size", "38px")</code>
+            </li>
+            <li>
+              <code>--cal-font</code> — font-family stack for the calendar.
+              <code>panel.style.setProperty("--cal-font", 'system-ui, sans-serif')</code>
+            </li>
+          </ul>
+          <p class="showcase-card__desc">
+            Full example below — the same <code>setProperty</code> calls work on
+            <code>picker.getCalendarElement()</code> in single and range mode.
+          </p>
+          <pre class="showcase-card__code"><code>const picker = dateFlow(input, {
+  value: new Date(2026, 5, 1),
+});
 const panel = picker.getCalendarElement();
+
 panel.style.setProperty("--cal-bg", "#fff7ed");
-panel.style.setProperty("--cal-accent", "#c2410c");</code></pre>
-          <div class="showcase-card__mount" data-demo="theme-custom-vars"></div>
-
+panel.style.setProperty("--cal-surface", "#ffedd5");
+panel.style.setProperty("--cal-text", "#431407");
+panel.style.setProperty("--cal-muted", "#9a3412");
+panel.style.setProperty("--cal-input-placeholder", "#b45309");
+panel.style.setProperty("--cal-border", "#fdba74");
+panel.style.setProperty("--cal-header-select-border", "#fb923c");
+panel.style.setProperty("--cal-accent", "#c2410c");
+panel.style.setProperty("--cal-accent-contrast", "#fff7ed");
+panel.style.setProperty("--cal-radius", "14px");
+panel.style.setProperty("--cal-shadow", "0 12px 40px rgb(194 65 12 / 0.12)");
+panel.style.setProperty("--cal-day-size", "38px");
+panel.style.setProperty("--cal-font", 'system-ui, sans-serif');</code></pre>
+          <div class="showcase-card__multi-picker-wrap">
+            <div class="showcase-card__multi-picker-row">
+              <span class="showcase-card__multi-picker-label">Single mode</span>
+              <div class="showcase-card__mount" data-demo="theme-custom-vars"></div>
+            </div>
+            <div class="showcase-card__multi-picker-row">
+              <span class="showcase-card__multi-picker-label">Range mode</span>
+              <div class="showcase-card__mount" data-demo="theme-custom-vars-range"></div>
+            </div>
+          </div>
         </article>
         <article class="showcase-card">
-          <h3 class="showcase-card__title">Forest theme + constraints</h3>
-          <p class="showcase-card__desc">Combine theme, locale, min/max, and disabledDates.</p>
-          <pre class="showcase-card__code"><code>import { de } from "@/calendar/locales";
-
-dateFlow(input, {
-  theme: "forest",
-  locale: de,
-  minDate: new Date(2026, 2, 1),
-  maxDate: new Date(2026, 3, 30),
-  disabledDates: (d) => d.getDay() === 3,
+          <h3 class="showcase-card__title">Custom accent only</h3>
+          <p class="showcase-card__desc">
+            Override a single token — selected day, today, hover, and focus rings follow
+            <code>--cal-accent</code>; everything else keeps the default theme. Works in range mode
+            with time pickers too.
+          </p>
+          <pre class="showcase-card__code"><code>const picker = dateFlow(input, {
+  mode: "range",
   showTime: true,
-});</code></pre>
-          <div class="showcase-card__mount" data-demo="theme-forest-combined"></div>
+  range: {
+    start: new Date(2026, 5, 1, 9, 30),
+    end: new Date(2026, 5, 15, 17, 45),
+  },
+});
+const panel = picker.getCalendarElement();
+panel.style.setProperty("--cal-accent", "#7c3aed");</code></pre>
+          <div class="showcase-card__mount" data-demo="theme-custom-accent"></div>
 
         </article>
+        </div>
+      </section>
+      <section id="accessibility" class="showcase-section">
+        <h2 class="showcase-section__title">Accessibility</h2>
+        <p class="showcase-section__lead">
+          The calendar panel is exposed as a labeled region for assistive technologies. Navigation
+          controls, month and time selectors, and the year field ship with default accessible names;
+          use <code>ariaLabel</code> when the calendar needs a context-specific name in your UI.
+        </p>
+        <div class="showcase__grid">
         <article class="showcase-card">
-          <h3 class="showcase-card__title">aria-label</h3>
-          <p class="showcase-card__desc">Custom accessible name for the calendar region.</p>
+          <h3 class="showcase-card__title">ariaLabel</h3>
+          <p class="showcase-card__desc">
+            Sets the <code>aria-label</code> on the calendar root. Defaults to
+            <code>"Calendar"</code> when omitted.
+          </p>
           <pre class="showcase-card__code"><code>dateFlow(input, {
   ariaLabel: "Delivery date",
 });</code></pre>
           <div class="showcase-card__mount" data-demo="aria-label"></div>
-
-        </article>
-        <article class="showcase-card">
-          <h3 class="showcase-card__title">Reset button</h3>
-          <p class="showcase-card__desc">showResetButton adds a header icon that clears the selection.</p>
-          <pre class="showcase-card__code"><code>dateFlow(input, {
-  showResetButton: true,
-  resetInputLabel: "Reset",
-  value: new Date(2026, 2, 13, 14, 15),
-  showTime: true,
-});</code></pre>
-          <div class="showcase-card__mount" data-demo="reset-button"></div>
-
-        </article>
-        <article class="showcase-card">
-          <h3 class="showcase-card__title">Year text input</h3>
-          <p class="showcase-card__desc">Type a year directly; values are clamped to minDate and maxDate when set.</p>
-          <pre class="showcase-card__code"><code>dateFlow(input, {
-  minDate: new Date(2026, 2, 1),
-  maxDate: new Date(2026, 8, 30),
-  value: new Date(2026, 5, 1),
-});</code></pre>
-          <div class="showcase-card__mount" data-demo="year-radius"></div>
 
         </article>
         </div>

@@ -65,6 +65,7 @@ export function attachCalendarPopover(
     const target = e.target;
     if (!(target instanceof Node)) return;
     if (panel.contains(target) || input.contains(target)) return;
+    if (target instanceof Element && target.closest(".cal__list-select__list--floating")) return;
     close();
   };
 
