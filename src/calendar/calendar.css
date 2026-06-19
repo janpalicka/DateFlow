@@ -583,7 +583,8 @@
   opacity: 0.55;
 }
 
-.cal:not(.cal--range) .cal__day:hover:not(:disabled):not(.cal__day--disabled):not(.cal__day--selected) {
+.cal:not(.cal--range)
+  .cal__day:hover:not(:disabled):not(.cal__day--disabled):not(.cal__day--selected) {
   color: rgb(70, 114, 235);
 }
 

@@ -8,8 +8,7 @@ const repoBase = "/DateFlow/";
 const pkg = JSON.parse(readFileSync(path.resolve(rootDir, "package.json"), "utf8")) as {
   version: string;
 };
-const docsChannel =
-  process.env.GH_PAGES_CHANNEL === "preview" ? "preview" : "production";
+const docsChannel = process.env.GH_PAGES_CHANNEL === "preview" ? "preview" : "production";
 const docsBase =
   process.env.GH_PAGES === "true"
     ? docsChannel === "preview"
@@ -17,13 +16,27 @@ const docsBase =
       : repoBase
     : "/";
 
+const docsVersionLabel = `v${pkg.version}`;
+
+const injectDocsVersionHtml = () => ({
+  name: "inject-docs-version-html",
+  transformIndexHtml: {
+    order: "pre" as const,
+    handler(html: string) {
+      return html.replace(
+        '<span class="site-header__version" data-docs-version aria-label="Documentation version"></span>',
+        `<span class="site-header__version" data-docs-version aria-label="Documentation version">${docsVersionLabel}</span>`,
+      );
+    },
+  },
+});
+
 export default defineConfig({
+  plugins: [injectDocsVersionHtml()],
   base: docsBase,
   define: {
     __DOCS_VERSION__: JSON.stringify(pkg.version),
-    __DOCS_CHANNEL__: JSON.stringify(
-      process.env.GH_PAGES === "true" ? docsChannel : "local",
-    ),
+    __DOCS_CHANNEL__: JSON.stringify(process.env.GH_PAGES === "true" ? docsChannel : "local"),
   },
   root: path.resolve(rootDir, "docs"),
   publicDir: path.resolve(rootDir, "assets"),

@@ -73,6 +73,19 @@ jobs:
           generate_release_notes: true
           prerelease: ${{ steps.release.outputs.prerelease == 'true' }}
 
+      - name: Append preview docs link
+        if: steps.release.outputs.channel == 'preview'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PREVIEW_URL="$(jq -r .homepage package.json | sed 's|/$||')/preview/"
+          BODY="$(gh release view "${{ github.ref_name }}" --json body -q .body)"
+          {
+            printf '%s\n\n## Preview documentation\n\n' "$BODY"
+            printf '[View preview docs](%s)\n' "$PREVIEW_URL"
+          } > release-notes.md
+          gh release edit "${{ github.ref_name }}" --notes-file release-notes.md
+
   deploy-docs:
     name: Deploy docs
     needs: publish

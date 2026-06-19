@@ -3,14 +3,13 @@ import { createCalendarDom } from "./dom/createElements";
 import { createInputController, type InputController } from "./input/createInputController";
 import { canGoNextMonth, canGoPrevMonth } from "./navigation";
 import { attachCalendarPopover, type CalendarPopover } from "./popover";
-import { renderGrid, type GridSelectionState } from "./render/grid";
-import { renderRangePresetsPanel } from "./render/rangePresetsPanel";
 import {
   DESKTOP_RANGE_PRESETS_MEDIA_QUERY,
   findMatchingPresetIndex,
   normalizePresetRange,
   shouldShowRangePresetsPanel,
 } from "./range/rangePresets";
+import { renderGrid, type GridSelectionState } from "./render/grid";
 import {
   clampYear,
   fillMonthYearSelects,
@@ -18,6 +17,7 @@ import {
   restoreYearInput,
   syncYearInputs,
 } from "./render/monthYear";
+import { renderRangePresetsPanel } from "./render/rangePresetsPanel";
 import { renderWeekdaysRow } from "./render/weekdays";
 import { coerceSetDateEntry } from "./setDate";
 import {
@@ -602,10 +602,7 @@ export const buildCalendarPicker = (
     const visible = shouldShowRangePresetsPanel(mode() === "range", config?.presets);
     dom.rangePresets.hidden = !visible;
     root.classList.toggle("cal--range-presets", visible);
-    root.classList.toggle(
-      "cal--range-presets-right",
-      visible && config?.position === "right",
-    );
+    root.classList.toggle("cal--range-presets-right", visible && config?.position === "right");
     if (!visible || !config) {
       dom.rangePresets.replaceChildren();
       return;
