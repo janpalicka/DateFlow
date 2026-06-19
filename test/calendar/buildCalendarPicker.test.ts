@@ -175,7 +175,9 @@ describe("buildCalendarPicker integration", () => {
         ],
       },
     });
-    const presetsNav = picker.getCalendarElement().querySelector(".cal__range-presets") as HTMLElement;
+    const presetsNav = picker
+      .getCalendarElement()
+      .querySelector(".cal__range-presets") as HTMLElement;
     expect(presetsNav.hidden).toBe(true);
     picker.destroy();
   });

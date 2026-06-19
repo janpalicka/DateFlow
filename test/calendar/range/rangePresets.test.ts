@@ -31,12 +31,12 @@ describe("presetMatchesRange", () => {
   };
 
   it("matches day-only ranges", () => {
-    expect(
-      presetMatchesRange(preset, new Date(2026, 5, 10), new Date(2026, 5, 16), false),
-    ).toBe(true);
-    expect(
-      presetMatchesRange(preset, new Date(2026, 5, 11), new Date(2026, 5, 16), false),
-    ).toBe(false);
+    expect(presetMatchesRange(preset, new Date(2026, 5, 10), new Date(2026, 5, 16), false)).toBe(
+      true,
+    );
+    expect(presetMatchesRange(preset, new Date(2026, 5, 11), new Date(2026, 5, 16), false)).toBe(
+      false,
+    );
   });
 
   it("matches exact instants when showTime is enabled", () => {
@@ -71,9 +71,9 @@ describe("findMatchingPresetIndex", () => {
 
 describe("shouldShowRangePresetsPanel", () => {
   it("requires range mode and presets", () => {
-    expect(shouldShowRangePresetsPanel(false, [{ caption: "A", start: new Date(), end: new Date() }])).toBe(
-      false,
-    );
+    expect(
+      shouldShowRangePresetsPanel(false, [{ caption: "A", start: new Date(), end: new Date() }]),
+    ).toBe(false);
     expect(shouldShowRangePresetsPanel(true, [])).toBe(false);
     expect(shouldShowRangePresetsPanel(true, undefined)).toBe(false);
   });

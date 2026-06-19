@@ -39,6 +39,16 @@ jobs:
         with:
           ref: ${{ inputs.tag }}
 
+      - name: Resolve docs channel
+        id: docs
+        run: |
+          TAG="${{ inputs.tag }}"
+          if [[ "$TAG" == *-* ]]; then
+            echo "channel=preview" >> "$GITHUB_OUTPUT"
+          else
+            echo "channel=production" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Install pnpm
         uses: pnpm/action-setup@v6
         with:
@@ -67,16 +77,20 @@ jobs:
         run: pnpm build:docs
         env:
           GH_PAGES: "true"
-          GH_PAGES_CHANNEL: ${{ inputs.channel }}
+          GH_PAGES_CHANNEL: ${{ steps.docs.outputs.channel }}
 
       - name: Merge into site tree
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          CHANNEL="${{ inputs.channel }}"
+          CHANNEL="${{ steps.docs.outputs.channel }}"
+          TAG="${{ inputs.tag }}"
           REPO="${{ github.repository }}"
           SITE="$(mktemp -d)"
+          ARTIFACT="$(mktemp -d)"
+
+          echo "Deploy channel: ${CHANNEL} (tag: ${TAG})"
 
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -108,21 +122,25 @@ jobs:
             fi
           fi
 
-          echo "SITE_DIR=$SITE" >> "$GITHUB_ENV"
+          touch "$SITE/.nojekyll"
+          rsync -a --delete --exclude .git "$SITE/" "$ARTIFACT/"
+          echo "Artifact layout:"
+          find "$ARTIFACT" -maxdepth 2 -type f | head -40
+          echo "ARTIFACT_DIR=$ARTIFACT" >> "$GITHUB_ENV"
 
           cd "$SITE"
           git add -A
           if git diff --staged --quiet; then
             echo "No site tree changes to commit"
           else
-            git commit -m "docs(${CHANNEL}): deploy ${{ inputs.tag }}"
+            git commit -m "docs(${CHANNEL}): deploy ${TAG}"
             git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPO}.git" HEAD:gh-pages
           fi
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5
         with:
-          path: ${{ env.SITE_DIR }}
+          path: ${{ env.ARTIFACT_DIR }}
 
       - name: Deploy to GitHub Pages
         id: deployment

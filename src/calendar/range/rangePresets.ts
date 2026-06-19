@@ -26,7 +26,9 @@ export const presetMatchesRange = (
   if (!start || !end) return false;
   const normalized = normalizePresetRange(preset, showTime);
   if (showTime) {
-    return start.getTime() === normalized.start.getTime() && end.getTime() === normalized.end.getTime();
+    return (
+      start.getTime() === normalized.start.getTime() && end.getTime() === normalized.end.getTime()
+    );
   }
   return isSameDay(start, normalized.start) && isSameDay(end, normalized.end);
 };
