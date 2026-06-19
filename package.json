@@ -71,18 +71,13 @@
     "date-fns": "^4.4.0",
     "jsdom": "^29.1.1",
     "typescript": "~6.0.3",
-    "vite": "^6.4.3",
-    "vite-plus": "^0.1.24",
+    "vite": "^8.0.16",
+    "vite-plus": "^0.2.1",
     "vitest": "^4.1.9"
   },
   "peerDependencies": {
     "@floating-ui/dom": "^1.6.0",
     "date-fns": "^4.0.0"
-  },
-  "pnpm": {
-    "overrides": {
-      "vite": "^6.4.3"
-    }
   },
   "packageManager": "pnpm@10.28.0"
 }
