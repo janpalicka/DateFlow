@@ -15,7 +15,7 @@
   --cal-accent-contrast: #ffffff;
   --cal-radius: 12px;
   --cal-shadow: 0 10px 40px rgb(0 0 0 / 0.08);
-  --cal-day-size: 2.75rem;
+  --cal-day-size: 36px;
   --cal-font:
     system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu, Cantarell, "Noto Sans", sans-serif;
 }
@@ -127,16 +127,20 @@
   background: var(--cal-bg);
   color: var(--cal-text);
   font: inherit;
-  font-size: 0.9375rem;
-  font-weight: 500;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 21px;
   cursor: pointer;
   text-align: left;
 }
 
 .cal__list-select--time .cal__list-select__trigger {
+  position: relative;
+  justify-content: center;
   min-height: 2.35rem;
-  padding: 0.4rem 0.5rem;
-  font-size: 0.8125rem;
+  padding: 0.4rem 1.75rem 0.4rem 0.5rem;
+  text-align: center;
   font-variant-numeric: tabular-nums;
 }
 
@@ -149,7 +153,19 @@
 }
 
 .cal__list-select--time .cal__list-select__label {
-  text-align: left;
+  flex: 0 1 auto;
+  text-align: center;
+}
+
+.cal__list-select--time .cal__list-select__chevron {
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.cal__list-select--time.cal__list-select--open .cal__list-select__chevron {
+  transform: translateY(-50%) rotate(180deg);
 }
 
 .cal__list-select__chevron {
@@ -208,9 +224,17 @@
 }
 
 .cal__list-select--time .cal__list-select__option {
-  padding: 0.45rem 0.65rem;
+  position: relative;
+  justify-content: center;
+  padding: 0.45rem 1.75rem 0.45rem 0.65rem;
   font-size: 0.8125rem;
   font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.cal__list-select--time .cal__list-select__check {
+  position: absolute;
+  right: 0.65rem;
 }
 
 .cal__list-select__option:hover {
@@ -242,10 +266,12 @@
   background: var(--cal-bg);
   color: var(--cal-text);
   font: inherit;
-  font-size: 0.8125rem;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 21px;
   text-align: center;
   font-variant-numeric: tabular-nums;
-  font-weight: 500;
 }
 
 .cal__year-input:focus-visible {
@@ -388,12 +414,14 @@
   width: 100%;
   aspect-ratio: 1;
   max-height: var(--cal-day-size);
+  padding: 8px;
   border-radius: 10px;
   border: 1px solid transparent;
   background: transparent;
   color: var(--cal-text);
   font: inherit;
-  font-size: 0.95rem;
+  font-size: 14px;
+  line-height: 20px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
@@ -434,7 +462,7 @@
   opacity: 0.55;
 }
 
-.cal:not(.cal--range) .cal__day:hover:not(:disabled):not(.cal__day--disabled) {
+.cal:not(.cal--range) .cal__day:hover:not(:disabled):not(.cal__day--disabled):not(.cal__day--selected) {
   color: rgb(70, 114, 235);
 }
 
@@ -449,8 +477,15 @@
   color: rgb(70, 114, 235);
 }
 
-/* Single mode: selected day is text-only (no fill, no border). */
-.cal:not(.cal--range) .cal__day--selected,
+/* Single mode: selected day uses accent fill. */
+.cal:not(.cal--range) .cal__day--selected {
+  border-color: transparent;
+  background: var(--cal-accent);
+  box-shadow: none;
+  color: var(--cal-accent-contrast);
+  font-weight: 600;
+}
+
 .cal:not(.cal--range) .cal__day--pseudo-selected {
   border-color: transparent;
   background: transparent;
@@ -459,10 +494,16 @@
   font-weight: 600;
 }
 
-.cal:not(.cal--range) .cal__day--today.cal__day--selected,
+.cal:not(.cal--range) .cal__day--today.cal__day--selected {
+  border-color: transparent;
+  background: var(--cal-accent);
+  color: var(--cal-accent-contrast);
+}
+
 .cal:not(.cal--range) .cal__day--today.cal__day--pseudo-selected {
   border-color: transparent;
   background: transparent;
+  color: rgb(70, 114, 235);
 }
 
 /* Range mode: start/end keep accent fill. */
@@ -735,10 +776,6 @@
   .cal {
     padding: 1rem;
     width: min(100%, 24rem);
-  }
-
-  .cal__day {
-    font-size: 1rem;
   }
 }
 
