@@ -136,9 +136,9 @@ export const createCalendarDom = (): CalendarDomElements => {
 
   const body = document.createElement("div");
   body.className = "cal__body";
-  main.append(panes, timeWrap);
+  main.append(panes, timeWrap, rangeActions);
   body.append(rangePresets, main);
-  root.append(body, rangeActions);
+  root.append(body);
   container.append(root);
 
   return {
