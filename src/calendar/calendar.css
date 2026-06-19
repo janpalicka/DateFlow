@@ -324,6 +324,18 @@
   scrollbar-color: color-mix(in srgb, var(--cal-muted) 70%, transparent) transparent;
 }
 
+.cal__list-select__list--floating {
+  position: fixed;
+  z-index: 10000;
+  top: 0;
+  left: 0;
+  right: auto;
+  width: auto;
+  min-width: 0;
+  font-family: var(--cal-font);
+  color: var(--cal-text);
+}
+
 .cal__list-select__list::-webkit-scrollbar {
   width: 6px;
 }
@@ -344,7 +356,8 @@
   color: var(--cal-text);
 }
 
-.cal__list-select--time .cal__list-select__option {
+.cal__list-select--time .cal__list-select__option,
+.cal__list-select__list--time .cal__list-select__option {
   position: relative;
   justify-content: center;
   padding: 0.45rem 1.75rem 0.45rem 0.65rem;
@@ -353,9 +366,10 @@
   text-align: center;
 }
 
-.cal__list-select--time .cal__list-select__check {
+.cal__list-select--time .cal__list-select__check,
+.cal__list-select__list--time .cal__list-select__check {
   position: absolute;
-  right: 0.65rem;
+  right: 0.1rem;
 }
 
 .cal__list-select__option:hover {
@@ -585,7 +599,7 @@
 
 .cal:not(.cal--range)
   .cal__day:hover:not(:disabled):not(.cal__day--disabled):not(.cal__day--selected) {
-  color: rgb(70, 114, 235);
+  color: var(--cal-accent);
 }
 
 /* Today outside selection/range highlight: plain cell like any other day. */
@@ -596,7 +610,7 @@
   ):not(.cal__day--range-preview-start):not(.cal__day--range-preview-end) {
   border-color: transparent;
   background: transparent;
-  color: rgb(70, 114, 235);
+  color: var(--cal-accent);
 }
 
 /* Single mode: selected day uses accent fill. */
@@ -612,7 +626,7 @@
   border-color: transparent;
   background: transparent;
   box-shadow: none;
-  color: rgb(70, 114, 235);
+  color: var(--cal-accent);
   font-weight: 600;
 }
 
@@ -625,7 +639,7 @@
 .cal:not(.cal--range) .cal__day--today.cal__day--pseudo-selected {
   border-color: transparent;
   background: transparent;
-  color: rgb(70, 114, 235);
+  color: var(--cal-accent);
 }
 
 /* Range mode: start/end keep accent fill. */
@@ -873,13 +887,6 @@
     --cal-border: #3f3f46;
     --cal-accent: #38bdf8;
   }
-}
-
-.cal[data-cal-theme="forest"],
-.cal__input[data-cal-theme="forest"] {
-  --cal-accent: #15803d;
-  --cal-accent-contrast: #ecfdf5;
-  --cal-surface: #ecfdf5;
 }
 
 .cal[data-cal-theme="contrast"],
