@@ -103,4 +103,13 @@ describe("renderGrid", () => {
     expect(left.querySelectorAll("button.cal__day")).toHaveLength(30);
     expect(right.querySelectorAll("button.cal__day")).toHaveLength(31);
   });
+
+  it("renders only the left month pane in compact range mode", () => {
+    const left = document.createElement("div");
+    const right = document.createElement("div");
+    right.innerHTML = "<button type='button' class='cal__day'></button>";
+    renderGrid(left, right, 2026, 5, {}, baseSelection(), { onDayClick: vi.fn() }, true);
+    expect(left.querySelectorAll("button.cal__day")).toHaveLength(30);
+    expect(right.querySelectorAll("button.cal__day")).toHaveLength(0);
+  });
 });

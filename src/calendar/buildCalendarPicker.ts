@@ -1,10 +1,16 @@
 import { addMonths, compareAsc, isSameDay, startOfDay } from "date-fns";
 import { createCalendarDom } from "./dom/createElements";
-import type { CustomSelectControl } from "./dom/customSelect";
 import { createInputController, type InputController } from "./input/createInputController";
 import { canGoNextMonth, canGoPrevMonth } from "./navigation";
 import { attachCalendarPopover, type CalendarPopover } from "./popover";
 import { renderGrid, type GridSelectionState } from "./render/grid";
+import { renderRangePresetsPanel } from "./render/rangePresetsPanel";
+import {
+  DESKTOP_RANGE_PRESETS_MEDIA_QUERY,
+  findMatchingPresetIndex,
+  normalizePresetRange,
+  shouldShowRangePresetsPanel,
+} from "./range/rangePresets";
 import {
   clampYear,
   fillMonthYearSelects,
@@ -32,6 +38,8 @@ import {
   parseCalendarDay,
   shouldShowTimeOn,
 } from "./utils";
+import { COMPACT_RANGE_MEDIA_QUERY, matchesCompactRangeLayout } from "./utils/viewport";
+import type { CustomSelectControl } from "./dom/customSelect";
 import type {
   CalendarMode,
   CalendarOptions,
@@ -205,6 +213,54 @@ export const buildCalendarPicker = (
   dom.grid.addEventListener("mouseleave", onGridMouseLeave);
   dom.gridRight.addEventListener("mousemove", updateRangeHoverFromPointer);
   dom.gridRight.addEventListener("mouseleave", onGridMouseLeave);
+
+  const rangePresetsMediaQuery =
+    typeof window !== "undefined" && typeof window.matchMedia === "function"
+      ? window.matchMedia(DESKTOP_RANGE_PRESETS_MEDIA_QUERY)
+      : null;
+  const onRangePresetsLayoutChange = (): void => {
+    render();
+  };
+  rangePresetsMediaQuery?.addEventListener("change", onRangePresetsLayoutChange);
+
+  const applyRangePreset = (index: number): void => {
+    const config = options.rangePresets;
+    const preset = config?.presets[index];
+    if (!preset || mode() !== "range") return;
+
+    clearRangeHover();
+    const { start, end } = normalizePresetRange(preset, shouldShowTimeOn(options));
+    rangeStart = start;
+    rangeEnd = end;
+    viewYear = start.getFullYear();
+    viewMonth = start.getMonth();
+    render();
+  };
+
+  const compactRangeMediaQuery =
+    typeof window !== "undefined" && typeof window.matchMedia === "function"
+      ? window.matchMedia(COMPACT_RANGE_MEDIA_QUERY)
+      : null;
+  const onCompactRangeLayoutChange = (): void => {
+    layoutCompactRangePanes();
+    render();
+  };
+  compactRangeMediaQuery?.addEventListener("change", onCompactRangeLayoutChange);
+
+  const isCompactRangeLayout = (): boolean => mode() === "range" && matchesCompactRangeLayout();
+
+  function layoutCompactRangePanes(): void {
+    const compact = isCompactRangeLayout();
+    if (compact) {
+      if (!dom.paneLeft.contains(dom.timeWrapRangeEnd)) {
+        dom.paneLeft.append(dom.timeWrapRangeEnd);
+      }
+      return;
+    }
+    if (mode() === "range" && !dom.paneRight.contains(dom.timeWrapRangeEnd)) {
+      dom.paneRight.append(dom.timeWrapRangeEnd);
+    }
+  }
 
   if (options.popover ?? true) {
     popover = attachCalendarPopover(valueInput, container, {
@@ -519,7 +575,8 @@ export const buildCalendarPicker = (
 
   function layoutRangeHeaders(): void {
     const isRange = mode() === "range";
-    if (isRange) {
+    const compact = isCompactRangeLayout();
+    if (isRange && !compact) {
       if (dom.btnNext.parentElement !== dom.headerRight) {
         dom.headerRight.append(dom.btnNext);
       }
@@ -540,10 +597,35 @@ export const buildCalendarPicker = (
     dom.btnApplyRange.textContent = locale.rangeApply ?? "Apply";
   }
 
+  function syncRangePresetsPanel(): void {
+    const config = options.rangePresets;
+    const visible = shouldShowRangePresetsPanel(mode() === "range", config?.presets);
+    dom.rangePresets.hidden = !visible;
+    root.classList.toggle("cal--range-presets", visible);
+    root.classList.toggle(
+      "cal--range-presets-right",
+      visible && config?.position === "right",
+    );
+    if (!visible || !config) {
+      dom.rangePresets.replaceChildren();
+      return;
+    }
+    const activeIndex = findMatchingPresetIndex(
+      config.presets,
+      rangeStart,
+      rangeEnd,
+      shouldShowTimeOn(options),
+    );
+    renderRangePresetsPanel(dom.rangePresets, config, activeIndex, applyRangePreset);
+  }
+
   function render(): void {
     const isRange = mode() === "range";
+    const compactRange = isCompactRangeLayout();
     root.classList.toggle("cal--range", isRange);
-    dom.paneRight.hidden = !isRange;
+    root.classList.toggle("cal--range-compact", compactRange);
+    dom.paneRight.hidden = !isRange || compactRange;
+    layoutCompactRangePanes();
     dom.rangeActions.hidden = !shouldShowApplyActions();
     layoutRangeHeaders();
     fillMonthYearSelects(dom.monthSelect, dom.monthSelectRight, viewYear, viewMonth, options);
@@ -552,15 +634,31 @@ export const buildCalendarPicker = (
     syncingYearInput = false;
     renderWeekdaysRow(dom.weekdaysRow, options);
     renderWeekdaysRow(dom.weekdaysRowRight, options);
-    renderGrid(dom.grid, dom.gridRight, viewYear, viewMonth, options, getGridSelection(), {
-      onDayClick,
-    });
+    renderGrid(
+      dom.grid,
+      dom.gridRight,
+      viewYear,
+      viewMonth,
+      options,
+      getGridSelection(),
+      {
+        onDayClick,
+      },
+      compactRange,
+    );
     syncTimeSelectsFromValue();
     updateTimeVisibility();
     updateResetVisibility();
     syncRangeActionLabels();
+    syncRangePresetsPanel();
     dom.btnPrev.disabled = !canGoPrevMonth(viewYear, viewMonth, options.minDate);
-    dom.btnNext.disabled = !canGoNextMonth(viewYear, viewMonth, options.maxDate, mode());
+    dom.btnNext.disabled = !canGoNextMonth(
+      viewYear,
+      viewMonth,
+      options.maxDate,
+      mode(),
+      compactRange,
+    );
     inputController.applyInputMode();
     inputController.syncInputFromState();
   }
@@ -879,7 +977,7 @@ export const buildCalendarPicker = (
     const rightView = addMonths(new Date(viewYear, viewMonth, 1), 1);
     return {
       startYear: viewYear,
-      endYear: rightView.getFullYear(),
+      endYear: isCompactRangeLayout() ? viewYear : rightView.getFullYear(),
     };
   };
 
@@ -1095,6 +1193,8 @@ export const buildCalendarPicker = (
       hidePanel();
     },
     destroy(): void {
+      rangePresetsMediaQuery?.removeEventListener("change", onRangePresetsLayoutChange);
+      compactRangeMediaQuery?.removeEventListener("change", onCompactRangeLayoutChange);
       popover?.destroy();
       valueInput.removeEventListener("blur", inputController.onInputBlur);
       valueInput.removeEventListener("keydown", onInputKeydown);

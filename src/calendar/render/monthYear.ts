@@ -1,6 +1,6 @@
 import { addMonths } from "date-fns";
-import type { CustomSelectControl } from "../dom/customSelect";
 import { mergeLocale } from "../utils";
+import type { CustomSelectControl } from "../dom/customSelect";
 import type { CalendarOptions } from "../types";
 
 export const parseYearInput = (text: string): number | null => {

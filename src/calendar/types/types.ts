@@ -46,6 +46,18 @@ export interface DateRangeValue {
   end: Date | null;
 }
 
+export interface RangePreset {
+  caption: string;
+  start: Date;
+  end: Date;
+}
+
+export interface RangePresetsConfig {
+  /** Sidebar position. Default: `"left"`. Hidden on viewports ≤899px. */
+  position?: "left" | "right";
+  presets: RangePreset[];
+}
+
 export type CalendarSelectedDatesSingle = {
   selectedDate: Date | null;
 };
@@ -82,6 +94,11 @@ export interface CalendarOptions {
   value?: Date | null;
   /** Range mode: start/end instants. Omitted parts default to `null`. */
   range?: DateRangeValue;
+  /**
+   * Range-mode shortcut list shown beside the calendar on viewports ≥900px.
+   * Omitted when not configured.
+   */
+  rangePresets?: RangePresetsConfig;
   onChange?: (date: Date | null) => void;
   onRangeChange?: (range: DateRangeValue) => void;
   minDate?: Date | null;

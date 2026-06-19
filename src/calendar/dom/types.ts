@@ -1,9 +1,12 @@
-import type { CustomSelectControl } from "./customSelect";
 import type { TimeRowElements } from "../time";
+import type { CustomSelectControl } from "./customSelect";
 
 export interface CalendarDomElements {
   container: HTMLDivElement;
   root: HTMLDivElement;
+  body: HTMLDivElement;
+  main: HTMLDivElement;
+  rangePresets: HTMLElement;
   paneLeft: HTMLDivElement;
   paneRight: HTMLDivElement;
   header: HTMLDivElement;

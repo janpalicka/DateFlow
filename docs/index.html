@@ -776,6 +776,44 @@ dateFlow(input, {
           <div class="showcase-card__mount" data-demo="range-dark"></div>
 
         </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Range presets</h3>
+          <p class="showcase-card__desc">Shortcut list for common ranges. Click a preset to preselect dates; Apply commits. Hidden on mobile (≤899px).</p>
+          <pre class="showcase-card__code"><code>dateFlow(input, {
+  mode: "range",
+  showTime: true,
+  rangePresets: {
+    position: "left",
+    presets: [
+      {
+        caption: "Next 7 Days",
+        start: new Date(2026, 5, 18),
+        end: new Date(2026, 5, 24),
+      },
+      {
+        caption: "Last Month",
+        start: new Date(2026, 4, 18),
+        end: new Date(2026, 5, 18),
+      },
+    ],
+  },
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="range-presets"></div>
+
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Range presets — right</h3>
+          <p class="showcase-card__desc">Set <code>rangePresets.position</code> to <code>"right"</code> to place the shortcut list on the right.</p>
+          <pre class="showcase-card__code"><code>dateFlow(input, {
+  mode: "range",
+  rangePresets: {
+    position: "right",
+    presets: [/* … */],
+  },
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="range-presets-right"></div>
+
+        </article>
         </div>
       </section>
       <section id="formatting" class="showcase-section">

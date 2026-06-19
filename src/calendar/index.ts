@@ -14,5 +14,7 @@ export type {
   DateFilter,
   DatePredicate,
   DateRangeValue,
+  RangePreset,
+  RangePresetsConfig,
   CalendarSetDateInput,
 } from "./types/types";

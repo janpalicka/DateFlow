@@ -110,7 +110,7 @@ describe("createTimeRow", () => {
       meridiem: "AM/PM",
     });
     expect(row.row.className).toBe("cal__time");
-    expect(row.hour.root.querySelector("button")?.getAttribute("aria-label")).toBe("Hour");
+    expect(row.hour.root.querySelector("input")?.getAttribute("aria-label")).toBe("Hour");
     expect(row.row.contains(row.minute.root)).toBe(true);
   });
 });
