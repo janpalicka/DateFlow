@@ -1,4 +1,5 @@
 import { ICON_SELECT_CHECK, ICON_SELECT_CHEVRON } from "../icons";
+import { attachFloatingList } from "./floatingList";
 
 export interface CustomSelectOption {
   value: string;
@@ -56,9 +57,9 @@ const findOptionForTypedValue = (
   return best.option;
 };
 
-const createList = (ariaLabel: string): HTMLUListElement => {
+const createList = (ariaLabel: string, variant: CustomSelectVariant): HTMLUListElement => {
   const list = document.createElement("ul");
-  list.className = "cal__list-select__list";
+  list.className = `cal__list-select__list cal__list-select__list--${variant}`;
   list.setAttribute("role", "listbox");
   list.setAttribute("aria-label", ariaLabel);
   list.hidden = true;
@@ -85,8 +86,10 @@ const createMonthCustomSelect = (ariaLabel: string): CustomSelectControl => {
 
   trigger.append(label, chevron);
 
-  const list = createList(ariaLabel);
+  const list = createList(ariaLabel, "month");
   root.append(trigger, list);
+
+  const floatingList = attachFloatingList(trigger, list, root);
 
   let options: CustomSelectOption[] = [];
   let selectedValue = "";
@@ -105,6 +108,7 @@ const createMonthCustomSelect = (ariaLabel: string): CustomSelectControl => {
   };
 
   const close = (): void => {
+    floatingList.stop();
     list.hidden = true;
     trigger.setAttribute("aria-expanded", "false");
     root.classList.remove("cal__list-select--open");
@@ -155,10 +159,14 @@ const createMonthCustomSelect = (ariaLabel: string): CustomSelectControl => {
     list.hidden = false;
     trigger.setAttribute("aria-expanded", "true");
     root.classList.add("cal__list-select--open");
+    floatingList.start();
     const selectedItem = list.querySelector(".cal__list-select__option--selected");
     selectedItem?.scrollIntoView({ block: "nearest" });
     docPointerListener = (event: PointerEvent): void => {
-      if (!root.contains(event.target as Node)) close();
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (root.contains(target) || list.contains(target)) return;
+      close();
     };
     document.addEventListener("pointerdown", docPointerListener);
   };
@@ -229,8 +237,10 @@ const createTimeCustomSelect = (ariaLabel: string): CustomSelectControl => {
 
   trigger.append(input, chevronBtn);
 
-  const list = createList(ariaLabel);
+  const list = createList(ariaLabel, "time");
   root.append(trigger, list);
+
+  const floatingList = attachFloatingList(trigger, list, root);
 
   let options: CustomSelectOption[] = [];
   let selectedValue = "";
@@ -249,6 +259,7 @@ const createTimeCustomSelect = (ariaLabel: string): CustomSelectControl => {
   };
 
   const close = (): void => {
+    floatingList.stop();
     list.hidden = true;
     chevronBtn.setAttribute("aria-expanded", "false");
     root.classList.remove("cal__list-select--open");
@@ -328,10 +339,14 @@ const createTimeCustomSelect = (ariaLabel: string): CustomSelectControl => {
     list.hidden = false;
     chevronBtn.setAttribute("aria-expanded", "true");
     root.classList.add("cal__list-select--open");
+    floatingList.start();
     const selectedItem = list.querySelector(".cal__list-select__option--selected");
     selectedItem?.scrollIntoView({ block: "nearest" });
     docPointerListener = (event: PointerEvent): void => {
-      if (!root.contains(event.target as Node)) close();
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      if (root.contains(target) || list.contains(target)) return;
+      close();
     };
     document.addEventListener("pointerdown", docPointerListener);
   };
