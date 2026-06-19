@@ -836,6 +836,16 @@ function mountQuickStartDemo() {
   });
 }
 
+function syncDocsLayoutMetrics() {
+  const header = document.querySelector(".site-header");
+  if (header instanceof HTMLElement) {
+    document.documentElement.style.setProperty(
+      "--site-header-height",
+      `${header.offsetHeight}px`,
+    );
+  }
+}
+
 function initTocSpy() {
   const disclosure = document.querySelector(".showcase-toc__disclosure");
   const currentLabel = document.querySelector("[data-toc-current]");
@@ -970,6 +980,8 @@ function initTocSpy() {
 }
 
 function initShowcase() {
+  syncDocsLayoutMetrics();
+  window.addEventListener("resize", syncDocsLayoutMetrics, { passive: true });
   mountQuickStartDemo();
   initTocSpy();
   for (const mount of document.querySelectorAll("[data-demo]")) {
