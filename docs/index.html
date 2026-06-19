@@ -661,6 +661,17 @@ dateFlow(input, {
           <div class="showcase-card__mount" data-demo="time-seconds-12h"></div>
 
         </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Dropdown-only time fields</h3>
+          <p class="showcase-card__desc">Set allowTimeInput to false to disable typing into hour, minute, and second selectors.</p>
+          <pre class="showcase-card__code"><code>dateFlow(input, {
+  showTime: true,
+  allowTimeInput: false,
+  value: new Date(2026, 2, 20, 14, 45),
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="time-no-input"></div>
+
+        </article>
         </div>
       </section>
       <section id="allow-input" class="showcase-section">

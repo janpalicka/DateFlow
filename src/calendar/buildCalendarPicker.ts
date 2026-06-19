@@ -529,6 +529,17 @@ export const buildCalendarPicker = (
     );
   }
 
+  function syncTimeFieldControls(): void {
+    const editable = options.allowTimeInput ?? true;
+    const context = { use12Hour: use12Hour(), minuteStep: minuteStepOn() };
+    for (const row of [dom.timeSingle, dom.timeRangeStart, dom.timeRangeEnd]) {
+      for (const field of [row.hour, row.minute, row.second] as const) {
+        field.setEditable?.(editable);
+        field.setClampContext?.(context);
+      }
+    }
+  }
+
   function updateTimeVisibility(): void {
     const st = options.showTime ?? false;
     const use12 = use12Hour();
@@ -549,6 +560,7 @@ export const buildCalendarPicker = (
     dom.timeRangeStart.sepSecond.hidden = !st || !secs || !rng;
     dom.timeRangeEnd.second.root.hidden = !st || !secs || !rng;
     dom.timeRangeEnd.sepSecond.hidden = !st || !secs || !rng;
+    syncTimeFieldControls();
   }
 
   function updateResetVisibility(): void {

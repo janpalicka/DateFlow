@@ -1,4 +1,11 @@
 import { ICON_SELECT_CHECK, ICON_SELECT_CHEVRON } from "../icons";
+import {
+  clampTimeNumericField,
+  formatTimeNumericLabel,
+  parseTimeNumericInput,
+  type TimeFieldClampContext,
+  type TimeNumericField,
+} from "../time/numericField";
 import { attachFloatingList } from "./floatingList";
 
 export interface CustomSelectOption {
@@ -13,9 +20,15 @@ export interface CustomSelectControl {
   setOptions(options: readonly CustomSelectOption[]): void;
   addEventListener(type: "change", listener: () => void): void;
   close(): void;
+  setEditable?(enabled: boolean): void;
+  setClampContext?(context: TimeFieldClampContext): void;
 }
 
 export type CustomSelectVariant = "month" | "time";
+
+export interface CustomSelectCreateOptions {
+  numericField?: TimeNumericField;
+}
 
 let openCustomSelect: (() => void) | null = null;
 
@@ -161,7 +174,7 @@ const createMonthCustomSelect = (ariaLabel: string): CustomSelectControl => {
     root.classList.add("cal__list-select--open");
     floatingList.start();
     const selectedItem = list.querySelector(".cal__list-select__option--selected");
-    selectedItem?.scrollIntoView({ block: "nearest" });
+    selectedItem?.scrollIntoView?.({ block: "nearest" });
     docPointerListener = (event: PointerEvent): void => {
       const target = event.target;
       if (!(target instanceof Node)) return;
@@ -209,7 +222,11 @@ const createMonthCustomSelect = (ariaLabel: string): CustomSelectControl => {
   };
 };
 
-const createTimeCustomSelect = (ariaLabel: string): CustomSelectControl => {
+const createTimeCustomSelect = (
+  ariaLabel: string,
+  createOptions: CustomSelectCreateOptions = {},
+): CustomSelectControl => {
+  const { numericField } = createOptions;
   const root = document.createElement("div");
   root.className = "cal__list-select cal__list-select--time";
 
@@ -221,8 +238,8 @@ const createTimeCustomSelect = (ariaLabel: string): CustomSelectControl => {
   input.type = "text";
   input.className = "cal__list-select__input";
   input.setAttribute("aria-label", ariaLabel);
-  input.inputMode = /am\/pm/i.test(ariaLabel) ? "text" : "numeric";
-  input.maxLength = /am\/pm/i.test(ariaLabel) ? 2 : 2;
+  input.inputMode = numericField ? "numeric" : "text";
+  input.maxLength = 2;
   input.readOnly = true;
   input.spellcheck = false;
   input.autocomplete = "off";
@@ -244,6 +261,8 @@ const createTimeCustomSelect = (ariaLabel: string): CustomSelectControl => {
 
   let options: CustomSelectOption[] = [];
   let selectedValue = "";
+  let editable = true;
+  let clampContext: TimeFieldClampContext = { use12Hour: false, minuteStep: 5 };
   const changeListeners: Array<() => void> = [];
   let docPointerListener: ((event: PointerEvent) => void) | null = null;
 
@@ -256,6 +275,23 @@ const createTimeCustomSelect = (ariaLabel: string): CustomSelectControl => {
   const syncInputDisplay = (): void => {
     const current = options.find((option) => option.value === selectedValue);
     input.value = current?.label ?? "";
+  };
+
+  const pickOptionValueForClamped = (clamped: number): string => {
+    const exact = String(clamped);
+    if (options.some((option) => option.value === exact)) return exact;
+    let bestValue = selectedValue;
+    let bestDistance = Number.POSITIVE_INFINITY;
+    for (const option of options) {
+      const numeric = Number.parseInt(option.value, 10);
+      if (!Number.isFinite(numeric)) continue;
+      const distance = Math.abs(numeric - clamped);
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        bestValue = option.value;
+      }
+    }
+    return bestValue;
   };
 
   const close = (): void => {
@@ -310,13 +346,17 @@ const createTimeCustomSelect = (ariaLabel: string): CustomSelectControl => {
     root.classList.remove("cal__list-select--editing");
 
     const previous = selectedValue;
-    const matched = findOptionForTypedValue(input.value, options);
-    if (!matched) {
-      syncInputDisplay();
-      return;
+    if (numericField) {
+      const parsed = parseTimeNumericInput(input.value);
+      if (parsed !== null) {
+        const clamped = clampTimeNumericField(numericField, parsed, clampContext);
+        selectedValue = pickOptionValueForClamped(clamped);
+      }
+    } else {
+      const matched = findOptionForTypedValue(input.value, options);
+      if (matched) selectedValue = matched.value;
     }
 
-    selectedValue = matched.value;
     syncInputDisplay();
     renderList();
     if (selectedValue !== previous) {
@@ -325,15 +365,22 @@ const createTimeCustomSelect = (ariaLabel: string): CustomSelectControl => {
   };
 
   const enterEditMode = (): void => {
-    if (!input.readOnly) return;
+    if (!editable || !input.readOnly) return;
     close();
     input.readOnly = false;
+    if (numericField) {
+      const parsed = Number.parseInt(selectedValue, 10);
+      input.value = Number.isFinite(parsed)
+        ? formatTimeNumericLabel(parsed)
+        : input.value;
+    }
     root.classList.add("cal__list-select--editing");
     input.focus();
     input.select();
   };
 
   const open = (): void => {
+    if (!input.readOnly) commitEdit();
     openCustomSelect?.();
     openCustomSelect = close;
     list.hidden = false;
@@ -341,7 +388,7 @@ const createTimeCustomSelect = (ariaLabel: string): CustomSelectControl => {
     root.classList.add("cal__list-select--open");
     floatingList.start();
     const selectedItem = list.querySelector(".cal__list-select__option--selected");
-    selectedItem?.scrollIntoView({ block: "nearest" });
+    selectedItem?.scrollIntoView?.({ block: "nearest" });
     docPointerListener = (event: PointerEvent): void => {
       const target = event.target;
       if (!(target instanceof Node)) return;
@@ -351,13 +398,24 @@ const createTimeCustomSelect = (ariaLabel: string): CustomSelectControl => {
     document.addEventListener("pointerdown", docPointerListener);
   };
 
+  const openFromInput = (): void => {
+    if (list.hidden) open();
+    else close();
+  };
+
   input.addEventListener("pointerdown", (event) => {
+    if (!editable) {
+      event.preventDefault();
+      openFromInput();
+      return;
+    }
     if (!input.readOnly) return;
     event.preventDefault();
     enterEditMode();
   });
 
   input.addEventListener("focus", () => {
+    if (!editable) return;
     if (input.readOnly) enterEditMode();
   });
 
@@ -380,15 +438,14 @@ const createTimeCustomSelect = (ariaLabel: string): CustomSelectControl => {
   chevronBtn.addEventListener("click", (event) => {
     event.stopPropagation();
     if (!input.readOnly) commitEdit();
-    if (list.hidden) open();
-    else close();
+    openFromInput();
   });
 
   chevronBtn.addEventListener("keydown", (event) => {
     if (event.key === "Escape") close();
   });
 
-  return {
+  const control: CustomSelectControl = {
     root,
     get value() {
       return selectedValue;
@@ -415,13 +472,32 @@ const createTimeCustomSelect = (ariaLabel: string): CustomSelectControl => {
     },
     close,
   };
+
+  if (numericField) {
+    control.setEditable = (enabled: boolean): void => {
+      editable = enabled;
+      if (!enabled && !input.readOnly) {
+        syncInputDisplay();
+        input.readOnly = true;
+        root.classList.remove("cal__list-select--editing");
+      }
+    };
+    control.setClampContext = (context: TimeFieldClampContext): void => {
+      clampContext = context;
+    };
+  }
+
+  return control;
 };
 
 export const createCustomSelect = (
   ariaLabel: string,
   variant: CustomSelectVariant = "time",
+  createOptions: CustomSelectCreateOptions = {},
 ): CustomSelectControl =>
-  variant === "month" ? createMonthCustomSelect(ariaLabel) : createTimeCustomSelect(ariaLabel);
+  variant === "month"
+    ? createMonthCustomSelect(ariaLabel)
+    : createTimeCustomSelect(ariaLabel, createOptions);
 
 export const createMonthSelect = (ariaLabel: string): CustomSelectControl =>
   createCustomSelect(ariaLabel, "month");

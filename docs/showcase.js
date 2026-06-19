@@ -665,6 +665,12 @@ function mountDemo(key) {
         showSeconds: true,
         use12HourTime: true,
       }).wrap;
+    case "time-no-input":
+      return mountFloatingCalendarDemo({
+        showTime: true,
+        allowTimeInput: false,
+        value: new Date(2026, 2, 20, 14, 45),
+      }).wrap;
     case "allow-input-date":
       return mountFloatingCalendarDemo({
         value: new Date(2026, 3, 14),
