@@ -109,6 +109,61 @@ body {
   gap: 0.5rem;
 }
 
+.site-header__version {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: 0 0.65rem;
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  background: var(--card-bg);
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+.showcase-preview-banner {
+  border-bottom: 1px solid rgb(37 99 235 / 0.25);
+  background: linear-gradient(90deg, rgb(37 99 235 / 0.12), rgb(37 99 235 / 0.04));
+}
+
+.showcase-preview-banner[hidden] {
+  display: none;
+}
+
+.showcase-preview-banner__text {
+  margin: 0;
+  padding: 0.55rem clamp(0.85rem, 3vw, 2rem);
+  color: var(--brand-navy);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.showcase-preview-banner__link {
+  margin-left: 0.35rem;
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.showcase-preview-banner__link:hover {
+  text-decoration: underline;
+}
+
+@media (prefers-color-scheme: dark) {
+  .showcase-preview-banner {
+    border-bottom-color: rgb(96 165 250 / 0.28);
+    background: linear-gradient(90deg, rgb(37 99 235 / 0.22), rgb(37 99 235 / 0.08));
+  }
+
+  .showcase-preview-banner__text {
+    color: #dbeafe;
+  }
+}
+
 .site-header__link {
   display: inline-flex;
   align-items: center;

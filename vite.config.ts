@@ -1,12 +1,30 @@
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite-plus";
 
 const rootDir = path.dirname(fileURLToPath(import.meta.url));
 const repoBase = "/DateFlow/";
+const pkg = JSON.parse(readFileSync(path.resolve(rootDir, "package.json"), "utf8")) as {
+  version: string;
+};
+const docsChannel =
+  process.env.GH_PAGES_CHANNEL === "preview" ? "preview" : "production";
+const docsBase =
+  process.env.GH_PAGES === "true"
+    ? docsChannel === "preview"
+      ? `${repoBase}preview/`
+      : repoBase
+    : "/";
 
 export default defineConfig({
-  base: process.env.GH_PAGES === "true" ? repoBase : "/",
+  base: docsBase,
+  define: {
+    __DOCS_VERSION__: JSON.stringify(pkg.version),
+    __DOCS_CHANNEL__: JSON.stringify(
+      process.env.GH_PAGES === "true" ? docsChannel : "local",
+    ),
+  },
   root: path.resolve(rootDir, "docs"),
   publicDir: path.resolve(rootDir, "assets"),
   resolve: {
