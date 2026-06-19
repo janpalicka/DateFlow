@@ -16,12 +16,10 @@ describe("createCustomSelect editable time fields", () => {
     select.addEventListener("change", onChange);
 
     const input = select.root.querySelector<HTMLInputElement>(".cal__list-select__input");
-    const trigger = select.root.querySelector<HTMLButtonElement>(".cal__list-select__trigger");
     expect(input).not.toBeNull();
-    expect(trigger).not.toBeNull();
 
-    trigger?.click();
-    expect(input?.hidden).toBe(false);
+    input?.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
+    expect(input?.readOnly).toBe(false);
     expect(select.root.classList.contains("cal__list-select--editing")).toBe(true);
 
     if (!input) return;
@@ -30,7 +28,7 @@ describe("createCustomSelect editable time fields", () => {
 
     expect(select.value).toBe("10");
     expect(onChange).toHaveBeenCalledTimes(1);
-    expect(input.hidden).toBe(true);
+    expect(input.readOnly).toBe(true);
     expect(select.root.classList.contains("cal__list-select--editing")).toBe(false);
   });
 
@@ -42,7 +40,7 @@ describe("createCustomSelect editable time fields", () => {
     ]);
     select.setClampContext?.({ use12Hour: false, minuteStep: 5 });
 
-    const chevron = select.root.querySelector<HTMLElement>(".cal__list-select__chevron");
+    const chevron = select.root.querySelector<HTMLButtonElement>(".cal__list-select__chevron-btn");
     chevron?.click();
 
     const list = select.root.querySelector<HTMLUListElement>(".cal__list-select__list");
@@ -54,10 +52,11 @@ describe("createCustomSelect editable time fields", () => {
     select.setOptions([{ value: "0", label: "00" }]);
     select.setEditable?.(false);
 
-    const trigger = select.root.querySelector<HTMLButtonElement>(".cal__list-select__trigger");
-    trigger?.click();
+    const input = select.root.querySelector<HTMLInputElement>(".cal__list-select__input");
+    input?.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
 
     const list = select.root.querySelector<HTMLUListElement>(".cal__list-select__list");
     expect(list?.hidden).toBe(false);
+    expect(input?.readOnly).toBe(true);
   });
 });
