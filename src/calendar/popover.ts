@@ -2,7 +2,12 @@ import { autoUpdate, computePosition, flip, offset, shift } from "@floating-ui/d
 
 export interface CalendarPopover {
   open(): void;
-  close(): void;
+  /**
+   * Close the panel. When `restoreFocus` is true and focus is currently inside
+   * the panel, focus is returned to the anchor input so keyboard focus is never
+   * lost when the calendar disappears.
+   */
+  close(restoreFocus?: boolean): void;
   destroy(): void;
 }
 
@@ -18,11 +23,15 @@ export function attachCalendarPopover(
   },
 ): CalendarPopover {
   input.setAttribute("aria-expanded", "false");
+  input.setAttribute("aria-haspopup", "dialog");
   if (floating) {
     panel.classList.add("cal-anchor--floating");
   }
 
   let cleanupAutoUpdate: (() => void) | null = null;
+  // Guards against the anchor's focus handler re-opening the panel when we
+  // programmatically return focus to the input after a close.
+  let suppressOpen = false;
 
   const updatePosition = (): void => {
     if (!floating) return;
@@ -36,16 +45,26 @@ export function attachCalendarPopover(
     });
   };
 
-  const close = (): void => {
+  const close = (restoreFocus = false): void => {
     if (panel.hidden) return;
+    const hadFocusInside =
+      panel.contains(document.activeElement) || document.activeElement === panel;
     panel.hidden = true;
     cleanupAutoUpdate?.();
     cleanupAutoUpdate = null;
     input.setAttribute("aria-expanded", "false");
     onClose?.();
+    if (restoreFocus && hadFocusInside) {
+      suppressOpen = true;
+      input.focus();
+      setTimeout(() => {
+        suppressOpen = false;
+      }, 0);
+    }
   };
 
   const open = (): void => {
+    if (suppressOpen) return;
     if (!panel.hidden) return;
     panel.hidden = false;
     input.setAttribute("aria-expanded", "true");

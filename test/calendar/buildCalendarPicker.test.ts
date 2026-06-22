@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { dateFlow } from "@/calendar/dateFlow";
-import { clickDay, createInput } from "./helpers";
+import { clickDay, createInput, findDayButton } from "./helpers";
 
 vi.mock("@/calendar/popover", () => ({
   attachCalendarPopover: vi.fn((_input, panel) => ({
@@ -322,5 +322,88 @@ describe("buildCalendarPicker integration", () => {
     expect(panel.isConnected).toBe(true);
     picker.destroy();
     expect(panel.isConnected).toBe(false);
+  });
+
+  it("previews a hovered range without rebuilding the grid", () => {
+    const input = createInput();
+    const picker = dateFlow(input, { inline: true, popover: false, mode: "range" });
+    const root = picker.getCalendarElement();
+
+    clickDay(root, new Date(2026, 5, 10)); // start the range
+    const day12 = findDayButton(root, new Date(2026, 5, 12));
+    day12.dispatchEvent(new MouseEvent("mousemove", { bubbles: true }));
+
+    // The same DOM node is reused (decorated in place, not torn down)…
+    expect(findDayButton(root, new Date(2026, 5, 12))).toBe(day12);
+    // …and it reflects the hovered preview end.
+    expect(day12.classList.contains("cal__day--range-preview-end")).toBe(true);
+    picker.destroy();
+  });
+
+  describe("keyboard navigation", () => {
+    const grid = (root: HTMLElement): HTMLElement =>
+      root.querySelector(".cal__grid") as HTMLElement;
+    const press = (root: HTMLElement, key: string, init: KeyboardEventInit = {}): void => {
+      grid(root).dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true, ...init }));
+    };
+    const tabbable = (root: HTMLElement): HTMLButtonElement =>
+      grid(root).querySelector('button.cal__day[tabindex="0"]') as HTMLButtonElement;
+
+    it("seeds the roving tabindex on the selected day", () => {
+      const input = createInput();
+      const picker = dateFlow(input, {
+        inline: true,
+        popover: false,
+        value: new Date(2026, 5, 15),
+      });
+      expect(tabbable(picker.getCalendarElement()).dataset.date).toBe("2026-06-15");
+      picker.destroy();
+    });
+
+    it("moves the active day with arrow keys", () => {
+      const input = createInput();
+      const picker = dateFlow(input, {
+        inline: true,
+        popover: false,
+        value: new Date(2026, 5, 15),
+      });
+      const root = picker.getCalendarElement();
+      press(root, "ArrowRight");
+      expect(tabbable(root).dataset.date).toBe("2026-06-16");
+      press(root, "ArrowDown");
+      expect(tabbable(root).dataset.date).toBe("2026-06-23");
+      picker.destroy();
+    });
+
+    it("advances the visible month when navigating past month end", () => {
+      const input = createInput();
+      const picker = dateFlow(input, {
+        inline: true,
+        popover: false,
+        value: new Date(2026, 5, 30),
+      });
+      const root = picker.getCalendarElement();
+      expect(picker.currentYear).toEqual({ currentYear: 2026 });
+      press(root, "ArrowRight"); // 30 Jun -> 1 Jul
+      const active = tabbable(root);
+      expect(active.dataset.date).toBe("2026-07-01");
+      // The July grid is now rendered and the active day is reachable in it.
+      expect(grid(root).getAttribute("aria-label")).toBe("July 2026");
+      picker.destroy();
+    });
+
+    it("does not navigate beyond minDate/maxDate", () => {
+      const input = createInput();
+      const picker = dateFlow(input, {
+        inline: true,
+        popover: false,
+        value: new Date(2026, 5, 1),
+        minDate: new Date(2026, 5, 1),
+      });
+      const root = picker.getCalendarElement();
+      press(root, "ArrowLeft"); // would move to 31 May, blocked by minDate
+      expect(tabbable(root).dataset.date).toBe("2026-06-01");
+      picker.destroy();
+    });
   });
 });

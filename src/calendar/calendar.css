@@ -526,6 +526,13 @@
   grid-template-columns: 2rem repeat(7, 1fr);
 }
 
+/* Rows and cells carry ARIA grid semantics while letting their children
+   participate directly in the CSS grid layout. */
+.cal__week,
+.cal__gridcell {
+  display: contents;
+}
+
 .cal__weeknum {
   font-size: 0.65rem;
   font-weight: 600;
