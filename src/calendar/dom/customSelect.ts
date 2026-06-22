@@ -370,9 +370,7 @@ const createTimeCustomSelect = (
     input.readOnly = false;
     if (numericField) {
       const parsed = Number.parseInt(selectedValue, 10);
-      input.value = Number.isFinite(parsed)
-        ? formatTimeNumericLabel(parsed)
-        : input.value;
+      input.value = Number.isFinite(parsed) ? formatTimeNumericLabel(parsed) : input.value;
     }
     root.classList.add("cal__list-select--editing");
     input.focus();

@@ -60,6 +60,68 @@ describe("attachCalendarPopover", () => {
     popover.destroy();
   });
 
+  it("advertises the popup to assistive tech", () => {
+    const input = document.createElement("input");
+    const panel = document.createElement("div");
+    panel.hidden = true;
+    document.body.append(input, panel);
+
+    attachCalendarPopover(input, panel, { floating: false });
+    expect(input.getAttribute("aria-haspopup")).toBe("dialog");
+  });
+
+  it("returns focus to the input when closing with focus inside the panel", () => {
+    const input = document.createElement("input");
+    const panel = document.createElement("div");
+    panel.hidden = true;
+    const dayBtn = document.createElement("button");
+    panel.append(dayBtn);
+    document.body.append(input, panel);
+
+    const popover = attachCalendarPopover(input, panel, { floating: false });
+    popover.open();
+    dayBtn.focus();
+    expect(document.activeElement).toBe(dayBtn);
+
+    popover.close(true);
+    expect(panel.hidden).toBe(true);
+    expect(document.activeElement).toBe(input);
+    popover.destroy();
+  });
+
+  it("does not re-open when focus is programmatically restored on close", () => {
+    const input = document.createElement("input");
+    const panel = document.createElement("div");
+    panel.hidden = true;
+    const dayBtn = document.createElement("button");
+    panel.append(dayBtn);
+    document.body.append(input, panel);
+
+    const popover = attachCalendarPopover(input, panel, { floating: false });
+    popover.open();
+    dayBtn.focus();
+    popover.close(true);
+    // The focus() triggered by close must not bounce the panel back open.
+    expect(panel.hidden).toBe(true);
+    popover.destroy();
+  });
+
+  it("leaves focus untouched when closing from an outside click", () => {
+    const input = document.createElement("input");
+    const panel = document.createElement("div");
+    panel.hidden = true;
+    const outside = document.createElement("button");
+    document.body.append(input, panel, outside);
+
+    const popover = attachCalendarPopover(input, panel, { floating: false });
+    popover.open();
+    outside.focus();
+    outside.dispatchEvent(new PointerEvent("pointerdown", { bubbles: true }));
+    expect(panel.hidden).toBe(true);
+    expect(document.activeElement).toBe(outside);
+    popover.destroy();
+  });
+
   it("positions floating panels with floating-ui", async () => {
     const { computePosition } = await import("@floating-ui/dom");
     const input = document.createElement("input");

@@ -9,7 +9,7 @@ export const createCalendarDom = (): CalendarDomElements => {
   container.hidden = true;
 
   const root = document.createElement("div");
-  root.setAttribute("role", "application");
+  root.setAttribute("role", "group");
 
   const header = document.createElement("div");
   header.className = "cal__header";
