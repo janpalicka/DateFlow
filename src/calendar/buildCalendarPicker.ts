@@ -497,27 +497,8 @@ export const buildCalendarPicker = (
     onCompactRangeLayoutChange,
     onInputKeydown,
     onGridKeydown: gridNav.onGridKeydown,
-    onExtraDestroy: () => {
-      dom.grid.removeEventListener("mousemove", updateRangeHoverFromPointer);
-      dom.grid.removeEventListener("mouseleave", onGridMouseLeave);
-      dom.gridRight.removeEventListener("mousemove", updateRangeHoverFromPointer);
-      dom.gridRight.removeEventListener("mouseleave", onGridMouseLeave);
-      // Close any open custom selects so their floating lists are removed from document.body
-      dom.monthSelect.close();
-      dom.monthSelectRight.close();
-      dom.timeSingle.hour.close();
-      dom.timeSingle.minute.close();
-      dom.timeSingle.second.close();
-      dom.timeSingle.meridiem.close();
-      dom.timeRangeStart.hour.close();
-      dom.timeRangeStart.minute.close();
-      dom.timeRangeStart.second.close();
-      dom.timeRangeStart.meridiem.close();
-      dom.timeRangeEnd.hour.close();
-      dom.timeRangeEnd.minute.close();
-      dom.timeRangeEnd.second.close();
-      dom.timeRangeEnd.meridiem.close();
-    },
+    onGridMouseMove: updateRangeHoverFromPointer,
+    onGridMouseLeave,
     mode,
     usesApplyActions,
     isCompactRangeLayout,

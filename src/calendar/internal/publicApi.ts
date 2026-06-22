@@ -26,7 +26,8 @@ export type PublicApiDeps = {
   onCompactRangeLayoutChange: () => void;
   onInputKeydown: (e: KeyboardEvent) => void;
   onGridKeydown: (e: KeyboardEvent) => void;
-  onExtraDestroy: () => void;
+  onGridMouseMove: (e: MouseEvent) => void;
+  onGridMouseLeave: () => void;
   mode: () => CalendarMode;
   usesApplyActions: () => boolean;
   isCompactRangeLayout: () => boolean;
@@ -46,7 +47,8 @@ export function createPublicApi({
   onCompactRangeLayoutChange,
   onInputKeydown,
   onGridKeydown,
-  onExtraDestroy,
+  onGridMouseMove,
+  onGridMouseLeave,
   mode,
   usesApplyActions,
   isCompactRangeLayout,
@@ -317,7 +319,24 @@ export function createPublicApi({
       valueInput.removeEventListener("keydown", onInputKeydown);
       dom.grid.removeEventListener("keydown", onGridKeydown);
       dom.gridRight.removeEventListener("keydown", onGridKeydown);
-      onExtraDestroy();
+      dom.grid.removeEventListener("mousemove", onGridMouseMove);
+      dom.grid.removeEventListener("mouseleave", onGridMouseLeave);
+      dom.gridRight.removeEventListener("mousemove", onGridMouseMove);
+      dom.gridRight.removeEventListener("mouseleave", onGridMouseLeave);
+      dom.monthSelect.close();
+      dom.monthSelectRight.close();
+      dom.timeSingle.hour.close();
+      dom.timeSingle.minute.close();
+      dom.timeSingle.second.close();
+      dom.timeSingle.meridiem.close();
+      dom.timeRangeStart.hour.close();
+      dom.timeRangeStart.minute.close();
+      dom.timeRangeStart.second.close();
+      dom.timeRangeStart.meridiem.close();
+      dom.timeRangeEnd.hour.close();
+      dom.timeRangeEnd.minute.close();
+      dom.timeRangeEnd.second.close();
+      dom.timeRangeEnd.meridiem.close();
       dom.container.remove();
     },
   };
