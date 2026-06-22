@@ -190,17 +190,6 @@ body {
   }
 }
 
-.site-header__link--primary {
-  background: var(--accent);
-  color: #ffffff;
-}
-
-.site-header__link--primary:hover {
-  background: var(--brand-blue);
-  color: #ffffff;
-  opacity: 0.95;
-}
-
 /* ── Hero ── */
 
 .showcase-hero {

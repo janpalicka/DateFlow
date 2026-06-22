@@ -20,7 +20,7 @@ import { COMPACT_RANGE_MEDIA_QUERY, matchesCompactRangeLayout } from "./utils/vi
 import type { CustomSelectControl } from "./dom/customSelect";
 import type { CalendarCallbacks, CalendarState } from "./internal/ctx";
 import type { CalendarMode, CalendarOptions, CalendarPickerInstance } from "./types";
-import "./calendar.css";
+import "../styles/calendar.css";
 
 export const buildCalendarPicker = (
   input: HTMLInputElement,
