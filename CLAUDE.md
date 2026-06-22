@@ -20,7 +20,16 @@ Before considering work done, run **`pnpm check`**, **`pnpm test`**, and **`pnpm
 ```
 dateFlow (entry)
   → resolveInputs (selector / element resolution)
-  → buildCalendarPicker (orchestrator — state, options, wiring)
+  → buildCalendarPicker (wiring — state init, DOM hookup, render loop)
+      → internal/   picker implementation (not exported)
+          ctx.ts                 CalendarState + CalendarCallbacks
+          dayClick.ts            day cell click / range selection
+          emitters.ts            onChange / onRangeChange, committed state
+          gridNav.ts             keyboard nav, active-day focus
+          layoutHelpers.ts       range layout, presets panel, reset/actions UI
+          navigationHandlers.ts  prev/next, month/year controls, apply/cancel
+          publicApi.ts           CalendarPickerInstance methods + destroy
+          timeManager.ts         time selectors sync and change handlers
       → render/     grid, month/year, weekdays, range presets panel
       → dom/        createElements, customSelect, floatingList
       → popover     Floating UI positioning
@@ -32,8 +41,24 @@ dateFlow (entry)
 
 - **Public API** lives in `src/calendar/index.ts` and `src/calendar/types/`.
 - **Locales** are a separate entry: `src/calendar/locales/` (tree-shakeable).
-- **`buildCalendarPicker.ts`** is the orchestrator (~1200 lines). Extend it in place; only extract modules when explicitly asked.
+- **`buildCalendarPicker.ts`** wires everything: creates `CalendarState`, attaches sub-modules, owns `render()` / `renderGridsOnly()`, returns the instance from `internal/publicApi.ts`.
+- **`internal/`** is private — never import from it outside `buildCalendarPicker.ts`.
 - **Styles** stay in `src/calendar/calendar.css` (`cal__*` classes, `data-cal-*` attributes).
+
+### Where to put new logic
+
+| Change | File |
+|--------|------|
+| New instance method or `setOptions` behavior | `internal/publicApi.ts` |
+| Day click / range selection | `internal/dayClick.ts` |
+| Keyboard / roving focus | `internal/gridNav.ts` (low-level keys in `render/gridKeyboard.ts`) |
+| Time picker behavior | `internal/timeManager.ts` |
+| Header nav, apply/cancel, year/month controls | `internal/navigationHandlers.ts` |
+| Range presets panel, compact layout, action labels | `internal/layoutHelpers.ts` |
+| `onChange` / `onRangeChange` / committed state | `internal/emitters.ts` |
+| Shared state or late-bound callbacks | `internal/ctx.ts` |
+| Render orchestration or new wiring | `buildCalendarPicker.ts` |
+| Pure rendering (no state) | `render/` |
 
 ## Conventions
 
@@ -42,6 +67,7 @@ dateFlow (entry)
 - **Date math/formatting:** use `date-fns` and existing helpers in `utils/`; don't roll custom date logic.
 - **CSS:** add to `calendar.css`; don't split or restructure styles without asking.
 - **Peer deps:** never bundle `date-fns` or `@floating-ui/dom` (configured in `vite.config.ts` `pack.deps.neverBundle`).
+- **Internal modules:** factory functions (`createX`, `attachX`) receive deps (`s`, `dom`, `cb`, option getters). `CalendarCallbacks` in `internal/ctx.ts` is late-bound — modules call `cb.render()` etc. after `buildCalendarPicker` assigns them.
 
 ## Adding features
 
@@ -92,4 +118,4 @@ Use [Conventional Commits](https://www.conventionalcommits.org/): `feat:`, `fix:
 - Breaking public API changes
 - Publishing / version bumps
 
-**Do not** refactor or split `buildCalendarPicker.ts` unless the task requires it or you are explicitly asked.
+**Do not** import `internal/` from outside `buildCalendarPicker.ts`. Keep new picker logic in the appropriate `internal/` module rather than growing the wiring file.
