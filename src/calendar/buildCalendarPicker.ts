@@ -497,6 +497,8 @@ export const buildCalendarPicker = (
     onCompactRangeLayoutChange,
     onInputKeydown,
     onGridKeydown: gridNav.onGridKeydown,
+    onGridMouseMove: updateRangeHoverFromPointer,
+    onGridMouseLeave,
     mode,
     usesApplyActions,
     isCompactRangeLayout,
