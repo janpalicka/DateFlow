@@ -54,6 +54,8 @@ export function createEmitters(
     } else {
       s.rangeStart = null;
       s.rangeEnd = null;
+      syncCommittedRange();
+      emitRange();
     }
     cb.render();
   }

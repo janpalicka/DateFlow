@@ -26,6 +26,7 @@ export type PublicApiDeps = {
   onCompactRangeLayoutChange: () => void;
   onInputKeydown: (e: KeyboardEvent) => void;
   onGridKeydown: (e: KeyboardEvent) => void;
+  onExtraDestroy: () => void;
   mode: () => CalendarMode;
   usesApplyActions: () => boolean;
   isCompactRangeLayout: () => boolean;
@@ -45,6 +46,7 @@ export function createPublicApi({
   onCompactRangeLayoutChange,
   onInputKeydown,
   onGridKeydown,
+  onExtraDestroy,
   mode,
   usesApplyActions,
   isCompactRangeLayout,
@@ -315,6 +317,7 @@ export function createPublicApi({
       valueInput.removeEventListener("keydown", onInputKeydown);
       dom.grid.removeEventListener("keydown", onGridKeydown);
       dom.gridRight.removeEventListener("keydown", onGridKeydown);
+      onExtraDestroy();
       dom.container.remove();
     },
   };

@@ -340,6 +340,40 @@ describe("buildCalendarPicker integration", () => {
     picker.destroy();
   });
 
+  it("clear() in range mode fires onRangeChange and syncs getRange()", () => {
+    const input = createInput();
+    const onRangeChange = vi.fn();
+    const picker = dateFlow(input, {
+      mode: "range",
+      inline: true,
+      popover: false,
+      onRangeChange,
+      range: { start: new Date(2026, 5, 3), end: new Date(2026, 5, 7) },
+    });
+    onRangeChange.mockClear();
+    picker.clear();
+    expect(onRangeChange).toHaveBeenCalledOnce();
+    expect(onRangeChange.mock.calls[0][0]).toEqual({ start: null, end: null });
+    expect(picker.getRange()).toEqual({ start: null, end: null });
+    picker.destroy();
+  });
+
+  it("destroy() removes mousemove and mouseleave listeners from grid elements", () => {
+    const input = createInput();
+    const picker = dateFlow(input, { inline: true, popover: false, mode: "range" });
+    const root = picker.getCalendarElement();
+    const [gridLeft, gridRight] = Array.from(root.querySelectorAll(".cal__grid")) as HTMLElement[];
+    const spyLeft = vi.spyOn(gridLeft, "removeEventListener");
+    const spyRight = vi.spyOn(gridRight, "removeEventListener");
+    picker.destroy();
+    const leftTypes = spyLeft.mock.calls.map((c) => c[0]);
+    const rightTypes = spyRight.mock.calls.map((c) => c[0]);
+    expect(leftTypes).toContain("mousemove");
+    expect(leftTypes).toContain("mouseleave");
+    expect(rightTypes).toContain("mousemove");
+    expect(rightTypes).toContain("mouseleave");
+  });
+
   describe("keyboard navigation", () => {
     const grid = (root: HTMLElement): HTMLElement =>
       root.querySelector(".cal__grid") as HTMLElement;
