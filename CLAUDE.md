@@ -47,18 +47,18 @@ dateFlow (entry)
 
 ### Where to put new logic
 
-| Change | File |
-|--------|------|
-| New instance method or `setOptions` behavior | `internal/publicApi.ts` |
-| Day click / range selection | `internal/dayClick.ts` |
-| Keyboard / roving focus | `internal/gridNav.ts` (low-level keys in `render/gridKeyboard.ts`) |
-| Time picker behavior | `internal/timeManager.ts` |
-| Header nav, apply/cancel, year/month controls | `internal/navigationHandlers.ts` |
-| Range presets panel, compact layout, action labels | `internal/layoutHelpers.ts` |
-| `onChange` / `onRangeChange` / committed state | `internal/emitters.ts` |
-| Shared state or late-bound callbacks | `internal/ctx.ts` |
-| Render orchestration or new wiring | `buildCalendarPicker.ts` |
-| Pure rendering (no state) | `render/` |
+| Change                                             | File                                                               |
+| -------------------------------------------------- | ------------------------------------------------------------------ |
+| New instance method or `setOptions` behavior       | `internal/publicApi.ts`                                            |
+| Day click / range selection                        | `internal/dayClick.ts`                                             |
+| Keyboard / roving focus                            | `internal/gridNav.ts` (low-level keys in `render/gridKeyboard.ts`) |
+| Time picker behavior                               | `internal/timeManager.ts`                                          |
+| Header nav, apply/cancel, year/month controls      | `internal/navigationHandlers.ts`                                   |
+| Range presets panel, compact layout, action labels | `internal/layoutHelpers.ts`                                        |
+| `onChange` / `onRangeChange` / committed state     | `internal/emitters.ts`                                             |
+| Shared state or late-bound callbacks               | `internal/ctx.ts`                                                  |
+| Render orchestration or new wiring                 | `buildCalendarPicker.ts`                                           |
+| Pure rendering (no state)                          | `render/`                                                          |
 
 ## Conventions
 
