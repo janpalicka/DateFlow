@@ -703,6 +703,14 @@ function mountDemo(key) {
         range: { start: new Date(2026, 3, 5), end: new Date(2026, 3, 18) },
         outputFormat: "yyyy-MM-dd",
       }).wrap;
+    case "range-reset":
+      return mountFloatingCalendarDemo({
+        mode: "range",
+        showResetButton: true,
+        resetInputLabel: "Reset",
+        range: { start: new Date(2026, 3, 5), end: new Date(2026, 3, 18) },
+        outputFormat: "yyyy-MM-dd",
+      }).wrap;
     case "range-presets":
       return mountFloatingCalendarDemo({
         mode: "range",

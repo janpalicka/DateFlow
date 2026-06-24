@@ -80,6 +80,7 @@ export function attachNavigationHandlers({
 
   dom.btnReset.addEventListener("click", (): void => {
     emitters.clearSelection();
+    cb.hidePanel();
   });
 
   dom.btnApplyRange.addEventListener("click", (): void => {
@@ -149,10 +150,8 @@ export function attachNavigationHandlers({
     }
     if (mode() !== "range") return;
     cb.clearRangeHover();
-    s.rangeStart = null;
-    s.rangeEnd = null;
-    emitters.syncCommittedRange();
-    emitters.emitRange();
+    s.rangeStart = s.committedRangeStart ? new Date(s.committedRangeStart.getTime()) : null;
+    s.rangeEnd = s.committedRangeEnd ? new Date(s.committedRangeEnd.getTime()) : null;
     cb.hidePanel();
     cb.render();
   });

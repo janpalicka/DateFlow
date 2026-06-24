@@ -755,6 +755,22 @@ dateFlow(input, {
 
         </article>
         <article class="showcase-card">
+          <h3 class="showcase-card__title">Range + reset button</h3>
+          <p class="showcase-card__desc">showResetButton adds a header icon that clears the range and closes the picker.</p>
+          <pre class="showcase-card__code"><code>dateFlow(input, {
+  mode: "range",
+  showResetButton: true,
+  resetInputLabel: "Reset",
+  range: {
+    start: new Date(2026, 3, 5),
+    end: new Date(2026, 3, 18),
+  },
+  outputFormat: "yyyy-MM-dd",
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="range-reset"></div>
+
+        </article>
+        <article class="showcase-card">
           <h3 class="showcase-card__title">Range with start & end time</h3>
           <p class="showcase-card__desc">Separate time controls under each calendar pane in range mode.</p>
           <pre class="showcase-card__code"><code>dateFlow(input, {

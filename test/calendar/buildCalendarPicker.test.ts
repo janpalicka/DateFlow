@@ -43,6 +43,27 @@ describe("buildCalendarPicker integration", () => {
     picker.destroy();
   });
 
+  it("hides the picker when Reset is clicked", () => {
+    const input = createInput();
+    const picker = dateFlow(input, {
+      inline: false,
+      popover: true,
+      showResetButton: true,
+      value: new Date(2026, 5, 15),
+    });
+    const root = picker.getCalendarElement();
+    root.hidden = true;
+    picker.open();
+    expect(root.hidden).toBe(false);
+
+    const reset = root.querySelector(".cal__reset") as HTMLButtonElement;
+    reset.click();
+
+    expect(picker.getValue()).toBeNull();
+    expect(root.hidden).toBe(true);
+    picker.destroy();
+  });
+
   it("supports setValue and clear", () => {
     const input = createInput();
     const picker = dateFlow(input, { inline: true, popover: false });
@@ -85,6 +106,34 @@ describe("buildCalendarPicker integration", () => {
     expect(picker.getValue()?.getDate()).toBe(20);
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(input.value).toContain("2026-06-20");
+    picker.destroy();
+  });
+
+  it("restores the committed range when Cancel is clicked", () => {
+    const input = createInput();
+    const onRangeChange = vi.fn();
+    const picker = dateFlow(input, {
+      mode: "range",
+      inline: true,
+      popover: false,
+      hideOnSingleSelect: false,
+      range: { start: new Date(2026, 3, 5), end: new Date(2026, 3, 18) },
+      onRangeChange,
+    });
+    const root = picker.getCalendarElement();
+
+    clickDay(root, new Date(2026, 3, 1));
+    clickDay(root, new Date(2026, 3, 25));
+
+    const cancel = root.querySelector(".cal__action-btn--ghost") as HTMLButtonElement;
+    cancel.click();
+
+    const range = picker.getRange();
+    expect(range.start?.getDate()).toBe(5);
+    expect(range.end?.getDate()).toBe(18);
+    expect(onRangeChange).not.toHaveBeenCalled();
+    expect(input.value).toBe("2026-04-05 — 2026-04-18");
+    expect(root.hidden).toBe(true);
     picker.destroy();
   });
 
