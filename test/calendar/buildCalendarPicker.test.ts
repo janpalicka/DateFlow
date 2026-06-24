@@ -43,6 +43,27 @@ describe("buildCalendarPicker integration", () => {
     picker.destroy();
   });
 
+  it("hides the picker when Reset is clicked", () => {
+    const input = createInput();
+    const picker = dateFlow(input, {
+      inline: false,
+      popover: true,
+      showResetButton: true,
+      value: new Date(2026, 5, 15),
+    });
+    const root = picker.getCalendarElement();
+    root.hidden = true;
+    picker.open();
+    expect(root.hidden).toBe(false);
+
+    const reset = root.querySelector(".cal__reset") as HTMLButtonElement;
+    reset.click();
+
+    expect(picker.getValue()).toBeNull();
+    expect(root.hidden).toBe(true);
+    picker.destroy();
+  });
+
   it("supports setValue and clear", () => {
     const input = createInput();
     const picker = dateFlow(input, { inline: true, popover: false });

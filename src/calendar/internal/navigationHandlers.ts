@@ -80,6 +80,7 @@ export function attachNavigationHandlers({
 
   dom.btnReset.addEventListener("click", (): void => {
     emitters.clearSelection();
+    cb.hidePanel();
   });
 
   dom.btnApplyRange.addEventListener("click", (): void => {
