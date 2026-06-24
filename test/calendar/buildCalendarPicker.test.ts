@@ -88,6 +88,34 @@ describe("buildCalendarPicker integration", () => {
     picker.destroy();
   });
 
+  it("restores the committed range when Cancel is clicked", () => {
+    const input = createInput();
+    const onRangeChange = vi.fn();
+    const picker = dateFlow(input, {
+      mode: "range",
+      inline: true,
+      popover: false,
+      hideOnSingleSelect: false,
+      range: { start: new Date(2026, 3, 5), end: new Date(2026, 3, 18) },
+      onRangeChange,
+    });
+    const root = picker.getCalendarElement();
+
+    clickDay(root, new Date(2026, 3, 1));
+    clickDay(root, new Date(2026, 3, 25));
+
+    const cancel = root.querySelector(".cal__action-btn--ghost") as HTMLButtonElement;
+    cancel.click();
+
+    const range = picker.getRange();
+    expect(range.start?.getDate()).toBe(5);
+    expect(range.end?.getDate()).toBe(18);
+    expect(onRangeChange).not.toHaveBeenCalled();
+    expect(input.value).toBe("2026-04-05 — 2026-04-18");
+    expect(root.hidden).toBe(true);
+    picker.destroy();
+  });
+
   it("selects a date range and applies on Apply", () => {
     const input = createInput();
     const onRangeChange = vi.fn();
