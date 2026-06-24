@@ -19,7 +19,7 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
-    <script type="module" crossorigin src="/DateFlow/assets/index-fQbKrif2.js"></script>
+    <script type="module" crossorigin src="/DateFlow/assets/index-DjuiwyV_.js"></script>
     <link rel="stylesheet" crossorigin href="/DateFlow/assets/index-DLT9Scyj.css">
   </head>
   <body>
@@ -32,7 +32,7 @@
           </picture>
         </a>
         <nav class="site-header__nav" aria-label="External links">
-          <span class="site-header__version" data-docs-version aria-label="Documentation version">v0.7.1</span>
+          <span class="site-header__version" data-docs-version aria-label="Documentation version">v0.7.2</span>
           <a
             class="site-header__link"
             href="https://github.com/janpalicka/DateFlow"
@@ -267,13 +267,16 @@ picker.selectedDates;
         <article class="showcase-card">
           <h3 class="showcase-card__title">selectedDates — range mode</h3>
           <p class="showcase-card__desc">
-            <code>{ start: Date | null, end: Date | null }</code>
+            <code>{ start: Date | null, end: Date | null }</code> — with <code>showTime</code>, each
+            date includes the selected time.
           </p>
           <pre class="showcase-card__code"><code>const picker = dateFlow(input, {
   mode: "range",
+  showTime: true,
+  outputFormat: "yyyy-MM-dd HH:mm",
   range: {
-    start: new Date(2026, 3, 5),
-    end: new Date(2026, 3, 18),
+    start: new Date(2026, 3, 5, 9, 0),
+    end: new Date(2026, 3, 18, 17, 30),
   },
 });
 
