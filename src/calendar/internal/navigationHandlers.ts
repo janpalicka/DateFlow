@@ -2,7 +2,7 @@ import { addMonths, compareAsc, startOfDay } from "date-fns";
 import { canGoNextMonth, canGoPrevMonth } from "../navigation";
 import { clampYear, parseYearInput, restoreYearInput } from "../render/monthYear";
 import { applyHM } from "../time";
-import { shouldShowTimeOn } from "../utils";
+import { orderDateTimeRange, shouldShowTimeOn } from "../utils";
 import type { CustomSelectControl } from "../dom/customSelect";
 import type { CalendarDomElements } from "../dom/types";
 import type { CalendarMode } from "../types";
@@ -133,6 +133,27 @@ export function attachNavigationHandlers({
             use12Hour(),
           )
         : hi;
+    }
+    if (shouldShowTimeOn(s.options) && s.rangeStart && s.rangeEnd) {
+      s.rangeStart = applyHM(
+        s.rangeStart,
+        dom.timeRangeStart.hour,
+        dom.timeRangeStart.minute,
+        dom.timeRangeStart.meridiem,
+        secondForStart(),
+        use12Hour(),
+      );
+      s.rangeEnd = applyHM(
+        s.rangeEnd,
+        dom.timeRangeEnd.hour,
+        dom.timeRangeEnd.minute,
+        dom.timeRangeEnd.meridiem,
+        secondForEnd(),
+        use12Hour(),
+      );
+      const ordered = orderDateTimeRange(s.rangeStart, s.rangeEnd);
+      s.rangeStart = ordered.start;
+      s.rangeEnd = ordered.end;
     }
     cb.clearRangeHover();
     emitters.syncCommittedRange();

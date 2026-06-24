@@ -24,3 +24,30 @@ export const findDayButton = (root: ParentNode, date: Date): HTMLButtonElement =
 export const clickDay = (root: ParentNode, date: Date): void => {
   findDayButton(root, date).click();
 };
+
+export const setRangeTime = (
+  root: ParentNode,
+  which: "start" | "end",
+  hour: number,
+  minute: number,
+): void => {
+  const row = root.querySelector(
+    which === "start" ? ".cal__time--range-start" : ".cal__time--range-end",
+  );
+  if (!row) throw new Error(`Missing ${which} time row`);
+
+  const setField = (labelRe: RegExp, value: number): void => {
+    const input = [...row.querySelectorAll("input")].find((el) =>
+      labelRe.test(el.getAttribute("aria-label") ?? ""),
+    );
+    if (!(input instanceof HTMLInputElement)) {
+      throw new Error(`Missing time input matching ${labelRe}`);
+    }
+    input.focus();
+    input.value = String(value).padStart(2, "0");
+    input.blur();
+  };
+
+  setField(/hour/i, hour);
+  setField(/minute/i, minute);
+};

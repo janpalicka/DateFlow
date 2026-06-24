@@ -1,3 +1,4 @@
+import { compareAsc } from "date-fns";
 import { compareCalendarDay } from "./days";
 import { matchesFilter } from "./filters";
 import type { DateFilter, DateRangeValue, YearRange } from "../types/types";
@@ -46,4 +47,14 @@ const cloneRange = (range: DateRangeValue): DateRangeValue => {
   };
 };
 
-export { isSelectable, yearRange, cloneRange };
+const orderDateTimeRange = (start: Date, end: Date): { start: Date; end: Date } => {
+  if (compareAsc(start, end) <= 0) {
+    return { start, end };
+  }
+  return {
+    start: new Date(end.getTime()),
+    end: new Date(start.getTime()),
+  };
+};
+
+export { isSelectable, yearRange, cloneRange, orderDateTimeRange };

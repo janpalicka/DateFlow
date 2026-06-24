@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { cloneRange, isSelectable, yearRange } from "@/calendar/utils/range";
+import { cloneRange, isSelectable, orderDateTimeRange, yearRange } from "@/calendar/utils/range";
 
 describe("isSelectable", () => {
   const day = new Date(2026, 5, 15);
@@ -40,6 +40,22 @@ describe("yearRange", () => {
       from: 2026,
       to: 2026,
     });
+  });
+});
+
+describe("orderDateTimeRange", () => {
+  it("keeps chronological ranges unchanged", () => {
+    const start = new Date(2026, 3, 18, 9, 0);
+    const end = new Date(2026, 3, 18, 20, 0);
+    expect(orderDateTimeRange(start, end)).toEqual({ start, end });
+  });
+
+  it("swaps same-day ranges when start time is after end time", () => {
+    const early = new Date(2026, 3, 18, 9, 0);
+    const late = new Date(2026, 3, 18, 20, 0);
+    const ordered = orderDateTimeRange(late, early);
+    expect(ordered.start).toEqual(early);
+    expect(ordered.end).toEqual(late);
   });
 });
 

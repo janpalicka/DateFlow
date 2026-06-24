@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { dateFlow } from "@/calendar/dateFlow";
-import { clickDay, createInput, findDayButton } from "./helpers";
+import { clickDay, createInput, findDayButton, setRangeTime } from "./helpers";
 
 vi.mock("@/calendar/popover", () => ({
   attachCalendarPopover: vi.fn((_input, panel) => ({
@@ -134,6 +134,38 @@ describe("buildCalendarPicker integration", () => {
     expect(onRangeChange).not.toHaveBeenCalled();
     expect(input.value).toBe("2026-04-05 — 2026-04-18");
     expect(root.hidden).toBe(true);
+    picker.destroy();
+  });
+
+  it("orders same-day timed ranges when start time is after end time", () => {
+    const input = createInput();
+    const onRangeChange = vi.fn();
+    const picker = dateFlow(input, {
+      mode: "range",
+      inline: true,
+      popover: false,
+      showTime: true,
+      outputFormat: "yyyy-MM-dd HH:mm",
+      onRangeChange,
+    });
+    const root = picker.getCalendarElement();
+    const day = new Date(2026, 5, 18);
+
+    clickDay(root, day);
+    clickDay(root, day);
+    setRangeTime(root, "start", 20, 0);
+    setRangeTime(root, "end", 9, 0);
+
+    const apply = root.querySelector(".cal__action-btn--primary") as HTMLButtonElement;
+    apply.click();
+
+    const range = picker.getRange();
+    expect(range.start?.getHours()).toBe(9);
+    expect(range.end?.getHours()).toBe(20);
+    expect(onRangeChange).toHaveBeenCalledWith({
+      start: new Date(2026, 5, 18, 9, 0),
+      end: new Date(2026, 5, 18, 20, 0),
+    });
     picker.destroy();
   });
 
