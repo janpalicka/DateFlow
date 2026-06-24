@@ -105,8 +105,8 @@ function mountFloatingCalendarDemo(opts, hooks = {}) {
 }
 
 /** @param {import('../src/calendar/types/types.ts').CalendarSelectedDates} dates */
-function formatSelectedDatesPreview(dates) {
-  const fmt = (d) => (d ? format(d, "yyyy-MM-dd") : null);
+function formatSelectedDatesPreview(dates, dateFormat = "yyyy-MM-dd") {
+  const fmt = (d) => (d ? format(d, dateFormat) : null);
   if ("selectedDate" in dates) {
     return JSON.stringify({ selectedDate: fmt(dates.selectedDate) }, null, 2);
   }
@@ -151,21 +151,28 @@ function mountSelectedDatesDemo(mode) {
     mode === "range"
       ? {
           mode: "range",
-          range: { start: new Date(2026, 3, 5), end: new Date(2026, 3, 18) },
+          showTime: true,
+          outputFormat: "yyyy-MM-dd HH:mm",
+          range: {
+            start: new Date(2026, 3, 5, 9, 0),
+            end: new Date(2026, 3, 18, 17, 30),
+          },
         }
       : { value: new Date(2026, 3, 14) };
+
+  const previewFormat = mode === "range" ? "yyyy-MM-dd HH:mm" : "yyyy-MM-dd";
 
   const picker = dateFlow(trigger, {
     ...options,
     onChange: () => {
-      output.textContent = formatSelectedDatesPreview(picker.selectedDates);
+      output.textContent = formatSelectedDatesPreview(picker.selectedDates, previewFormat);
     },
     onRangeChange: () => {
-      output.textContent = formatSelectedDatesPreview(picker.selectedDates);
+      output.textContent = formatSelectedDatesPreview(picker.selectedDates, previewFormat);
     },
   });
 
-  output.textContent = formatSelectedDatesPreview(picker.selectedDates);
+  output.textContent = formatSelectedDatesPreview(picker.selectedDates, previewFormat);
 
   return wrap;
 }
