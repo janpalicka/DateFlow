@@ -1,4 +1,5 @@
-import { dateOnlyIfNeeded } from "../utils";
+import { dateOnlyIfNeeded, shouldShowTimeOn } from "../utils";
+import { orderDateTimeRange } from "../utils/range";
 import type { CalendarMode } from "../types";
 import type { CalendarCallbacks, CalendarState } from "./ctx";
 
@@ -20,7 +21,15 @@ export function createEmitters(
     s.committedSelected = s.selected ? new Date(s.selected.getTime()) : null;
   }
 
+  function normalizeRangeSelection(): void {
+    if (!shouldShowTimeOn(s.options) || !s.rangeStart || !s.rangeEnd) return;
+    const ordered = orderDateTimeRange(s.rangeStart, s.rangeEnd);
+    s.rangeStart = ordered.start;
+    s.rangeEnd = ordered.end;
+  }
+
   function syncCommittedRange(): void {
+    normalizeRangeSelection();
     s.committedRangeStart = s.rangeStart ? new Date(s.rangeStart.getTime()) : null;
     s.committedRangeEnd = s.rangeEnd ? new Date(s.rangeEnd.getTime()) : null;
   }
@@ -39,6 +48,7 @@ export function createEmitters(
   }
 
   function emitRange(): void {
+    normalizeRangeSelection();
     s.options.onRangeChange?.({
       start: s.rangeStart ? new Date(dateOnlyIfNeeded(s.options, s.rangeStart).getTime()) : null,
       end: s.rangeEnd ? new Date(dateOnlyIfNeeded(s.options, s.rangeEnd).getTime()) : null,
