@@ -19,8 +19,8 @@
       href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
-    <script type="module" crossorigin src="/DateFlow/assets/index-2RygeT6T.js"></script>
-    <link rel="stylesheet" crossorigin href="/DateFlow/assets/index-Bngin5wA.css">
+    <script type="module" crossorigin src="/DateFlow/assets/index-fQbKrif2.js"></script>
+    <link rel="stylesheet" crossorigin href="/DateFlow/assets/index-DLT9Scyj.css">
   </head>
   <body>
     <div class="showcase-shell" id="top">
@@ -32,7 +32,7 @@
           </picture>
         </a>
         <nav class="site-header__nav" aria-label="External links">
-          <span class="site-header__version" data-docs-version aria-label="Documentation version">v0.7.0</span>
+          <span class="site-header__version" data-docs-version aria-label="Documentation version">v0.7.1</span>
           <a
             class="site-header__link"
             href="https://github.com/janpalicka/DateFlow"
@@ -40,9 +40,6 @@
             rel="noopener noreferrer"
           >
             GitHub
-          </a>
-          <a class="site-header__link site-header__link--primary" href="#quick-start">
-            Quick start
           </a>
         </nav>
       </header>
@@ -756,6 +753,22 @@ dateFlow(input, {
   outputFormat: "yyyy-MM-dd",
 });</code></pre>
           <div class="showcase-card__mount" data-demo="range-basic"></div>
+
+        </article>
+        <article class="showcase-card">
+          <h3 class="showcase-card__title">Range + reset button</h3>
+          <p class="showcase-card__desc">showResetButton adds a header icon that clears the range and closes the picker.</p>
+          <pre class="showcase-card__code"><code>dateFlow(input, {
+  mode: "range",
+  showResetButton: true,
+  resetInputLabel: "Reset",
+  range: {
+    start: new Date(2026, 3, 5),
+    end: new Date(2026, 3, 18),
+  },
+  outputFormat: "yyyy-MM-dd",
+});</code></pre>
+          <div class="showcase-card__mount" data-demo="range-reset"></div>
 
         </article>
         <article class="showcase-card">
