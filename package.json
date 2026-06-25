@@ -1,14 +1,20 @@
 {
   "name": "dateflow",
   "version": "0.7.2",
-  "description": "DateFlow — lightweight date and range calendar picker for the web",
+  "description": "Framework-agnostic TypeScript date picker with range and time selection.",
   "keywords": [
     "calendar",
+    "calendar-picker",
+    "date-input",
     "date-picker",
-    "date-range",
+    "date-range-picker",
     "datepicker",
-    "datetime",
-    "floating-ui",
+    "datetime-picker",
+    "esm",
+    "javascript",
+    "typescript",
+    "ui-component",
+    "vanilla-javascript",
     "vanilla-js"
   ],
   "homepage": "https://janpalicka.github.io/DateFlow/",
@@ -63,11 +69,14 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage"
   },
+  "dependencies": {
+    "@floating-ui/dom": "^1.7.6"
+  },
   "devDependencies": {
-    "@floating-ui/dom": "^1.7.6",
     "@tsdown/css": "^0.22.3",
     "@types/node": "^26.0.0",
     "@vitest/coverage-v8": "^4.1.9",
+    "@voidzero-dev/vite-plus-linux-x64-gnu": "0.2.1",
     "date-fns": "^4.4.0",
     "jsdom": "^29.1.1",
     "typescript": "~6.0.3",
@@ -76,8 +85,19 @@
     "vitest": "^4.1.9"
   },
   "peerDependencies": {
-    "@floating-ui/dom": "^1.6.0",
     "date-fns": "^4.0.0"
   },
-  "packageManager": "pnpm@10.28.0"
+  "packageManager": "pnpm@10.28.0",
+  "pnpm": {
+    "supportedArchitectures": {
+      "cpu": [
+        "current",
+        "x64"
+      ],
+      "os": [
+        "current",
+        "linux"
+      ]
+    }
+  }
 }
