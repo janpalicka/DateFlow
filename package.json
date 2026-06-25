@@ -1,6 +1,6 @@
 {
   "name": "dateflow",
-  "version": "0.7.2",
+  "version": "0.8.0",
   "description": "Framework-agnostic TypeScript date picker with range and time selection.",
   "keywords": [
     "calendar",
