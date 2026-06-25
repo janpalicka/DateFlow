@@ -12,6 +12,9 @@
   <img src="https://img.shields.io/npm/d18m/dateflow" alt="NPM Downloads" />
   <img src="https://img.shields.io/npm/l/dateflow" alt="NPM License" />
   <img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" alt="Typescript" />
+  <img src="https://img.shields.io/github/stars/janpalicka/DateFlow?style=flat" alt="GitHub stars" />
+  <img src="https://img.shields.io/github/actions/workflow/status/janpalicka/DateFlow/ci.yml" alt="CI" />
+  <img src="https://pkg-size.dev/badge/bundle/20185" alt="Bundle size" />
 </p>
 
 <p align="center">
@@ -58,7 +61,7 @@ npm install dateflow date-fns
 
 `date-fns` is a peer dependency — install it in your app.
 
-## Why DateFlow?
+## Why DateFlow
 
 DateFlow was built for modern TypeScript applications.
 
@@ -187,7 +190,7 @@ DateFlow targets modern evergreen browsers. The library ships as ESM and uses cu
 
 These versions cover full styling, including CSS `color-mix()` used for themes and range highlights. The picker may still work on slightly older browsers (for example Safari 14+), but colors and transparency can look incorrect.
 
-Internet Explorer is not supported. Use a bundler (Vite, webpack, Rollup, etc.) in your app — DateFlow does not ship a legacy UMD build.
+Internet Explorer is not supported. Use a bundler (Vite, Webpack, Rollup, etc.) in your app — DateFlow does not ship a legacy UMD build.
 
 ## Development
 
