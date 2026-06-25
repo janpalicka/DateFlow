@@ -7,27 +7,68 @@
 
 # DateFlow
 
-Lightweight date and date-range calendar picker for the web. Vanilla TypeScript, no framework required. Popover positioning via [Floating UI](https://floating-ui.com/), formatting via [date-fns](https://date-fns.org/).
+<p align="center">
+  <img src="https://img.shields.io/npm/v/dateflow" alt="NPM version" />
+  <img src="https://img.shields.io/npm/d18m/dateflow" alt="NPM Downloads" />
+  <img src="https://img.shields.io/npm/l/dateflow" alt="NPM License" />
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?logo=typescript&logoColor=white" alt="Typescript" />
+</p>
 
-**[Live documentation & examples](https://janpalicka.github.io/DateFlow/)**
+<p align="center">
+  <img src="./assets/calendar-light.png" alt="DateFlow range picker — light theme" width="420" />
+  <img src="./assets/calendar-dark.png" alt="DateFlow range picker — dark theme" width="420" />
+</p>
 
-## Features
+<p align="center">
+  <strong>Modern TypeScript date picker for web applications.</strong>
+</p>
 
-- Single-date and range selection
-- Optional time pickers (12h/24h, seconds, minute steps)
-- Floating popover or inline layout
-- Built-in locales (`en`, `de`, `cs`, `fr`) with partial overrides
-- Min/max bounds, allowlists, blocklists, week numbers
-- Typed programmatic API (`setDate`, `setRange`, `open`, `close`, …)
-- Accessible markup and keyboard support
+<table align="center">
+  <tr>
+    <td align="right">✓</td>
+    <td align="left">Single dates and ranges</td>
+    <td width="32"></td>
+    <td align="right">✓</td>
+    <td align="left">Time selection</td>
+    <td width="32"></td>
+    <td align="right">✓</td>
+    <td align="left">Framework agnostic</td>
+  </tr>
+  <tr>
+    <td align="right">✓</td>
+    <td align="left">Accessible</td>
+    <td></td>
+    <td align="right">✓</td>
+    <td align="left">Tree-shakeable locales</td>
+    <td></td>
+    <td align="right">✓</td>
+    <td align="left">Mobile friendly</td>
+  </tr>
+</table>
+
+<p align="center">
+  <a href="https://janpalicka.github.io/DateFlow/"><strong>Live documentation & examples →</strong></a>
+</p>
 
 ## Install
 
 ```bash
-npm install dateflow date-fns @floating-ui/dom
+npm install dateflow date-fns
 ```
 
-`date-fns` and `@floating-ui/dom` are peer dependencies — install them in your app.
+`date-fns` is a peer dependency — install it in your app.
+
+## Why DateFlow?
+
+DateFlow was built for modern TypeScript applications.
+
+- No framework lock-in
+- Strong TypeScript support
+- Accessible keyboard navigation
+- Range selection built in
+- Tree-shakeable locales
+- ~20 kB gzip JavaScript
+- ~3.4 kB gzip CSS
 
 ## Quick start
 
@@ -50,6 +91,16 @@ const picker = dateFlow(input, {
 ```
 
 `dateFlow` also accepts a `#id` selector or a `.class` selector (class returns one instance per matched input).
+
+## Features
+
+- Single-date and range selection
+- Optional time pickers (12h/24h, seconds, minute steps)
+- Floating popover or inline layout
+- Built-in locales (`en`, `de`, `cs`, `fr`) with partial overrides
+- Min/max bounds, allowlists, blocklists, week numbers
+- Typed programmatic API (`setDate`, `setRange`, `open`, `close`, …)
+- Accessible markup and keyboard support
 
 ## Date ranges
 
@@ -123,6 +174,20 @@ Each call to `dateFlow` returns a `CalendarPickerInstance`:
 | `open()` / `close()`                         | Show or hide the panel                               |
 | `getInputElement()` / `getCalendarElement()` | DOM references                                       |
 | `destroy()`                                  | Tear down listeners and popover                      |
+
+## Browser support
+
+DateFlow targets modern evergreen browsers. The library ships as ESM and uses current DOM APIs (`replaceChildren`, optional chaining, and similar).
+
+| Browser       | Minimum version |
+| ------------- | --------------- |
+| Chrome / Edge | 111+            |
+| Firefox       | 113+            |
+| Safari / iOS  | 16.2+           |
+
+These versions cover full styling, including CSS `color-mix()` used for themes and range highlights. The picker may still work on slightly older browsers (for example Safari 14+), but colors and transparency can look incorrect.
+
+Internet Explorer is not supported. Use a bundler (Vite, webpack, Rollup, etc.) in your app — DateFlow does not ship a legacy UMD build.
 
 ## Development
 
