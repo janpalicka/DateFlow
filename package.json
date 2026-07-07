@@ -76,7 +76,7 @@
     "@tsdown/css": "^0.22.3",
     "@types/node": "^26.0.0",
     "@vitest/coverage-v8": "^4.1.9",
-    "@voidzero-dev/vite-plus-linux-x64-gnu": "0.2.2",
+    "@voidzero-dev/vite-plus-linux-x64-gnu": "0.2.3",
     "date-fns": "^4.4.0",
     "jsdom": "^29.1.1",
     "typescript": "~6.0.3",
