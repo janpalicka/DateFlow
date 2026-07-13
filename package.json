@@ -87,17 +87,5 @@
   "peerDependencies": {
     "date-fns": "^4.0.0"
   },
-  "packageManager": "pnpm@10.28.0",
-  "pnpm": {
-    "supportedArchitectures": {
-      "cpu": [
-        "current",
-        "x64"
-      ],
-      "os": [
-        "current",
-        "linux"
-      ]
-    }
-  }
+  "packageManager": "pnpm@10.28.0"
 }
