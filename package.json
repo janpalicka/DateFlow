@@ -1,6 +1,6 @@
 {
   "name": "dateflow",
-  "version": "0.8.0",
+  "version": "1.0.0",
   "description": "Framework-agnostic TypeScript date picker with range and time selection.",
   "keywords": [
     "calendar",
@@ -87,17 +87,5 @@
   "peerDependencies": {
     "date-fns": "^4.0.0"
   },
-  "packageManager": "pnpm@10.28.0",
-  "pnpm": {
-    "supportedArchitectures": {
-      "cpu": [
-        "current",
-        "x64"
-      ],
-      "os": [
-        "current",
-        "linux"
-      ]
-    }
-  }
+  "packageManager": "pnpm@10.28.0"
 }
