@@ -22,8 +22,8 @@ importers:
         specifier: ^4.1.9
         version: 4.1.9(@vitest/browser@4.1.9)(vitest@4.1.9)
       '@voidzero-dev/vite-plus-linux-x64-gnu':
-        specifier: 0.2.6
-        version: 0.2.6
+        specifier: 0.2.8
+        version: 0.2.8
       date-fns:
         specifier: ^4.4.0
         version: 4.4.0
@@ -974,12 +974,6 @@ packages:
     resolution: {integrity: sha512-VbWUwaSAw0Ndql5uYy/Gfqt7duSy1sxTacLngD5M5kF4ZK7yoKKcx8iFiA0il1Gf3J7OGojPonKi5b3NSn3K7A==}
     engines: {node: '>=20.0.0'}
     cpu: [arm64]
-    os: [linux]
-
-  '@voidzero-dev/vite-plus-linux-x64-gnu@0.2.6':
-    resolution: {integrity: sha512-5vqldBBnRjIAUmQ88oKli+wPd5vSQaA2AZ2xs+omRlZfeJhC8chlud6DyJV6fVZCC9GI4otK2zSGpfQZx8Kc3A==}
-    engines: {node: '>=20.0.0'}
-    cpu: [x64]
     os: [linux]
 
   '@voidzero-dev/vite-plus-linux-x64-gnu@0.2.8':
@@ -2640,10 +2634,7 @@ snapshots:
   '@voidzero-dev/vite-plus-linux-arm64-musl@0.2.8':
     optional: true
 
-  '@voidzero-dev/vite-plus-linux-x64-gnu@0.2.6': {}
-
-  '@voidzero-dev/vite-plus-linux-x64-gnu@0.2.8':
-    optional: true
+  '@voidzero-dev/vite-plus-linux-x64-gnu@0.2.8': {}
 
   '@voidzero-dev/vite-plus-linux-x64-musl@0.2.8':
     optional: true
