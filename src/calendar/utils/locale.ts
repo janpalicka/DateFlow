@@ -58,4 +58,4 @@ const mergeLocale = (partial: Partial<CalendarLocale> | undefined): ResolvedCale
   };
 };
 
-export { getFirstDayOfWeekFromIntl, mergeLocale, resolveFirstDayOfWeek };
+export { mergeLocale, resolveFirstDayOfWeek };

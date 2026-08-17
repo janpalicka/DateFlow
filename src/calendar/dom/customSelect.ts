@@ -8,7 +8,7 @@ import {
 } from "../time/numericField";
 import { attachFloatingList } from "./floatingList";
 
-export interface CustomSelectOption {
+interface CustomSelectOption {
   value: string;
   label: string;
 }

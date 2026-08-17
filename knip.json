@@ -1,0 +1,6 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": ["src/calendar/index.ts!", "src/calendar/locales/index.ts!", "test/**/*.test.ts"],
+  "project": ["src/**/*.ts"],
+  "ignoreDependencies": ["@voidzero-dev/vite-plus-linux-x64-gnu"]
+}

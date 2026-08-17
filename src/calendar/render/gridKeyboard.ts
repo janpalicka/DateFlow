@@ -53,4 +53,4 @@ const nextActiveDate = (
   }
 };
 
-export { GRID_NAV_KEYS, isGridNavKey, nextActiveDate };
+export { isGridNavKey, nextActiveDate };
