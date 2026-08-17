@@ -68,7 +68,8 @@
     "knip": "knip",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "prepare": "husky"
   },
   "dependencies": {
     "@floating-ui/dom": "^1.7.6"
@@ -78,6 +79,7 @@
     "@vitest/coverage-v8": "^4.1.9",
     "@voidzero-dev/vite-plus-linux-x64-gnu": "0.2.8",
     "date-fns": "^4.4.0",
+    "husky": "^9.1.7",
     "jsdom": "^30.0.0",
     "knip": "^6.32.2",
     "typescript": "~6.0.3",
