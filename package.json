@@ -82,7 +82,7 @@
     "husky": "^9.1.7",
     "jsdom": "^30.0.0",
     "knip": "^6.32.2",
-    "typescript": "~6.0.3",
+    "typescript": "~7.0.2",
     "vite": "^8.0.16",
     "vite-plus": "^0.2.1",
     "vitest": "^4.1.9"
