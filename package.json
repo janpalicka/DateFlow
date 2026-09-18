@@ -76,16 +76,16 @@
   },
   "devDependencies": {
     "@types/node": "^26.0.0",
-    "@vitest/coverage-v8": "^4.1.9",
-    "@voidzero-dev/vite-plus-linux-x64-gnu": "0.3.0",
+    "@vitest/coverage-v8": "catalog:",
+    "@voidzero-dev/vite-plus-linux-x64-gnu": "0.3.2",
     "date-fns": "^4.4.0",
     "husky": "^9.1.7",
     "jsdom": "^30.0.0",
     "knip": "^6.32.2",
     "typescript": "~6.0.3",
-    "vite": "^8.0.16",
-    "vite-plus": "^0.3.2",
-    "vitest": "^4.1.9"
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
   },
   "peerDependencies": {
     "date-fns": "^4.0.0"
