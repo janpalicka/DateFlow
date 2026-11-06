@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import { DEFAULT_LOCALE } from "@/calendar/locales";
 import { mergeLocale, resolveFirstDayOfWeek } from "@/calendar/utils/locale";
 

@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vite-plus/test";
 import { dateFlow } from "@/calendar/dateFlow";
 import { createInput } from "./helpers";
 

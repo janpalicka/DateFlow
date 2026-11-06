@@ -66,9 +66,9 @@
     "fmt": "vp fmt",
     "lint": "vp lint",
     "knip": "knip",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
+    "test": "vp test run",
+    "test:watch": "vp test",
+    "test:coverage": "vp test run --coverage",
     "prepare": "husky"
   },
   "dependencies": {

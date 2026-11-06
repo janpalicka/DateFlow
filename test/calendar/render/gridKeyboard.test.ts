@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { isGridNavKey, nextActiveDate } from "@/calendar/render/gridKeyboard";
 
 const at = (y: number, m: number, d: number): Date => new Date(y, m, d);

@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vite-plus/test";
 import { renderGrid, renderGridForMonth } from "@/calendar/render/grid";
 import type { GridSelectionState } from "@/calendar/render/grid";
 

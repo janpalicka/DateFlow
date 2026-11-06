@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vite-plus/test";
 import { createCustomSelect } from "@/calendar/dom/customSelect";
 
 function getSelectList(root: HTMLElement, ariaLabel: string): HTMLUListElement | null {
