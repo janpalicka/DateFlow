@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi } from "vite-plus/test";
 import { createInputController } from "@/calendar/input/createInputController";
 import type { CalendarMode } from "@/calendar/types";
 

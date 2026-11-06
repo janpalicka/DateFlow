@@ -6,10 +6,10 @@ supportedArchitectures:
     - current
     - linux
 catalog:
-  vite: npm:@voidzero-dev/vite-plus-core@1.0.0
-  vitest: 5.0.1
-  vite-plus: 1.0.0
-  "@vitest/coverage-v8": 5.0.1
+  vite: npm:@voidzero-dev/vite-plus-core@1.3.0
+  vitest: 5.0.5
+  vite-plus: 1.3.0
+  "@vitest/coverage-v8": 5.0.5
 overrides:
   vite@*: "catalog:"
   vitest@*: "catalog:"

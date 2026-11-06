@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { ICON_NEXT_MONTH, ICON_PREV_MONTH, ICON_RESET } from "@/calendar/icons";
 
 describe("icons", () => {

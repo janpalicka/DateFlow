@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { canGoNextMonth, canGoPrevMonth } from "@/calendar/navigation";
 
 describe("canGoPrevMonth", () => {

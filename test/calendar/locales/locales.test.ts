@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it } from "vite-plus/test";
 import { cs, de, en, fr } from "@/calendar/locales";
 import { mergeLocale } from "@/calendar/utils/locale";
 
